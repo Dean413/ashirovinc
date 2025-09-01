@@ -4,6 +4,7 @@ import Image from "next/image";
 import Carousel from "../component/carousel";
 import { supabase } from "@/lib/supabaseclient";
 import { FaMicrochip, FaMemory, FaHdd, FaDesktop } from "react-icons/fa";
+import Link from "next/link";
 
 interface Product {
   id: number;
@@ -33,7 +34,7 @@ export default function HomePage() {
       });
       return updated;
     });
-  }, 2000); // every 2 seconds
+  }, 7000); // every 7 seconds
 
   return () => clearInterval(interval);
 }, [products]);
@@ -90,22 +91,26 @@ export default function HomePage() {
                 className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col"
               >
                 {/* Carousel */}
-                <div className="w-full relative h-64 md:h-72 lg:h-80">
+                <div className="w-full relative h-64 md:h-72 lg:h-96">
+                    <Link href={`/product/${product.id}`}>
                   {product.image_url && product.image_url.length > 0 ? (
-                    <Image
+                    
+                        <Image
                       src={product.image_url[currentIndex]}
                       alt={product.name}
                       fill
                       style={{ objectFit: "cover" }}
                       className="w-full h-full"
                     />
+                    
+                    
                   ) : (
                     <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                       No Image
                     </div>
-                  )}
+                  )} </Link>
 
-                  {/* Carousel arrows */}
+                  {/* Carousel arrows
                   {totalImages > 1 && (
                     <>
                       <button
@@ -121,7 +126,7 @@ export default function HomePage() {
                         ›
                       </button>
                     </>
-                  )}
+                  )} */}
                 </div>
 
                 <div className="p-4 flex flex-col flex-1">

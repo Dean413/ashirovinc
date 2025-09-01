@@ -6,8 +6,8 @@ export default function ComingSoon() {
  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 55);
+    const targetDate = new Date("2025-10-22T00:00:00")
+    targetDate.setDate(targetDate.getDate());
 
     const timer = setInterval(() => {
       const now = new Date().getTime();

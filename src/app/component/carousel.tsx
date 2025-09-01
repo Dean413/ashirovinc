@@ -21,15 +21,20 @@ const slides = [
   },
   {
     id: 2,
-    type: "image",
-    image: "https://th.bing.com/th/id/OIP.ed-29-ckMum--DpdlJRKHgHaFW?w=233&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-    caption: "🔥 Up to 30% Off on MacBooks!",
+    type: "cta",
+     title: "Repairs and Installation",
+    description:
+      "Bring your laptops and pc for repairs and installation",
+    buttonText: "Book a Repair",
     buttonLink: "/products",
+    bgColor: "bg-blue-800",
+     image:
+      "",
   },
   {
     id: 3,
     type: "image",
-    image: "https://th.bing.com/th/id/OIP.ed-29-ckMum--DpdlJRKHgHaFW?w=233&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+    image: "https://th.bing.com/th/id/OIP.cnDid7r7Hrwh53nUO0SSAwHaEo?w=278&h=181&c=7&r=0&o=5&dpr=1.3&pid=1.7",
     caption: "💻 Best deals on Dell & HP laptops",
     buttonLink: "/products",
   },
