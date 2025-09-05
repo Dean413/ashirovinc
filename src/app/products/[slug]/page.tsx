@@ -95,12 +95,7 @@ function PrevArrow(props: any) {
     <div className="relative w-full flex items-center justify-center p-6">
       <div className="bg-white shadow-lg rounded-xl p-8 max-w-3xl w-full">
         <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
-       <Link
-    href={`/products/brand/${product.brand}`}
-    className="text-blue-600 hover:underline"
-  >
-    {product.brand}
-  </Link>
+       <div className="mb-4"><p>Brand: <Link  href={`/products/brand/${encodeURIComponent(product.brand)}`} className="text-blue-600 hover:underline">{product.brand}</Link></p></div>
 
         {/* ✅ Main Slider */}
         {product.image_url?.length > 0 && (

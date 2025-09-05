@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabaseclient";
 import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaMicrochip, FaMemory, FaHdd, FaDesktop } from "react-icons/fa";
+import { FaMicrochip, FaMemory, FaHdd, FaDesktop, FaExclamationTriangle } from "react-icons/fa";
 
 interface Product {
   id: number;
@@ -17,6 +17,7 @@ interface Product {
   ram?: string;
   storage?: string;
   display?: string;
+  stock: number;
 }
 
 export default function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
@@ -94,6 +95,26 @@ export default function BrandPage({ params }: { params: Promise<{ brand: string 
                   <small className="text-gray-500">{product.brand}</small>
                   <h3 className="text-lg font-semibold text-gray-800 mt-1">{product.name}</h3>
                   <p className="text-blue-600 font-bold mt-2">₦{product.price?.toLocaleString()}</p>
+                  <div>
+                    {
+                      product.stock > 20 ? 
+                      (
+                        <p className="text-gray-500">In Stock</p>
+                      )
+                      : 
+                      product.stock >=11 ? 
+                      (
+                        <p className="text-red-500">few units left</p>
+                      ) 
+                      :                    
+                      (
+                        <div className="flex items-center gap-2">
+                          <FaExclamationTriangle className="text-red-400" />
+                            <p className="text-red-500">{product.stock} units left</p>
+                        </div>
+                      ) 
+                    }
+                  </div>
 
                   {/* Product Details */}
                   <div className="flex flex-wrap gap-6 mt-3 text-gray-600 text-sm">
