@@ -5,7 +5,8 @@ import { useState } from "react";
 import { Menu, ShoppingCart, X, Search, SearchIcon, Contact, Contact2Icon, ContactIcon, ContactRound, UserCheck } from "lucide-react"; // icons
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaFacebook, FaTwitter, FaInstagram, FaWhatsapp, FaUserCheck, FaUser } from "react-icons/fa";
+import { FaFacebook, FaTwitter, FaInstagram, FaWhatsapp, FaUserCheck, FaUser, FaUserAlt } from "react-icons/fa";
+import SearchBar from "./search-bar";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -50,19 +51,19 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex justify-center flex-3 space-x-6 text-gray-700 font-medium">
-          <li><Link href="/landing-page">Home</Link></li>
+          <li><Link href="/products">Home</Link></li>
           <li><Link href="/shop">Shop</Link></li>
           <li><Link href="/about">About</Link></li>
           <li><Link href="/contact">Contact</Link></li>
         </ul>
 
+        
+
         {/* Search Bar (visible only on md and up) */}
+        
         <div className="hidden md:flex items-center space-x-2 mr-4">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="px-3 py-1 text-gray-700 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <FaUserAlt size={24} className="text-blue-900"/>
+          <SearchBar />
 
           
           
@@ -93,7 +94,7 @@ export default function Navbar() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: "-100%", opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed top-0 left-0 h-full w-64 bg-blue-900 p-6 text-white z-50 shadow-lg flex flex-col space-y-6"
+            className="fixed top-0 left-0 h-full w-72 bg-blue-900 p-6 text-white z-50 shadow-lg flex flex-col space-y-6"
           >
             {/* Close Button inside Sidebar */}
             <button
@@ -104,13 +105,9 @@ export default function Navbar() {
             </button>
 
             {/* Search Bar (for mobile) */}
-            <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="flex-1 text-black focus:outline-none"
-              />
-              <Search className="text-gray-500" size={20} />
+            <div className="flex items-center rounded-lg">
+              <SearchBar />
+              
             </div>
 
             {/* Menu Links */}
