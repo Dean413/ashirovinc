@@ -122,7 +122,7 @@ function PrevArrow(props: any) {
             </Slider>
 
             {/* ✅ Thumbnail cards */}
-            <div className="grid grid-cols-11 gap-2 mt-8">
+            <div className="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-11 gap-2 mt-8">
               {product.image_url.map((thumb, idx) => (
                 <div
                   key={idx}
