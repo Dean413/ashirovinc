@@ -184,7 +184,7 @@ export default function HomePage() {
                     </Link>
                     
 
-                    <button onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, quantity: 1, image: product.image_url[0] })} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Add to Cart</button>
+                    <button onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, quantity: 1, image: product.image_url[0], brand: product.brand })} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Add to Cart</button>
                   </div>
                 </div>
               );

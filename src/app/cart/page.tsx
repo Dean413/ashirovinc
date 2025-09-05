@@ -40,12 +40,13 @@ export default function CartPage() {
                   )}
                   {/* Product info */}
                   <div>
-                    <p className="font-bold">{item.name}</p>
                     {item.brand && (
                       <p className="text-gray-500 text-sm">{item.brand}</p>
                     )}
-                    <p className="font-medium">Qty: {item.price}</p>
+                    <p className="font-bold">{item.name}</p>
+                    <p className="font-medium">Price: ₦{item.price}</p>
                     <p className="text-gray-700 text-sm">Qty: {item.quantity}</p>
+                    <p className="font-semibold">Total: ₦{item.price * item.quantity}</p>
                   </div>
 
                   
@@ -54,9 +55,9 @@ export default function CartPage() {
 
                 {/* Right: price & remove */}
                 <div className="flex items-center gap-4">
-                  <p className="font-semibold">₦{item.price * item.quantity}</p>
+                  
                   <button onClick={() => removeFromCart(item.id)}>
-                    <FaTrash className="text-red-500" />
+                    <span className="flex gap-2 items-center text-red-500">Remove<FaTrash className="text-red-500" /></span>
                   </button>
                 </div>
               </li>
@@ -65,7 +66,7 @@ export default function CartPage() {
 
           <div className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row justify-between items-center mt-6">
             <p className="text-lg font-semibold text-gray-800">
-              Total ({getTotalItems()} items): ₦{totalPrice.toLocaleString()}
+              SubTotal ({getTotalItems()} items): ₦{totalPrice.toLocaleString()}
             </p>
             <Link
               href="/checkout"
