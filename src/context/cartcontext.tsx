@@ -8,14 +8,14 @@ export type CartItem = {
   price: number;
   quantity: number;
   image: string;
-
 };
 
 type CartContextType = {
-  cartItems: CartItem[]; // note plural
+  cartItems: CartItem[];
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: number) => void;
   getTotalItems: () => number;
+  updateQuantity: (id: number, quantity: number) => void;
 };
 
 const CartContext = createContext<CartContextType | {}>({});
@@ -43,9 +43,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const getTotalItems = () =>
     cartItems.reduce((total, item) => total + item.quantity, 0);
 
+  const updateQuantity = (id: number, quantity: number) => {
+    setCartItems(cartItems.map((item) =>
+      item.id === id ? { ...item, quantity } : item
+    ));
+  };
+
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, getTotalItems }}
+      value={{ cartItems, addToCart, removeFromCart, getTotalItems, updateQuantity }}
     >
       {children}
     </CartContext.Provider>

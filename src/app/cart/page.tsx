@@ -2,16 +2,28 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "@/context/cartcontext";
+import { useCart, CartItem } from "@/context/cartcontext";
 import { FaTrash } from "react-icons/fa";
 
 export default function CartPage() {
-  const { cartItems, removeFromCart, getTotalItems } = useCart();
+  const { cartItems, removeFromCart, getTotalItems, updateQuantity } = useCart();
 
   const totalPrice = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  const handleIncrease = (item: CartItem) => {
+    updateQuantity(item.id, item.quantity + 1);
+  };
+
+  const handleDecrease = (item: CartItem) => {
+    if (item.quantity > 1) {
+      updateQuantity(item.id, item.quantity - 1);
+    } else {
+      removeFromCart(item.id); // optional: remove if quantity hits 0
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -27,7 +39,6 @@ export default function CartPage() {
                 key={item.id}
                 className="flex justify-between items-center border p-2 rounded"
               >
-                {/* Left: image */}
                 <div className="flex items-center gap-4">
                   {item.image && (
                     <Image
@@ -38,26 +49,37 @@ export default function CartPage() {
                       className="rounded"
                     />
                   )}
-                  {/* Product info */}
                   <div>
-                    {item.brand && (
-                      <p className="text-gray-500 text-sm">{item.brand}</p>
-                    )}
+                    {item.brand && <p className="text-gray-500 text-sm">{item.brand}</p>}
                     <p className="font-bold">{item.name}</p>
                     <p className="font-medium">Price: ₦{item.price}</p>
-                    <p className="text-gray-700 text-sm">Qty: {item.quantity}</p>
-                    <p className="font-semibold">Total: ₦{item.price * item.quantity}</p>
-                  </div>
 
-                  
+                    {/* Quantity Controls */}
+                    <div className="flex items-center gap-2 mt-1">
+                      <button
+                        className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                        onClick={() => handleDecrease(item)}
+                      >
+                        –
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                        onClick={() => handleIncrease(item)}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <p className="font-semibold mt-1">Total: ₦{item.price * item.quantity}</p>
+                  </div>
                 </div>
 
-
-                {/* Right: price & remove */}
                 <div className="flex items-center gap-4">
-                  
                   <button onClick={() => removeFromCart(item.id)}>
-                    <span className="flex gap-2 items-center text-red-500">Remove<FaTrash className="text-red-500" /></span>
+                    <span className="flex gap-2 items-center text-red-500">
+                      Remove<FaTrash className="text-red-500" />
+                    </span>
                   </button>
                 </div>
               </li>
