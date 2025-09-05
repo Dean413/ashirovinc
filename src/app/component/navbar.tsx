@@ -28,7 +28,7 @@ export default function Navbar() {
         </div>
       </header>
 
-      <nav className="bg-white shadow px-6 py-4 flex items-center justify-between sticky top-12 z-50">
+      <nav className="bg-white shadow px-6 py-4 flex items-center justify-between sticky top-8 z-50">
         <div className="container mx-auto flex items-center justify-between p-4">
           <button onClick={() => setOpen(!open)} className="md:hidden focus:outline-none">
             {open ? <X size={28} /> : <Menu size={28} />}
