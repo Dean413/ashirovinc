@@ -5,7 +5,8 @@ import Carousel from "../component/carousel";
 import { supabase } from "@/lib/supabaseclient";
 import { FaMicrochip, FaMemory, FaHdd, FaDesktop, FaExclamationTriangle } from "react-icons/fa";
 import Link from "next/link";
-import { AlertCircle, AlertTriangle } from "lucide-react";
+import { useCart } from "@/context/cartcontext";
+
 
 interface Product {
   id: number;
@@ -23,6 +24,7 @@ interface Product {
 }
 
 export default function HomePage() {
+  const {addToCart} = useCart()
   const [products, setProducts] = useState<Product[]>([]);
   const [currentImages, setCurrentImages] = useState<{ [id: number]: number }>({});
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
@@ -124,7 +126,9 @@ export default function HomePage() {
                   </div>
 
                   {/* Product Info */}
-                  <Link  href={`/products/${product.slug}`} className="p-4 flex flex-col flex-1">
+                   
+                  <div className="p-4 flex flex-col flex-1">
+                     <Link href={`/products/${product.slug}`}>
                     <small className="text-gray-500">{product.brand}</small>
                     <h3 className="text-lg font-semibold text-gray-800 mt-1">{product.name}</h3>
                     <p className="text-blue-600 font-bold mt-2">₦{product.price?.toLocaleString()}</p>
@@ -177,9 +181,11 @@ export default function HomePage() {
                         </div>
                       )}
                     </div>
+                    </Link>
+                    
 
-                    <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Add to Cart</button>
-                  </Link>
+                    <button onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, quantity: 1, image: product.image_url[0] })} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Add to Cart</button>
+                  </div>
                 </div>
               );
             })}
