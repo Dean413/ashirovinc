@@ -72,11 +72,17 @@ export default function CheckoutPage() {
     localStorage.setItem("lastOrder", JSON.stringify(orderData));
 
     // Update stock in DB
-    await fetch("/api/update-stock", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cartItems }),
-    });
+    await fetch("/api/create-order", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    cartItems,
+    total: totalPrice,
+    details,
+    reference: response.reference,
+    userId: null, // if logged in
+  }),
+});
 
     router.push("/success");
     clearCart();
@@ -305,6 +311,7 @@ export default function CheckoutPage() {
         Pay Now
       </button>
     </div>
+    
 
     {/* Paystack Script */}
     <Script

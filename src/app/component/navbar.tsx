@@ -43,12 +43,14 @@ export default function Navbar() {
             <li><Link href="/shop">Shop</Link></li>
             <li><Link href="/about">About</Link></li>
             <li><Link href="/contact">Contact</Link></li>
+            
+           
           </ul>
 
-          <div className="hidden md:flex items-center space-x-2 mr-4">
+          <Link href="/sign-in" className="hidden md:flex items-center space-x-2 mr-4">
             <FaUserAlt size={24} className="text-blue-900"/>
             <SearchBar />
-          </div>
+          </Link>
 
           {/* Cart */}
           <Link href="/cart" className="relative">
@@ -84,6 +86,7 @@ export default function Navbar() {
                 <li><Link href="/shop" onClick={() => setOpen(false)}>Shop</Link></li>
                 <li><Link href="/about" onClick={() => setOpen(false)}>About</Link></li>
                 <li><Link href="/contact" onClick={() => setOpen(false)}>Contact</Link></li>
+                 <li className="mt-80 rounded full bg-white text-blue-900 p-2 w-[50%] text-center font-bold"><Link href="/sign-in">Sign In</Link></li>
               </ul>
             </motion.div>
           )}
