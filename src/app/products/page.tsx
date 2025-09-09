@@ -24,10 +24,11 @@ interface Product {
 }
 
 export default function HomePage() {
-  const {addToCart} = useCart()
+  const {addToCart, cartItems} = useCart()
   const [products, setProducts] = useState<Product[]>([]);
   const [currentImages, setCurrentImages] = useState<{ [id: number]: number }>({});
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+
 
   // Rotate images
   useEffect(() => {
@@ -104,6 +105,9 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {filteredProducts.map((product) => {
               const currentIndex = currentImages[product.id] || 0;
+                const currentQuantity =
+  cartItems.find((item) => item.id === product.id)?.quantity ?? 0;
+
               return (
                 <div key={product.id} className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col">
                   {/* Image */}
@@ -137,7 +141,12 @@ export default function HomePage() {
                         <p className="text-gray-500">In Stock</p>
                       ): product.stock >=11 ? (
                         <p className="text-red-500">few units left</p>
-                      ) : (
+                      ) : product.stock <=1 ? (
+                        <p className="text-red-500">out of stock</p>
+                        
+                      ):
+                      
+                      (
                       <div className="flex items-center gap-2">
                         <FaExclamationTriangle className="text-red-400" />
                         <p className="text-red-500">{product.stock} units left</p>
@@ -184,7 +193,29 @@ export default function HomePage() {
                     </Link>
                     
 
-                    <button onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, quantity: 1, image: product.image_url[0], brand: product.brand })} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Add to Cart</button>
+                   <button
+  onClick={() =>
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      image: product.image_url[0],
+      brand: product.brand,
+    })
+    
+  }
+  
+  disabled={currentQuantity >= product.stock}
+  className={`mt-4 px-4 py-2 rounded-lg transition 
+    ${
+      currentQuantity >= product.stock
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-blue-600 text-white hover:bg-blue-700"
+    }`}
+>
+  {currentQuantity >= product.stock ? "Out of Stock" : "Add to Cart"}
+</button>
                   </div>
                 </div>
               );

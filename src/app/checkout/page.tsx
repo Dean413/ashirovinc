@@ -6,10 +6,12 @@ import Image from "next/image";
 import Script from "next/script";
 import countries from "world-countries"
 import {getAllStates} from "nigeria-states"
+import { useRouter } from "next/navigation";
 
 
 export default function CheckoutPage() {
-  const { cartItems, getTotalItems } = useCart();
+  const router = useRouter()
+  const { cartItems, getTotalItems, clearCart } = useCart();
   const totalPrice = cartItems.reduce( (sum, item) => sum + item.price * item.quantity, 0);
   const [selectedOption, setSelectedOption] = useState("")
 
@@ -57,9 +59,32 @@ export default function CheckoutPage() {
       firstname: details.name,
       phone: details.phone,
       callback: function (response: any) {
-        alert("Payment successful. Reference: " + response.reference);
-        // clear cart or redirect
-      },
+  (async () => {
+    alert("Payment successful. Reference: " + response.reference);
+
+    const orderData = {
+      items: cartItems,
+      total: totalPrice,
+      details,
+      reference: response.reference,
+    };
+
+    localStorage.setItem("lastOrder", JSON.stringify(orderData));
+
+    // Update stock in DB
+    await fetch("/api/update-stock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: cartItems }),
+    });
+
+    router.push("/success");
+    clearCart();
+    
+  })();
+},
+
+
       onClose: function () {
         alert("Payment was cancelled.");
       },
