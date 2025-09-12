@@ -57,24 +57,23 @@ export default function Navbar() {
     <>
       {/* Top Header */}
       <header className="bg-blue-950 text-white py-2 px-4 sticky top-0 z-50">
-        <div className="relative max-w-7xl mx-auto flex items-center justify-end md:justify-end gap-4 text-xs md:text-sm">
-          {/* Centered text */}
-          <span className="absolute left-1/2 transform -translate-x-1/2 font-semibold tracking-wide">
-            WELCOME TO ASHIROV TECHNOLOGY
-          </span>
+  <div className="relative max-w-7xl mx-auto flex items-center justify-end gap-4 text-xs md:text-sm">
+    {/* Centered text */}
+    <span className="absolute left-[30%] md:left-1/2 transform -translate-x-1/2 font-semibold">
+      WELCOME TO ASHIROV TECHNOLOGY
+    </span>
 
-          {/* Right side */}
-          <div className="flex items-center gap-3">
-            <a href="tel:+2347039752831" className="hover:text-gray-300 transition">
-              +2347039752831
-            </a>
-            <FaFacebook className="hover:text-gray-300 transition" />
-            <FaTwitter className="hover:text-gray-300 transition" />
-            <FaInstagram className="hover:text-gray-300 transition" />
-            <FaWhatsapp className="hover:text-gray-300 transition" />
-          </div>
-        </div>
-      </header>
+    {/* Right side */}
+    <div className="flex items-center gap-3">
+      <FaFacebook className="hover:text-gray-300 transition" />
+      <FaTwitter className="hover:text-gray-300 transition" />
+      <FaInstagram className="hover:text-gray-300 transition" />
+      <FaWhatsapp className="hover:text-gray-300 transition" />
+    </div>
+  </div>
+</header>
+
+
 
       {/* Main Navbar */}
       <nav className="bg-white shadow-md px-6 py-3 flex items-center justify-between sticky top-0 z-50">
