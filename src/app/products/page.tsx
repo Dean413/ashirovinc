@@ -141,7 +141,7 @@ export default function HomePage() {
                         <p className="text-gray-500">In Stock</p>
                       ): product.stock >=11 ? (
                         <p className="text-red-500">few units left</p>
-                      ) : product.stock <=1 ? (
+                      ) : product.stock == 0 ? (
                         <p className="text-red-500">out of stock</p>
                         
                       ):

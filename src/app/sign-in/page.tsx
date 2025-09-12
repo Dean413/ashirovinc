@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
   const supabase = createClientComponentClient();
@@ -10,6 +11,7 @@ export default function SignInPage() {
   const [step, setStep] = useState<"email" | "otp">("email");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const router = useRouter()
 
   // 🔹 Step 1: Request OTP
   const handleRequestOtp = async (e: React.FormEvent) => {
@@ -47,7 +49,9 @@ export default function SignInPage() {
     if (error) {
       setMessage(error.message);
     } else {
+      router.push("/dashboard/client-dashboard")
       setMessage("✅ Signed in successfully!");
+
       console.log("User:", data.user);
     }
     setLoading(false);
