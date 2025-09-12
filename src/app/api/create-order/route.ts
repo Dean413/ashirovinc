@@ -31,13 +31,17 @@ export async function POST(req: Request) {
 
     if (orderError) throw orderError;
 
-    // 2. Insert order items
-    const orderItems = cartItems.map((item: any) => ({
-      order_id: order.id,
-      product_id: item.id,
-      quantity: item.quantity,
-      price: item.price,
-    }));
+   
+   // 2. Insert order items
+const orderItems = cartItems.map((item: any) => ({
+  order_id: order.id,
+  product_id: item.id,
+  product_name: item.name,        // ✅ add product name
+  product_image: item.image,      // ✅ add product image
+  quantity: item.quantity,
+  price: item.price,
+}));
+
 
     const { error: itemsError } = await supabase
       .from("order_items")
