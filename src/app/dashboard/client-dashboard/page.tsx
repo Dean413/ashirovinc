@@ -36,6 +36,8 @@ export default function ClientDashboard() {
         data: { user },
       } = await supabase.auth.getUser();
 
+      
+
       if (!user) {
         router.push("/sign-in");
         return;
@@ -82,76 +84,113 @@ export default function ClientDashboard() {
   }, [supabase, router]);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Orders</h1>
-      {user && <p className="mt-2">Welcome, {user.email} 👋</p>}
+    <div className="p-6 max-w-4xl mx-auto">
+  <h1 className="text-3xl font-bold text-gray-800">My Orders</h1>
+  {user && (
+   <p className="mt-2 text-gray-600">
+  Welcome,{" "}
+  <span className="font-medium capitalize">
+    {user.user_metadata?.full_name
+      ? user.user_metadata.full_name.split(" ")[0]
+      : user.email}
+  </span>{" "}
+  👋
+</p>
+  )}
 
-      {orders.length === 0 ? (
-        <p className="text-gray-500 mt-6">No orders yet.</p>
-      ) : (
-        <ul className="mt-6 space-y-4">
-          {orders.map((order) => (
-            <li key={order.id} className="p-4 border rounded-lg shadow bg-white">
-              {/* Order Details */}
-              <div>
-                <p className="font-semibold text-lg">Order #{order.id}</p>
-                <p className="text-gray-700">💰 ₦{order.total_amount}</p>
-                <p className="text-green-600 font-medium">✅ Status: {order.status}</p>
-                <p className="text-blue-600">
-                  🚚 Delivery: {order.delivery_status || "pending delivery"}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Ordered on {new Date(order.created_at).toLocaleString()}
-                </p>
+  {orders.length === 0 ? (
+    <p className="text-gray-500 mt-10 text-center">
+      You haven’t placed any orders yet.
+    </p>
+  ) : (
+    <ul className="mt-8 space-y-6">
+      {orders.map((order) => (
+        <li
+          key={order.id}
+          className="p-6 border rounded-2xl shadow-sm bg-white hover:shadow-md transition"
+        >
+          {/* Order Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-semibold text-lg text-gray-800">
+                Order #{order.id}
+              </p>
+              <p className="text-gray-600 text-sm">
+                Ordered on{" "}
+                <span className="font-medium">
+                  {new Date(order.created_at).toLocaleDateString()}{" "}
+                  {new Date(order.created_at).toLocaleTimeString()}
+                </span>
+              </p>
+            </div>
 
-                <ul className="mt-4 space-y-2">
-                {order.items?.map((item) => (
-                  <li
-                    key={item.id}
-                    className={`flex items-center space-x-4 p-2 rounded ${
-                      order.delivery_status === "delivered" ? "opacity-50 blur-[1px]" : ""
-                    }`}
-                  >
-                    {/* Product Image */}
-                    <div className="w-16 h-16 relative flex-shrink-0">
-                      <Image
-                        src={item.product_image || "/placeholder.png"}
-                        alt={item.product_name}
-                        fill
-                        className="object-cover rounded"
-                      />
-                    </div>
+            <div className="mt-3 sm:mt-0 flex space-x-3">
+              <span className="px-3 py-1 text-sm rounded-full bg-green-100 text-green-700 font-medium">
+                {order.status}
+              </span>
+              <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-700 font-medium">
+                {order.delivery_status || "pending delivery"}
+              </span>
+            </div>
+          </div>
 
-                    
+          {/* Order Summary */}
+          <div className="mt-4">
+            <p className="text-gray-700">
+              <span className="font-semibold">💰 Total:</span> ₦{order.total_amount}
+            </p>
+          </div>
 
-                    {/* Item Info */}
-                    <div>
-                      <p className="font-medium">{item.product_name}</p>
-                      <p>Qty: {item.quantity}</p>
-                      <p>₦{item.price}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              </div>
+          {/* Order Items */}
+          <ul className="mt-6 divide-y divide-gray-100">
+            {order.items?.map((item) => (
+              <li
+                key={item.id}
+                className={`flex items-center space-x-4 py-4 ${
+                  order.delivery_status === "delivered"
+                    ? "opacity-70 blur-[0.5px]"
+                    : ""
+                }`}
+              >
+                {/* Product Image */}
+                <div className="w-16 h-16 relative flex-shrink-0 rounded-lg overflow-hidden border">
+                  <Image
+                    src={item.product_image || "/placeholder.png"}
+                    alt={item.product_name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
 
-              {/* Order Items */}
-              
-            </li>
-          ))}
-        </ul>
-      )}
+                {/* Item Info */}
+                <div className="flex-1">
+                  <p className="font-medium text-gray-800">{item.product_name}</p>
+                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                </div>
 
-      {/* Logout */}
-      <button
-        onClick={async () => {
-          await supabase.auth.signOut();
-          router.push("/sign-in");
-        }}
-        className="mt-8 px-4 py-2 bg-red-500 text-white rounded-lg"
-      >
-        Sign Out
-      </button>
-    </div>
+                {/* Price */}
+                <p className="font-semibold text-gray-700">₦{item.price}</p>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  {/* Logout */}
+  <div className="text-center mt-10">
+    <button
+      onClick={async () => {
+        await supabase.auth.signOut();
+        router.push("/sign-in");
+      }}
+      className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-md transition"
+    >
+      Sign Out
+    </button>
+  </div>
+</div>
+
   );
 }
