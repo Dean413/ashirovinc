@@ -130,20 +130,22 @@ export default function Navbar() {
             </ul>
           ) : (
             // Normal Menu
-            <ul className="hidden md:flex items-center justify-center flex-1 space-x-6 text-gray-700 font-medium">
-              <li>
-                <Link href="/products" className="hover:text-blue-700 transition">Home</Link>
-              </li>
-              <li>
-                <Link href="/shop" className="hover:text-blue-700 transition">Shop</Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-blue-700 transition">About</Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-blue-700 transition">Contact</Link>
-              </li>
-            </ul>
+           <ul className="hidden md:flex items-center space-x-6 text-gray-700 font-medium absolute left-1/2 transform -translate-x-1/2">
+  <li>
+    <Link href="/products" className="hover:text-blue-700 transition">Home</Link>
+  </li>
+  <li>
+    <Link href="/about" className="hover:text-blue-700 transition">About</Link>
+  </li>
+  <li>
+    <Link href="/contact" className="hover:text-blue-700 transition">Contact</Link>
+  </li>
+
+   <li>
+    <Link href="/contact" className="hover:text-blue-700 transition">Shop</Link>
+  </li>
+</ul>
+
           )}
 
           {/* User icon for non-dashboard */}
