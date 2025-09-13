@@ -76,7 +76,7 @@ export default function Navbar() {
 
 
       {/* Main Navbar */}
-      <nav className="bg-white shadow-md px-6 py-3 flex items-center justify-between sticky top-7 z-50">
+      <nav className="bg-white shadow-md px-6 py-3 flex items-center justify-between sticky top-7.5 z-50">
         <div className="container mx-auto flex items-center justify-between">
           {/* Mobile Menu Button */}
           <button
@@ -181,11 +181,11 @@ export default function Navbar() {
           {open && (
             <motion.div
               initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed top-0 left-0 h-full w-72 bg-blue-900 p-6 text-white z-50 shadow-lg flex flex-col space-y-6"
-            >
+  animate={{ x: 0, opacity: 1 }}
+  exit={{ x: "-100%", opacity: 0 }}
+  transition={{ duration: 0.3, ease: "easeInOut" }}
+  className="fixed top-0 left-0 h-full w-72 bg-blue-900 p-6 text-white z-50 shadow-lg flex flex-col justify-between"
+>
               <button
                 onClick={() => setOpen(false)}
                 className="self-end text-white focus:outline-none"
