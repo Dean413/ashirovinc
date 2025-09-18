@@ -96,7 +96,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex flex-1 justify-center md:justify-start">
-            <Image src="/company-logo.jpg" alt="logo" width={50} height={50} />
+            <Image src="/company-logo.png" alt="logo" width={150} height={100} />
           </Link>
 
           {/* Dashboard Menu */}

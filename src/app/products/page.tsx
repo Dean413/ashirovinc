@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabaseclient";
 import { FaMicrochip, FaMemory, FaHdd, FaDesktop, FaExclamationTriangle } from "react-icons/fa";
 import Link from "next/link";
 import { useCart } from "@/context/cartcontext";
+import FullPageLoader from "../component/page-reloader";
 
 
 interface Product {
@@ -28,6 +29,7 @@ export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [currentImages, setCurrentImages] = useState<{ [id: number]: number }>({});
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [loading, setLoading] =useState(true)
 
 
   // Rotate images
@@ -57,6 +59,8 @@ export default function HomePage() {
       if (!error && data) {
         setProducts(data as Product[]);
       }
+
+      setLoading(false)
     };
     fetchProducts();
   }, []);
@@ -66,6 +70,8 @@ export default function HomePage() {
 
   // Filter products
   const filteredProducts = selectedBrand && selectedBrand !== "All" ? products.filter((p) => p.brand === selectedBrand) : products;
+
+  if(loading) return <FullPageLoader />
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
