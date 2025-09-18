@@ -4,9 +4,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCart, CartItem } from "@/context/cartcontext";
 import { FaTrash } from "react-icons/fa";
+import { supabase } from "@/lib/supabaseclient";
+
+import { useRouter } from "next/navigation";
+
+
 
 export default function CartPage() {
   const { cartItems, removeFromCart, getTotalItems, updateQuantity } = useCart();
+  const router = useRouter();
+
+  const handleCheckout = async () => {
+  const isValid = await validateCart();
+  if (isValid) {
+    router.push("/checkout");
+  }
+};
 
   const totalPrice = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -24,6 +37,35 @@ export default function CartPage() {
       removeFromCart(item.id); // optional: remove if quantity hits 0
     }
   };
+
+  const validateCart = async () => {
+  for (const item of cartItems) {
+    // fetch latest stock from Supabase
+    const { data: product, error } = await supabase
+      .from("products")
+      .select("stock, name")
+      .eq("id", item.id)  // 👈 careful: here item.id should match product id
+      .single();
+
+    if (error) {
+      alert("Error checking stock. Please try again.");
+      return false;
+    }
+
+    if (!product || product.stock < item.quantity) {
+      alert(
+        `"${item.name}" exceeds available stock. Only ${product?.stock ?? 0} left.`
+      );
+
+      // update cart quantity in localStorage
+      updateQuantity(item.id, product?.stock ?? 0);
+
+      return false;
+    }
+  }
+  return true;
+};
+
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -90,12 +132,12 @@ export default function CartPage() {
             <p className="text-lg font-semibold text-gray-800">
               SubTotal ({getTotalItems()} items): ₦{totalPrice.toLocaleString()}
             </p>
-            <Link
-              href="/checkout"
+            <button
+              onClick={handleCheckout}
               className="mt-3 md:mt-0 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
             >
               Proceed to Checkout
-            </Link>
+            </button>
           </div>
         </>
       )}

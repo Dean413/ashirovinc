@@ -29,18 +29,22 @@ export async function POST(req: Request) {
 
     // ✅ Handle successful payment
     if (event.event === "charge.success") {
-      const orderId = event.data.metadata.order_id;
+  const orderId = event.data.metadata.order_id;
 
-      await supabase
-        .from("orders")
-        .update({
-          status: "paid",
-          transaction_reference: event.data.reference,
-        })
-        .eq("id", orderId);
+  const { error } = await supabase.rpc("confirm_order", {
+    order_id: orderId,
+    reference: event.data.reference,
+  });
 
-      return NextResponse.json({ received: true }, { status: 200 });
-    }
+  if (error) {
+    console.error("Stock update failed:", error);
+    await supabase.from("orders").update({ status: "out_of_stock" }).eq("id", orderId);
+    return NextResponse.json({ error: "Not enough stock" }, { status: 400 });
+  }
+
+  return NextResponse.json({ received: true }, { status: 200 });
+}
+
 
     // You can handle failed or abandoned payments here too
     return NextResponse.json({ received: true }, { status: 200 });

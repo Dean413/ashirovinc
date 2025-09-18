@@ -49,6 +49,9 @@ export default function SignInPage() {
     if (error) {
       setMessage(error.message);
     } else {
+      await supabase.auth.getSession();
+      router.refresh();  // ⬅️ important
+
       router.push("/dashboard/client-dashboard")
       setMessage("✅ Signed in successfully!");
 

@@ -37,6 +37,7 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
+  const { clearCart } = useCart();
 
   useEffect(() => {
     const getUser = async () => {
@@ -44,6 +45,13 @@ export default function Navbar() {
       setUser(user);
     };
     getUser();
+
+    const handleSignOut = async () =>{
+        clearCart()
+        await supabase.auth.signOut()
+        router.push("/sign-in")
+        
+    }
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => setUser(session?.user ?? null)
@@ -105,13 +113,14 @@ export default function Navbar() {
                 </Link>
               </li>
               <li>
-                <Link href="/shop" className="hover:text-blue-700 transition">
+                <Link href="/products" className="hover:text-blue-700 transition">
                   Shop
                 </Link>
               </li>
               <li>
                 <button
                   onClick={async () => {
+                    clearCart()
                     await supabase.auth.signOut();
                     router.push("/sign-in");
                   }}
@@ -142,7 +151,7 @@ export default function Navbar() {
   </li>
 
    <li>
-    <Link href="/contact" className="hover:text-blue-700 transition">Shop</Link>
+    <Link href="/products" className="hover:text-blue-700 transition">Shop</Link>
   </li>
 </ul>
 
@@ -181,11 +190,11 @@ export default function Navbar() {
           {open && (
             <motion.div
               initial={{ x: "-100%", opacity: 0 }}
-  animate={{ x: 0, opacity: 1 }}
-  exit={{ x: "-100%", opacity: 0 }}
-  transition={{ duration: 0.3, ease: "easeInOut" }}
-  className="fixed top-0 left-0 h-full w-72 bg-blue-900 p-6 text-white z-50 shadow-lg flex flex-col justify-between"
->
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "-100%", opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="fixed top-0 left-0 h-full w-72 bg-blue-900 p-6 text-white z-50 shadow-lg flex flex-col space-y-6"
+            >
               <button
                 onClick={() => setOpen(false)}
                 className="self-end text-white focus:outline-none"
@@ -219,7 +228,7 @@ export default function Navbar() {
                       </Link>
                     </li>
                     <li>
-                      <Link href="/shop" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
+                      <Link href="/products" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
                         Shop
                       </Link>
                     </li>
@@ -227,10 +236,11 @@ export default function Navbar() {
                       <button
                         onClick={async () => {
                           await supabase.auth.signOut();
+                          clearCart()
                           router.push("/sign-in");
                           setOpen(false);
                         }}
-                        className="text-red-400 hover:text-red-200 transition"
+                        className="rounded-full bg-white text-red-400 p-2 w-[80%] mx-auto text-center transition"
                       >
                         Sign Out
                       </button>
@@ -258,11 +268,11 @@ export default function Navbar() {
                         Contact
                       </Link>
                     </li>
-                    <li className="mt-80 rounded-full bg-white text-blue-900 p-2 w-[50%] text-center font-bold">
-                      <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
-                        {user ? "Account" : "Sign In"}
-                      </Link>
-                    </li>
+                    <div className="rounded-full bg-white text-blue-900 p-2 w-[80%] mx-auto text-center font-bold">
+    <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
+      {user ? "Account" : "Sign In"}
+    </Link>
+  </div>
                   </>
                 )}
               </ul>
