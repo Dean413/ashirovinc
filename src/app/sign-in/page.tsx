@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabaseclient";
 import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
-  const supabase = createClientComponentClient();
+
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<"email" | "otp">("email");

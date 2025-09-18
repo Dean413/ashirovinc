@@ -95,6 +95,9 @@ export function CartProvider({ userId, children }: CartProviderProps) {
   useEffect(() => {
   async function loadCart() {
     console.log("📥 loadCart fired. Current userId =", userId);
+    const { data: { user } } = await supabase.auth.getUser();
+console.log("Current user from client", user?.id);
+
 
     if (!userId) {
       const guest = localStorage.getItem("cart_guest");
@@ -105,23 +108,34 @@ export function CartProvider({ userId, children }: CartProviderProps) {
 
     console.log("🔎 Fetching cart rows for user:", userId);
     const { data, error } = await supabase
-      .from("cart")
-      .select("product_id, quantity")
-      .eq("user_id", userId);
+  .from("cart")
+  .select(`
+    product_id,
+    quantity,
+    products (
+      id,
+      name,
+      price,
+      image_url
+    )
+  `)
+  .eq("user_id", userId);
+
 
     console.log("🛒 Supabase fetch -> error:", error);
     console.log("🛒 Supabase fetch -> data:", data);
 
     let merged: CartItem[] = [];
     if (!error && data) {
+      console.log("Cart rows raw:", data, "error:", error);
+
       merged = data.map((row: any) => ({
-        id: row.product_id,
-        // these will be empty until you join the products table again
-        name: row.products?.name ?? "",
-        price: row.products?.price ?? 0,
-        image: row.products?.image ?? "",
-        quantity: row.quantity,
-      }));
+  id: row.product_id ?? crypto.randomUUID(), // fallback if undefined
+  name: row.products?.name ?? "",
+  price: row.products?.price ?? 0,
+  image: row.products?.image_url ?? "/ashirov-logo",
+  quantity: row.quantity,
+}));
       console.log("✅ Parsed/merged cart from DB:", merged);
     }
 
