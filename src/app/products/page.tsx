@@ -202,6 +202,7 @@ export default function HomePage() {
       quantity: 1,
       image: product.image_url[0],
       brand: product.brand,
+      maxStock: product.stock
     })
     
   }
