@@ -5,28 +5,51 @@ import Image from "next/image";
 import { useCart, CartItem } from "@/context/cartcontext";
 import { FaTrash } from "react-icons/fa";
 import { supabase } from "@/lib/supabaseclient";
-
 import { useRouter } from "next/navigation";
-
-
 
 export default function CartPage() {
   const { cartItems, removeFromCart, getTotalItems, updateQuantity } = useCart();
   const router = useRouter();
 
+  // --- Final safety check before checkout ---
+  const validateCart = async () => {
+    for (const item of cartItems) {
+      const { data: product, error } = await supabase
+        .from("products")
+        .select("stock, name")
+        .eq("id", item.id)
+        .single();
+
+      if (error) {
+        alert("Error checking stock. Please try again.");
+        return false;
+      }
+
+      if (!product || product.stock < item.quantity) {
+        alert(
+          `"${item.name}" exceeds available stock. Only ${product?.stock ?? 0} left.`
+        );
+        // clamp cart quantity if stock dropped
+        updateQuantity(item.id, product?.stock ?? 0);
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleCheckout = async () => {
-  const isValid = await validateCart();
-  if (isValid) {
-    router.push("/checkout");
-  }
-};
+    const isValid = await validateCart();
+    if (isValid) router.push("/checkout");
+  };
 
   const totalPrice = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
+  // quick UX check when increasing
   const handleIncrease = (item: CartItem) => {
+    if (item.quantity >= item.maxStock) return; // already at limit
     updateQuantity(item.id, item.quantity + 1);
   };
 
@@ -34,38 +57,9 @@ export default function CartPage() {
     if (item.quantity > 1) {
       updateQuantity(item.id, item.quantity - 1);
     } else {
-      removeFromCart(item.id); // optional: remove if quantity hits 0
+      removeFromCart(item.id);
     }
   };
-
-  const validateCart = async () => {
-  for (const item of cartItems) {
-    // fetch latest stock from Supabase
-    const { data: product, error } = await supabase
-      .from("products")
-      .select("stock, name")
-      .eq("id", item.id)  // 👈 careful: here item.id should match product id
-      .single();
-
-    if (error) {
-      alert("Error checking stock. Please try again.");
-      return false;
-    }
-
-    if (!product || product.stock < item.quantity) {
-      alert(
-        `"${item.name}" exceeds available stock. Only ${product?.stock ?? 0} left.`
-      );
-
-      // update cart quantity in localStorage
-      updateQuantity(item.id, product?.stock ?? 0);
-
-      return false;
-    }
-  }
-  return true;
-};
-
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -92,35 +86,40 @@ export default function CartPage() {
                     />
                   )}
                   <div>
-                    {item.brand && <p className="text-gray-500 text-sm">{item.brand}</p>}
+                    {item.brand && (
+                      <p className="text-gray-500 text-sm">{item.brand}</p>
+                    )}
                     <p className="font-bold">{item.name}</p>
                     <p className="font-medium">Price: ₦{item.price}</p>
 
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-2 mt-1">
                       <button
-                        className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                        className="px-2 py-1 bg-blue-300 rounded hover:bg-blue-400"
                         onClick={() => handleDecrease(item)}
                       >
                         –
                       </button>
                       <span>{item.quantity}</span>
                       <button
-                        className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                        className="px-2 py-1 bg-blue-300 rounded hover:bg-blue-400 disabled:opacity-50"
                         onClick={() => handleIncrease(item)}
+                        disabled={item.quantity >= item.maxStock}
                       >
                         +
                       </button>
                     </div>
 
-                    <p className="font-semibold mt-1">Total: ₦{item.price * item.quantity}</p>
+                    <p className="font-semibold mt-1">
+                      Total: ₦{item.price * item.quantity}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <button onClick={() => removeFromCart(item.id)}>
                     <span className="flex gap-2 items-center text-red-500">
-                      Remove<FaTrash className="text-red-500" />
+                      Remove <FaTrash className="text-red-500" />
                     </span>
                   </button>
                 </div>
@@ -130,7 +129,8 @@ export default function CartPage() {
 
           <div className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row justify-between items-center mt-6">
             <p className="text-lg font-semibold text-gray-800">
-              SubTotal ({getTotalItems()} items): ₦{totalPrice.toLocaleString()}
+              SubTotal ({getTotalItems()} items): ₦
+              {totalPrice.toLocaleString()}
             </p>
             <button
               onClick={handleCheckout}

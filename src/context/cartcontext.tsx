@@ -17,6 +17,8 @@ export type CartItem = {
   price: number;
   quantity: number;
   image: string;
+  maxStock: number
+  
 };
 
 type CartContextType = {
@@ -54,10 +56,8 @@ async function syncToDb(product_id: number, quantity: number) {
 
 async function removeFromDb(product_id: number) {
   try {
-    const res = await fetch("/api/cart-db", {
+    const res = await fetch(`/api/cart-db/${product_id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product_id }),
       credentials: "include",
     });
     if (!res.ok) throw new Error(`Request failed with ${res.status}`);
@@ -65,6 +65,7 @@ async function removeFromDb(product_id: number) {
     console.error("Cart DB delete failed:", err);
   }
 }
+
 
 // ---------------- context ----------------
 export function CartProvider({ userId, children }: CartProviderProps) {
@@ -116,6 +117,7 @@ console.log("Current user from client", user?.id);
       id,
       name,
       price,
+      stock,
       image_url
     )
   `)
@@ -130,11 +132,12 @@ console.log("Current user from client", user?.id);
       console.log("Cart rows raw:", data, "error:", error);
 
       merged = data.map((row: any) => ({
-  id: row.product_id ?? crypto.randomUUID(), // fallback if undefined
+  id: row.product_id, // fallback if undefined
   name: row.products?.name ?? "",
   price: row.products?.price ?? 0,
-  image: row.products?.image_url ?? "/ashirov-logo",
+  image: row.products?.image_url?.[0],
   quantity: row.quantity,
+  maxStock: row.products?.stock ?? 0,   // ✅ correct source
 }));
       console.log("✅ Parsed/merged cart from DB:", merged);
     }
@@ -178,16 +181,21 @@ console.log("Current user from client", user?.id);
 
   // ---------------- actions ----------------
   const addToCart = (item: CartItem) => {
-    setCartItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
-      const nextQuantity = existing ? existing.quantity + 1 : 1;
-      const newCart = existing
-        ? prev.map((i) => (i.id === item.id ? { ...i, quantity: nextQuantity } : i))
-        : [...prev, { ...item, quantity: nextQuantity }];
-      if (userId) syncToDb(item.id, nextQuantity);
-      return newCart;
-    });
-  };
+  setCartItems((prev) => {
+    const existing = prev.find((i) => i.id === item.id);
+    const nextQuantity = existing
+      ? Math.min(existing.quantity + 1, existing.maxStock)
+      : 1;
+    const newCart = existing
+      ? prev.map((i) =>
+          i.id === item.id ? { ...i, quantity: nextQuantity } : i
+        )
+      : [...prev, { ...item, quantity: nextQuantity }];
+    if (userId) syncToDb(item.id, nextQuantity);
+    return newCart;
+  });
+};
+
 
   const updateQuantity = (id: number, quantity: number) => {
     setCartItems((prev) => {
