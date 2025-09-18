@@ -6,9 +6,11 @@ import { useCart, CartItem } from "@/context/cartcontext";
 import { FaTrash } from "react-icons/fa";
 import { supabase } from "@/lib/supabaseclient";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function CartPage() {
   const { cartItems, removeFromCart, getTotalItems, updateQuantity } = useCart();
+  const [loadingIds, setLoadingIds] = useState<(string | number)[]>([]);
   const router = useRouter();
 
   // --- Final safety check before checkout ---
@@ -38,9 +40,16 @@ export default function CartPage() {
   };
 
   const handleCheckout = async () => {
-    const isValid = await validateCart();
-    if (isValid) router.push("/checkout");
-  };
+  // Check if any item has quantity 0
+  const hasZeroQty = cartItems.some((c) => c.quantity === 0);
+  if (hasZeroQty) {
+    alert("Each item must have quantity greater than 0");
+    return;
+  }
+
+  const isValid = await validateCart();
+  if (isValid) router.push("/checkout");
+};
 
   const totalPrice = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -48,10 +57,32 @@ export default function CartPage() {
   );
 
   // quick UX check when increasing
-  const handleIncrease = (item: CartItem) => {
-    if (item.quantity >= item.maxStock) return; // already at limit
-    updateQuantity(item.id, item.quantity + 1);
-  };
+  const handleIncrease = async (item: CartItem) => {
+  // Always fetch the latest stock
+  setLoadingIds((prev) => [...prev, item.id]);
+  const { data: product, error } = await supabase
+    .from("products")
+    .select("stock")
+    .eq("id", item.id)
+    .single();
+  
+    setLoadingIds((prev) => prev.filter((id) => id !== item.id)); // clear loading
+
+
+  if (error) {
+    console.error("Error fetching stock:", error);
+    alert("Unable to check stock right now.");
+    return;
+  }
+
+  if (!product || item.quantity >= product.stock) {
+    alert(`Only ${product?.stock ?? 0} in stock right now.`);
+    return;
+  }
+
+  updateQuantity(item.id, item.quantity + 1);
+};
+
 
   const handleDecrease = (item: CartItem) => {
     if (item.quantity > 1) {
@@ -95,19 +126,44 @@ export default function CartPage() {
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-2 mt-1">
                       <button
-                        className="px-2 py-1 bg-blue-300 rounded hover:bg-blue-400"
+                        className="px-2 py-1 bg-blue-500 rounded hover:bg-blue-600 flex items-center justify-center w-8 h-8"
                         onClick={() => handleDecrease(item)}
                       >
                         –
                       </button>
                       <span>{item.quantity}</span>
-                      <button
-                        className="px-2 py-1 bg-blue-300 rounded hover:bg-blue-400 disabled:opacity-50"
-                        onClick={() => handleIncrease(item)}
-                        disabled={item.quantity >= item.maxStock}
-                      >
-                        +
-                      </button>
+                     <button
+  onClick={() => handleIncrease(item)}
+  disabled={loadingIds.includes(item.id) || item.quantity >= item.maxStock}
+  className="px-2 py-1 bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50 flex items-center justify-center w-8 h-8"
+>
+  {loadingIds.includes(item.id) ? (
+    // Tiny spinner (Tailwind + animate-spin)
+    <svg
+      className="animate-spin h-4 w-4 text-white"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+      />
+    </svg>
+  ) : (
+    "+"
+  )}
+</button>
+
                     </div>
 
                     <p className="font-semibold mt-1">
