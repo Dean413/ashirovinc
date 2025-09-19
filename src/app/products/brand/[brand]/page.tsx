@@ -5,6 +5,9 @@ import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaMicrochip, FaMemory, FaHdd, FaDesktop, FaExclamationTriangle } from "react-icons/fa";
+import { useCart } from "@/context/cartcontext";
+import FullPageLoader from "@/app/component/page-reloader";
+
 
 interface Product {
   id: number;
@@ -22,8 +25,10 @@ interface Product {
 
 export default function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const { brand } = use(params);
+  const { cartItems, addToCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [currentImages, setCurrentImages] = useState<{ [id: number]: number }>({});
+  const [loading, setLoading] = useState(true);
 
   // Auto-loop images every 7s
   useEffect(() => {
@@ -41,6 +46,7 @@ export default function BrandPage({ params }: { params: Promise<{ brand: string 
     return () => clearInterval(interval);
   }, [products]);
 
+  // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
       const { data, error } = await supabase
@@ -50,10 +56,14 @@ export default function BrandPage({ params }: { params: Promise<{ brand: string 
 
       if (error) console.error("Error:", error);
       else setProducts(data as Product[]);
+
+      setLoading(false);
     };
 
     fetchProducts();
   }, [brand]);
+
+  if (loading) return <FullPageLoader />;
 
   return (
     <div className="p-8 min-h-screen bg-gray-50">
@@ -65,6 +75,8 @@ export default function BrandPage({ params }: { params: Promise<{ brand: string 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {products.map((product) => {
             const currentIndex = currentImages[product.id] || 0;
+            const currentQuantity = cartItems.find((item) => item.id === product.id)?.quantity ?? 0;
+            const isOutOfStock = currentQuantity >= product.stock;
 
             return (
               <div
@@ -95,28 +107,21 @@ export default function BrandPage({ params }: { params: Promise<{ brand: string 
                   <small className="text-gray-500">{product.brand}</small>
                   <h3 className="text-lg font-semibold text-gray-800 mt-1">{product.name}</h3>
                   <p className="text-blue-600 font-bold mt-2">₦{product.price?.toLocaleString()}</p>
+
                   <div>
-                    {
-                      product.stock > 20 ? 
-                      (
-                        <p className="text-gray-500">In Stock</p>
-                      )
-                      : 
-                      product.stock >=11 ? 
-                      (
-                        <p className="text-red-500">few units left</p>
-                      ) 
-                      :                    
-                      (
-                        <div className="flex items-center gap-2">
-                          <FaExclamationTriangle className="text-red-400" />
-                            <p className="text-red-500">{product.stock} units left</p>
-                        </div>
-                      ) 
-                    }
+                    {product.stock > 20 ? (
+                      <p className="text-gray-500">In Stock</p>
+                    ) : product.stock >= 11 ? (
+                      <p className="text-red-500">Few units left</p>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <FaExclamationTriangle className="text-red-400" />
+                        <p className="text-red-500">{product.stock} units left</p>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Product Details */}
+                  {/* Product Specs */}
                   <div className="flex flex-wrap gap-6 mt-3 text-gray-600 text-sm">
                     {product.display && (
                       <div className="flex flex-col items-center gap-1">
@@ -148,8 +153,27 @@ export default function BrandPage({ params }: { params: Promise<{ brand: string 
                     )}
                   </div>
 
-                  <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                    Add to Cart
+                  {/* Add to Cart Button */}
+                  <button
+                    onClick={() => {
+                      if (isOutOfStock) return;
+
+                      addToCart({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        quantity: 1,
+                        image: product.image_url[0],
+                        brand: product.brand,
+                        maxStock: product.stock,
+                      });
+                    }}
+                    disabled={isOutOfStock}
+                    className={`mt-4 px-4 py-2 rounded-lg text-white transition w-full ${
+                      isOutOfStock ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                  >
+                    {isOutOfStock ? "Out of Stock" : "Add to Cart"}
                   </button>
                 </div>
               </div>

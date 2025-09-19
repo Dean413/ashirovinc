@@ -8,6 +8,7 @@ import countries from "world-countries"
 import {getAllStates} from "nigeria-states"
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import FullPageLoader from "../component/page-reloader";
 
 
 export default function CheckoutPage() {
@@ -15,9 +16,9 @@ export default function CheckoutPage() {
   const { cartItems, getTotalItems, clearCart } = useCart();
   const totalPrice = cartItems.reduce( (sum, item) => sum + item.price * item.quantity, 0);
   const [selectedOption, setSelectedOption] = useState("")
-   const supabase = createClientComponentClient();
-
+  const supabase = createClientComponentClient();
   const nigeriaStates = getAllStates()
+  const [loading, setLoading] = useState(false)
 
   
   const sortedCountries = countries.sort((a, b) =>
@@ -61,6 +62,7 @@ export default function CheckoutPage() {
       firstname: details.name,
       phone: details.phone,
       callback: function (response: any) {(async () => {
+        setLoading(true)
       alert("Payment successful. Reference: " + response.reference);
 
             const {
@@ -104,6 +106,8 @@ export default function CheckoutPage() {
     });
     handler.openIframe();
   };
+
+  if (loading) return <FullPageLoader />
 
   if (cartItems.length === 0) return <p className="p-6">Your cart is empty.</p>;
 

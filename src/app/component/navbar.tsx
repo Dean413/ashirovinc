@@ -5,14 +5,7 @@ import { useState, useEffect } from "react";
 import { Menu, ShoppingCart, X } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  FaFacebook,
-  FaTwitter,
-  FaInstagram,
-  FaWhatsapp,
-  FaUser,
-  FaUserCheck,
-} from "react-icons/fa";
+import { FaFacebook, FaTwitter, FaInstagram, FaWhatsapp, FaUser, FaUserCheck } from "react-icons/fa";
 import SearchBar from "./search-bar";
 import { useCart } from "@/context/cartcontext";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -20,24 +13,25 @@ import { useRouter, usePathname } from "next/navigation";
 
 const getInitials = (user: any) => {
   const fullName = user.user_metadata?.full_name;
-
   if (fullName) {
     const parts = fullName.trim().split(" ");
-    if (parts.length === 1) return parts[0][0].toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return parts.length === 1
+      ? parts[0][0].toUpperCase()
+      : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
-
   return user.email ? user.email.slice(0, 2).toUpperCase() : "?";
 };
 
+const getAvatarOrInitials = (user: any) => user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const { getTotalItems } = useCart();
+  const { getTotalItems, clearCart } = useCart();
   const supabase = createClientComponentClient();
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
-  const { clearCart } = useCart();
+  const isDashboard = pathname?.startsWith("/dashboard/client-dashboard");
 
   useEffect(() => {
     const getUser = async () => {
@@ -46,45 +40,38 @@ export default function Navbar() {
     };
     getUser();
 
-    const handleSignOut = async () =>{
-        clearCart()
-        await supabase.auth.signOut()
-        router.push("/sign-in")
-        
-    }
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => setUser(session?.user ?? null)
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) =>
+      setUser(session?.user ?? null)
     );
+
     return () => listener.subscription.unsubscribe();
   }, [supabase]);
 
-  const isDashboard = pathname?.startsWith("/dashboard/client-dashboard");
+  const signOut = async () => {
+    clearCart();
+    await supabase.auth.signOut();
+    router.push("/sign-in");
+  };
 
   return (
     <>
       {/* Top Header */}
       <header className="bg-blue-950 text-white py-2 px-4 sticky top-0 z-50">
-  <div className="relative max-w-7xl mx-auto flex items-center justify-end gap-4 text-xs md:text-sm">
-    {/* Centered text */}
-    <span className="absolute left-[30%] md:left-1/2 transform -translate-x-1/2 font-semibold">
-      WELCOME TO ASHIROV TECHNOLOGY
-    </span>
-
-    {/* Right side */}
-    <div className="flex items-center gap-3">
-      <FaFacebook className="hover:text-gray-300 transition" />
-      <FaTwitter className="hover:text-gray-300 transition" />
-      <FaInstagram className="hover:text-gray-300 transition" />
-      <FaWhatsapp className="hover:text-gray-300 transition" />
-    </div>
-  </div>
-</header>
-
-
+        <div className="relative max-w-7xl mx-auto flex items-center justify-end gap-4 text-xs md:text-sm">
+          <span className="absolute left-[30%] md:left-1/2 transform -translate-x-1/2 font-semibold">
+            WELCOME TO ASHIROV TECHNOLOGY
+          </span>
+          <div className="flex items-center gap-3">
+            <FaFacebook className="hover:text-gray-300 transition" />
+            <FaTwitter className="hover:text-gray-300 transition" />
+            <FaInstagram className="hover:text-gray-300 transition" />
+            <FaWhatsapp className="hover:text-gray-300 transition" />
+          </div>
+        </div>
+      </header>
 
       {/* Main Navbar */}
-      <nav className="bg-white shadow-md px-6 py-0.5 flex items-center justify-between sticky top-7 z-50">
+      <nav className="bg-white shadow-md px-6 flex items-center justify-between sticky top-7 z-50">
         <div className="container mx-auto flex items-center justify-between">
           {/* Mobile Menu Button */}
           <button
@@ -99,11 +86,11 @@ export default function Navbar() {
             <Image src="/company-logo.png" alt="logo" width={150} height={100} />
           </Link>
 
-          {/* Dashboard Menu */}
+          {/* Menu */}
           {isDashboard && user ? (
             <ul className="hidden md:flex items-center justify-center flex-1 space-x-6 text-gray-700 font-medium">
               <li>
-                <Link href="/dashboard/client-dashboard/orders" className="hover:text-blue-700 transition">
+                <Link href="/dashboard/client-dashboard" className="hover:text-blue-700 transition">
                   Orders
                 </Link>
               </li>
@@ -118,56 +105,49 @@ export default function Navbar() {
                 </Link>
               </li>
               <li>
-                <button
-                  onClick={async () => {
-                    clearCart()
-                    await supabase.auth.signOut();
-                    router.push("/sign-in");
-                  }}
-                  className="text-red-600 hover:text-red-400 transition"
-                >
+                <button onClick={signOut} className="text-red-600 hover:text-red-400 transition">
                   Sign Out
                 </button>
               </li>
-              {user && (
-                <li>
+              <li>
+                <Link href="/dashboard/client-dashboard/settings">
+                {getAvatarOrInitials(user) ? (
+                  <Image
+                    src={getAvatarOrInitials(user)}
+                    alt="Profile picture"
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full object-cover shadow-md"
+                  />
+                ) : (
                   <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold cursor-pointer shadow-md">
                     {getInitials(user)}
                   </div>
-                </li>
-              )}
+                )}
+                </Link>
+              </li>
             </ul>
           ) : (
-            // Normal Menu
-           <ul className="hidden md:flex items-center space-x-6 text-gray-700 font-medium absolute left-1/2 transform -translate-x-1/2">
-  <li>
-    <Link href="/products" className="hover:text-blue-700 transition">Home</Link>
-  </li>
-  <li>
-    <Link href="/about" className="hover:text-blue-700 transition">About</Link>
-  </li>
-  <li>
-    <Link href="/contact" className="hover:text-blue-700 transition">Contact</Link>
-  </li>
-
-   <li>
-    <Link href="/products" className="hover:text-blue-700 transition">Shop</Link>
-  </li>
-</ul>
-
+            <ul className="hidden md:flex items-center space-x-6 text-gray-700 font-medium absolute left-1/2 transform -translate-x-1/2">
+              <li>
+                <Link href="/products" className="hover:text-blue-700 transition">Home</Link>
+              </li>
+              <li>
+                <Link href="/about" className="hover:text-blue-700 transition">About</Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-blue-700 transition">Contact</Link>
+              </li>
+              <li>
+                <Link href="/products" className="hover:text-blue-700 transition">Shop</Link>
+              </li>
+            </ul>
           )}
 
           {/* User icon for non-dashboard */}
           {!isDashboard && (
-            <Link
-              href={user ? "/dashboard/client-dashboard" : "/sign-in"}
-              className="hidden md:flex items-center space-x-2 ml-4"
-            >
-              {user ? (
-                <FaUserCheck size={24} className="text-blue-900" />
-              ) : (
-                <FaUser size={24} className="text-blue-900" />
-              )}
+            <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"} className="hidden md:flex items-center space-x-2 ml-4">
+              {user ? <FaUserCheck size={24} className="text-blue-900" /> : <FaUser size={24} className="text-blue-900" />}
               <SearchBar />
             </Link>
           )}
@@ -195,10 +175,7 @@ export default function Navbar() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="fixed top-0 left-0 h-full w-72 bg-blue-900 p-6 text-white z-50 shadow-lg flex flex-col space-y-6"
             >
-              <button
-                onClick={() => setOpen(false)}
-                className="self-end text-white focus:outline-none"
-              >
+              <button onClick={() => setOpen(false)} className="self-end text-white focus:outline-none">
                 <X size={28} />
               </button>
 
@@ -210,20 +187,12 @@ export default function Navbar() {
                 {isDashboard && user ? (
                   <>
                     <li>
-                      <Link
-                        href="/dashboard/client-dashboard/orders"
-                        onClick={() => setOpen(false)}
-                        className="hover:text-gray-300 transition"
-                      >
+                      <Link href="/dashboard/client-dashboard/orders" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
                         Orders
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        href="/dashboard/client-dashboard/settings"
-                        onClick={() => setOpen(false)}
-                        className="hover:text-gray-300 transition"
-                      >
+                      <Link href="/dashboard/client-dashboard/settings" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
                         Settings
                       </Link>
                     </li>
@@ -233,15 +202,7 @@ export default function Navbar() {
                       </Link>
                     </li>
                     <li>
-                      <button
-                        onClick={async () => {
-                          await supabase.auth.signOut();
-                          clearCart()
-                          router.push("/sign-in");
-                          setOpen(false);
-                        }}
-                        className="rounded-full bg-white text-red-400 p-2 w-[80%] mx-auto text-center transition"
-                      >
+                      <button onClick={signOut} className="rounded-full bg-white text-red-400 p-2 w-[80%] mx-auto text-center transition">
                         Sign Out
                       </button>
                     </li>
@@ -269,10 +230,10 @@ export default function Navbar() {
                       </Link>
                     </li>
                     <div className="rounded-full bg-white text-blue-900 p-2 w-[80%] mx-auto text-center font-bold">
-    <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
-      {user ? "Account" : "Sign In"}
-    </Link>
-  </div>
+                      <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
+                        {user ? "Account" : "Sign In"}
+                      </Link>
+                    </div>
                   </>
                 )}
               </ul>

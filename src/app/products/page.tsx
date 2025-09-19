@@ -1,13 +1,14 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Carousel from "../component/carousel";
-import { supabase } from "@/lib/supabaseclient";
-import { FaMicrochip, FaMemory, FaHdd, FaDesktop, FaExclamationTriangle } from "react-icons/fa";
 import Link from "next/link";
-import { useCart } from "@/context/cartcontext";
-import FullPageLoader from "../component/page-reloader";
+import { FaMicrochip, FaMemory, FaHdd, FaDesktop, FaExclamationTriangle } from "react-icons/fa";
 
+import Carousel from "../component/carousel";
+import FullPageLoader from "../component/page-reloader";
+import { supabase } from "@/lib/supabaseclient";
+import { useCart } from "@/context/cartcontext";
 
 interface Product {
   id: number;
@@ -25,14 +26,15 @@ interface Product {
 }
 
 export default function HomePage() {
-  const {addToCart, cartItems} = useCart()
+  const { addToCart, cartItems } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [currentImages, setCurrentImages] = useState<{ [id: number]: number }>({});
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
-  const [loading, setLoading] =useState(true)
+  const [loading, setLoading] = useState(true);
+  const [navigating, setNavigating] = useState(false);
+  
 
-
-  // Rotate images
+  // Rotate product images
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImages((prev) => {
@@ -44,11 +46,10 @@ export default function HomePage() {
         return updated;
       });
     }, 7000);
-
     return () => clearInterval(interval);
   }, [products]);
 
-  // Fetch products
+  // Fetch products from Supabase
   useEffect(() => {
     const fetchProducts = async () => {
       const { data, error } = await supabase
@@ -56,44 +57,47 @@ export default function HomePage() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (!error && data) {
-        setProducts(data as Product[]);
-      }
-
-      setLoading(false)
+      if (data && !error) setProducts(data as Product[]);
+      setLoading(false);
     };
     fetchProducts();
   }, []);
 
-  // Extract brands dynamically
+  if (loading || navigating) return <FullPageLoader />;
+
   const brands = Array.from(new Set(products.map((p) => p.brand)));
-
-  // Filter products
-  const filteredProducts = selectedBrand && selectedBrand !== "All" ? products.filter((p) => p.brand === selectedBrand) : products;
-
-  if(loading) return <FullPageLoader />
+  const filteredProducts =
+    selectedBrand && selectedBrand !== "All"
+      ? products.filter((p) => p.brand === selectedBrand)
+      : products;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Carousel />
+
       {/* Brand Filter */}
       <section className="px-6 py-8">
         <div className="flex flex-wrap justify-center gap-3">
-          <button className=
-            {`px-4 py-2 rounded-lg font-medium transition ${ selectedBrand === "All" || !selectedBrand ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"}`} 
-            onClick={
-              () => setSelectedBrand("All")
-            }>All
+          <button
+            className={`px-4 py-2 rounded-lg font-medium transition ${
+              !selectedBrand || selectedBrand === "All"
+                ? "bg-blue-900 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setSelectedBrand("All")}
+          >
+            All
           </button>
 
           {brands.map((brand) => (
-            <button key={brand} className= 
-              {`px-4 py-2 rounded-lg font-medium transition 
-                ${
-                  selectedBrand === brand ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"
-                }
-              `}
-              onClick={() => setSelectedBrand(brand)}>{brand}
+            <button
+              key={brand}
+              className={`px-4 py-2 rounded-lg font-medium transition ${
+                selectedBrand === brand ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => setSelectedBrand(brand)}
+            >
+              {brand}
             </button>
           ))}
         </div>
@@ -102,24 +106,27 @@ export default function HomePage() {
       {/* Featured Products */}
       <section className="py-10 px-6">
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-10">Featured Products</h2>
-        {filteredProducts.length === 0 ? 
-          (
-            <p className="text-center text-gray-500">No products found.</p>
-          ) : 
-          
-          (
+
+        {filteredProducts.length === 0 ? (
+          <p className="text-center text-gray-500">No products found.</p>
+        ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {filteredProducts.map((product) => {
               const currentIndex = currentImages[product.id] || 0;
-                const currentQuantity =
-  cartItems.find((item) => item.id === product.id)?.quantity ?? 0;
+              const currentQuantity = cartItems.find((item) => item.id === product.id)?.quantity ?? 0;
 
               return (
-                <div key={product.id} className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col">
-                  {/* Image */}
-                  <div className="w-full relative h-64 md:h-72 lg:h-96">
+                <div
+                  key={product.id}
+                  className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col"
+                >
+                  {/* Product Image & Link */}
+                  <div
+                    className="w-full relative h-64 md:h-72 lg:h-96 cursor-pointer"
+                    onClick={() => setNavigating(true)}
+                  >
                     <Link href={`/products/${product.slug}`}>
-                      {product.image_url?.length > 0 ? (
+                      {product.image_url?.length ? (
                         <Image
                           src={product.image_url[currentIndex]}
                           alt={product.name}
@@ -136,93 +143,83 @@ export default function HomePage() {
                   </div>
 
                   {/* Product Info */}
-                   
                   <div className="p-4 flex flex-col flex-1">
-                     <Link href={`/products/${product.slug}`}>
-                    <small className="text-gray-500">{product.brand}</small>
-                    <h3 className="text-lg font-semibold text-gray-800 mt-1">{product.name}</h3>
-                    <p className="text-blue-600 font-bold mt-2">₦{product.price?.toLocaleString()}</p>
-                    <div>
-                      {product.stock > 20 ? (
-                        <p className="text-gray-500">In Stock</p>
-                      ): product.stock >=11 ? (
-                        <p className="text-red-500">few units left</p>
-                      ) : product.stock == 0 ? (
-                        <p className="text-red-500">out of stock</p>
-                        
-                      ):
-                      
-                      (
-                      <div className="flex items-center gap-2">
-                        <FaExclamationTriangle className="text-red-400" />
-                        <p className="text-red-500">{product.stock} units left</p>
+                    <Link href={`/products/${product.slug}`} onClick={() => setNavigating(true)}>
+                      <small className="text-gray-500">{product.brand}</small>
+                      <h3 className="text-lg font-semibold text-gray-800 mt-1">{product.name}</h3>
+                      <p className="text-blue-600 font-bold mt-2">₦{product.price?.toLocaleString()}</p>
+
+                      {/* Stock Status */}
+                      <div className="mt-1">
+                        {product.stock > 20 ? (
+                          <p className="text-gray-500">In Stock</p>
+                        ) : product.stock >= 11 ? (
+                          <p className="text-red-500">Few units left</p>
+                        ) : product.stock === 0 ? (
+                          <p className="text-red-500">Out of stock</p>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <FaExclamationTriangle className="text-red-400" />
+                            <p className="text-red-500">{product.stock} units left</p>
+                          </div>
+                        )}
                       </div>
-                      ) }
-                    </div>
 
-                    <div className="flex flex-wrap gap-6 mt-3 text-gray-600 text-sm">
-                      {product.display && (
-                        <div className="flex flex-col items-center gap-1">
-                          <FaDesktop className="text-xl" />
-                          <span className="text-black font-semibold">{product.display}</span>
-                          <span className="text-xs text-gray-500">Display</span>
-                        </div>
-                      )}
-                      {product.ram && (
-                        <div className="flex flex-col items-center gap-1">
-                          <FaMemory className="text-xl" />
-                          <span className="text-black font-semibold">{product.ram}</span>
-                          <span className="text-xs text-gray-500">RAM</span>
-                        </div>
-                      )}
-                      {product.storage && (
-                        <div className="flex flex-col items-center gap-1">
-                          <FaHdd className="text-xl" />
-                          <span className="text-black font-semibold">
-                            {product.storage}
-                          </span>
-                          <span className="text-xs text-gray-500">Storage</span>
-                        </div>
-                      )}
-                      {product.processor && (
-                        <div className="flex flex-col items-center gap-1">
-                          <FaMicrochip className="text-xl" />
-                          <span className="text-black font-semibold">
-                            {product.processor}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            Processor
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                      {/* Product Specs */}
+                      <div className="flex flex-wrap gap-6 mt-3 text-gray-600 text-sm">
+                        {product.display && (
+                          <div className="flex flex-col items-center gap-1">
+                            <FaDesktop className="text-xl" />
+                            <span className="text-black font-semibold">{product.display}</span>
+                            <span className="text-xs text-gray-500">Display</span>
+                          </div>
+                        )}
+                        {product.ram && (
+                          <div className="flex flex-col items-center gap-1">
+                            <FaMemory className="text-xl" />
+                            <span className="text-black font-semibold">{product.ram}</span>
+                            <span className="text-xs text-gray-500">RAM</span>
+                          </div>
+                        )}
+                        {product.storage && (
+                          <div className="flex flex-col items-center gap-1">
+                            <FaHdd className="text-xl" />
+                            <span className="text-black font-semibold">{product.storage}</span>
+                            <span className="text-xs text-gray-500">Storage</span>
+                          </div>
+                        )}
+                        {product.processor && (
+                          <div className="flex flex-col items-center gap-1">
+                            <FaMicrochip className="text-xl" />
+                            <span className="text-black font-semibold">{product.processor}</span>
+                            <span className="text-xs text-gray-500">Processor</span>
+                          </div>
+                        )}
+                      </div>
                     </Link>
-                    
 
-                   <button
-  onClick={() =>
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-      image: product.image_url[0],
-      brand: product.brand,
-      maxStock: product.stock
-    })
-    
-  }
-  
-  disabled={currentQuantity >= product.stock}
-  className={`mt-4 px-4 py-2 rounded-lg transition 
-    ${
-      currentQuantity >= product.stock
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-blue-600 text-white hover:bg-blue-700"
-    }`}
->
-  {currentQuantity >= product.stock ? "Out of Stock" : "Add to Cart"}
-</button>
+                    {/* Add to Cart Button */}
+                    <button
+                      onClick={() =>
+                        addToCart({
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          quantity: 1,
+                          image: product.image_url[0],
+                          brand: product.brand,
+                          maxStock: product.stock,
+                        })
+                      }
+                      disabled={currentQuantity >= product.stock}
+                      className={`mt-4 px-4 py-2 rounded-lg transition w-full ${
+                        currentQuantity >= product.stock
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-blue-600 text-white hover:bg-blue-700"
+                      }`}
+                    >
+                      Add to Cart
+                    </button>
                   </div>
                 </div>
               );

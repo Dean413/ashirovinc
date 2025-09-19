@@ -14,6 +14,13 @@ const nextConfig: NextConfig = {
       hostname: 'th.bing.com',
       port: '',
      
+    },
+
+    {
+      protocol: 'https',
+      hostname: 'lh3.googleusercontent.com',
+      port: '',
+     
     }
   ]
 }

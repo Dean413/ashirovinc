@@ -19,11 +19,11 @@ export default function SignInPage() {
     setLoading(true);
     setMessage("");
 
-    const { error } = await supabase.auth.signInWithOtp({
-  email,
-  options: { shouldCreateUser: true },
-});
-
+    const { error } = await supabase.auth.signInWithOtp(
+      {
+        email, 
+        options: { shouldCreateUser: true },
+      });
 
     if (error) {
       setMessage(error.message);

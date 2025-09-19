@@ -4,7 +4,7 @@
 import Image from "next/image";
 
 export default function FullPageLoader({
-  text = "Loading...",
+  text = "",
 }: {
   text?: string;
 }) {
