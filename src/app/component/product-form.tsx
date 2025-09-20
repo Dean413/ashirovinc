@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Product {
   id?: number;
@@ -18,54 +18,67 @@ interface Product {
 interface ProductFormProps {
   fetchProducts: () => Promise<void>;
   editProduct?: Product;
+  clearEdit?: () => void; // callback to clear editing state
 }
 
-export default function ProductForm({ fetchProducts, editProduct }: ProductFormProps) {
+export default function ProductForm({ fetchProducts, editProduct, clearEdit }: ProductFormProps) {
   const [form, setForm] = useState<Product>({
-    name: editProduct?.name || "",
-    brand: editProduct?.brand || "",
-    price: editProduct?.price,
-    stock: editProduct?.stock,
-    image_url: editProduct?.image_url || [],
-    description: editProduct?.description || "",
-    display: editProduct?.display || "",
-    ram: editProduct?.ram || "",
-    storage: editProduct?.storage || "",
+    name: "",
+    brand: "",
+    price: undefined,
+    stock: undefined,
+    image_url: [],
+    description: "",
+    display: "",
+    ram: "",
+    storage: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Upload image
+  // When editProduct changes, populate the form
+  useEffect(() => {
+    if (editProduct) setForm(editProduct);
+  }, [editProduct]);
+
+  // Upload images
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (!e.target.files?.length) return;
-  setUploading(true);
+    if (!e.target.files?.length) return;
+    setUploading(true);
 
-  const formData = new FormData();
-  Array.from(e.target.files).forEach(file => formData.append("files", file));
+    const formData = new FormData();
+    Array.from(e.target.files).forEach((file) => formData.append("files", file));
 
-  try {
-    const res = await fetch("/api/upload-image", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("/api/upload-image", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
 
-    setForm(prev => ({
+      setForm((prev) => ({
+        ...prev,
+        image_url: [...(prev.image_url || []), ...data.publicUrls], // append new images
+      }));
+    } catch (err: any) {
+      alert("Image upload failed: " + err.message);
+    }
+
+    setUploading(false);
+  };
+
+  // Remove individual image
+  const removeImage = (url: string) => {
+    setForm((prev) => ({
       ...prev,
-      image_url: [...(prev.image_url || []), ...data.publicUrls],
+      image_url: prev.image_url?.filter((img) => img !== url),
     }));
-  } catch (err: any) {
-    alert("Image upload failed: " + err.message);
-  }
+  };
 
-  setUploading(false);
-};
-
-
-  // Submit product
+  // Submit product (insert or update)
   const handleSubmit = async () => {
     if (!form.name || !form.price) return alert("Name and price are required.");
     setLoading(true);
@@ -86,10 +99,11 @@ export default function ProductForm({ fetchProducts, editProduct }: ProductFormP
         throw new Error("Server did not return valid JSON");
       }
 
-      if (!res.ok) throw new Error(data.error || "Failed to add product");
+      if (!res.ok) throw new Error(data.error || "Failed to save product");
 
       await fetchProducts();
 
+      // Reset form
       setForm({
         name: "",
         brand: "",
@@ -101,6 +115,9 @@ export default function ProductForm({ fetchProducts, editProduct }: ProductFormP
         ram: "",
         storage: "",
       });
+
+      // Clear edit state
+      if (clearEdit) clearEdit();
     } catch (err: any) {
       alert(err.message);
     }
@@ -166,8 +183,25 @@ export default function ProductForm({ fetchProducts, editProduct }: ProductFormP
         className="border px-2 py-1 rounded"
       />
 
+      {/* Image Upload */}
       <input type="file" multiple onChange={handleImageUpload} className="border px-2 py-1 rounded" />
       {uploading && <p>Uploading image...</p>}
+
+      {/* Show existing images with remove option */}
+      <div className="flex gap-2 flex-wrap mt-2">
+        {form.image_url?.map((img) => (
+          <div key={img} className="relative">
+            <img src={img} alt="product" className="w-20 h-20 object-cover rounded" />
+            <button
+              type="button"
+              onClick={() => removeImage(img)}
+              className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-xs"
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
 
       <button
         onClick={handleSubmit}
