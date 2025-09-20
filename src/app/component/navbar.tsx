@@ -109,6 +109,12 @@ export default function Navbar() {
                   Sign Out
                 </button>
               </li>
+              {/* Admin Dashboard Link */}
+              {user?.user_metadata?.role === "admin" && (
+                <Link href="/dashboard/admin-dashboard" className="font-semibold">
+                  Admin Dashboard
+                </Link>
+              )}
               <li>
                 <Link href="/dashboard/client-dashboard/settings">
                 {getAvatarOrInitials(user) ? (
