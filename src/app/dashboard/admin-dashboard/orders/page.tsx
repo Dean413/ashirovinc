@@ -32,6 +32,10 @@ export default function AdminOrders() {
   const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "delivered">("all");
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -86,10 +90,15 @@ export default function AdminOrders() {
   // Apply filters: delivery_status + search
   const filteredOrders = orders.filter(order => {
     const matchesStatus = filterStatus === "all" ? true : order.delivery_status === filterStatus;
-    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          order.reference.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
+    const orderIdMatch = order.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const referenceMatch = (order.reference || "").toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesStatus && (orderIdMatch || referenceMatch);
   });
+
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+  const startIndex = (currentPage - 1) * ordersPerPage;
+  const paginatedOrders = filteredOrders.slice(startIndex, startIndex + ordersPerPage);
 
   return (
     <div className="p-6">
@@ -116,7 +125,7 @@ export default function AdminOrders() {
             type="text"
             className="border px-2 py-1 rounded"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}}
             placeholder="e.g. ORD123, REF456"
           />
         </div>
@@ -139,7 +148,7 @@ export default function AdminOrders() {
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.map((order) => (
+            {paginatedOrders.map((order) => (
               <tr key={order.id} className="hover:bg-gray-50">
                 <td className="border px-2 py-1">{order.id}</td>
                 <td className="border px-2 py-1">{order.name}</td>
@@ -177,9 +186,10 @@ export default function AdminOrders() {
                 <td className="border px-2 py-1 flex gap-2">
                   <button
                     className="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
-                    onClick={() =>
+                    onClick={() => {
                       setExpandedOrder(expandedOrder === order.id ? null : order.id)
-                    }
+                      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth", })
+                    }}
                   >
                     {expandedOrder === order.id ? "Hide Items" : "View Items"}
                   </button>
@@ -205,8 +215,29 @@ export default function AdminOrders() {
           </tbody>
         </table>
 
+        {/* Pagination Controls */}
+        <div className="mt-4 flex justify-center gap-2">
+          <button
+            className="px-3 py-1 border rounded disabled:opacity-50"
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </button>
+          <span className="px-3 py-1">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className="px-3 py-1 border rounded disabled:opacity-50"
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+
         {/* Collapsible Items */}
-        {filteredOrders.map(
+        {paginatedOrders.map(
           (order) =>
             expandedOrder === order.id && (
               <div
