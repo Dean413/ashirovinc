@@ -89,46 +89,33 @@ export default function CheckoutPage() {
       metadata: {
       order_id: orderId,   // ✅ Paystack will send this back in the webhook
     },
-      callback: function (response: any) {(async () => {
-        setLoading(true)
-      alert("Payment successful. Reference: " + response.reference);
+      callback: async function (response: any) {
+  setLoading(true);
+  alert("Payment successful. Reference: " + response.reference);
 
-            const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-    
-
-    const orderData = {
-      items: cartItems,
-      total: totalPrice,
-      details,
-      reference: response.reference,
-    };
-
-    localStorage.setItem("lastOrder", JSON.stringify(orderData));
-
-    // Update stock in DB
-    await fetch("/api/create-order", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    cartItems,
+  const orderData = {
+    items: cartItems,
     total: totalPrice,
     details,
     reference: response.reference,
-    userId: user?.id || null // if logged in
-  }),
-  
-});
+  };
+  localStorage.setItem("lastOrder", JSON.stringify(orderData));
 
+  // ✅ Update the existing order instead of inserting a new one
+  await fetch(`/api/update-order`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      orderId,                 // the id returned from createPendingOrder
+      reference: response.reference,
+      status: "paid",
+    }),
+  });
 
-
-    router.push("/success");
-    clearCart();
-    
-  })();
+  router.push("/success");
+  clearCart();
 },
+
 
 
       onClose: function () {
