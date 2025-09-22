@@ -49,15 +49,7 @@ const orderItems = cartItems.map((item: any) => ({
 
     if (itemsError) throw itemsError;
 
-    // 3. Update stock using RPC
-    for (const item of cartItems) {
-      const { error: stockError } = await supabase.rpc("decrement_stock", {
-        product_id: item.id,
-        qty: item.quantity,
-      });
-
-      if (stockError) throw stockError;
-    }
+   
 
     return NextResponse.json({ success: true, orderId: order.id });
   } catch (err: any) {
