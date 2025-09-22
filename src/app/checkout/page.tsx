@@ -66,7 +66,7 @@ export default function CheckoutPage() {
 };
 
 
-  const handlePaystackPayment = async () => {
+  const handlePaystackPayment =  () => {
     if (!details.email || !details.name || !details.phone || !details.address || !details.delivery) {
       alert("Please fill in all required details.");
       return;
@@ -77,7 +77,7 @@ export default function CheckoutPage() {
       return;
     }
 
-    const orderId = await createPendingOrder(); // get the DB id first
+    const orderId = createPendingOrder(); // get the DB id first
 
     const handler = (window as any).PaystackPop.setup({
       key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
