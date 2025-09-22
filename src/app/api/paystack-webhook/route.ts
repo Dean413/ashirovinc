@@ -1,26 +1,25 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
+import nodemailer from "nodemailer";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // service key 🔑
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 export async function POST(req: Request) {
   try {
-    // Get raw body
     const body = await req.text();
-    console.log("Webhook hit! Raw body:", body); // ✅ log raw payload
+    console.log("Webhook hit! Raw body:", body);
 
-    // ✅ Verify Paystack Signature
+    // ✅ Verify Paystack signature
     const hash = crypto
       .createHmac("sha512", process.env.PAYSTACK_SECRET_KEY!)
       .update(body)
       .digest("hex");
 
     const signature = req.headers.get("x-paystack-signature");
-
     if (hash !== signature) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
@@ -29,24 +28,63 @@ export async function POST(req: Request) {
 
     // ✅ Handle successful payment
     if (event.event === "charge.success") {
-  const orderId = event.data.metadata.order_id;
+      const orderId = event.data.metadata.order_id;
 
-  const { error } = await supabase.rpc("confirm_order", {
-    order_id: orderId,
-    reference: event.data.reference,
+      // 1️⃣ Confirm order in DB (no .select())
+      const { error: confirmError } = await supabase.rpc("confirm_order", {
+        order_id: orderId,
+        reference: event.data.reference,
+      });
+
+      if (confirmError) {
+        console.error("Stock update failed:", confirmError);
+        await supabase
+          .from("orders")
+          .update({ status: "out_of_stock" })
+          .eq("id", orderId);
+        return NextResponse.json(
+          { error: "Not enough stock" },
+          { status: 400 }
+        );
+      }
+
+      // 2️⃣ Fetch customer email & name
+      const { data: orderRow, error: fetchError } = await supabase
+        .from("orders")
+        .select("email, name, total_amount")
+        .eq("id", orderId)
+        .single();
+
+      if (fetchError) {
+        console.error("Order fetch failed:", fetchError);
+        return NextResponse.json({ received: true }, { status: 200 });
+      }
+
+      // 3️⃣ Send confirmation email
+      const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
   });
 
-  if (error) {
-    console.error("Stock update failed:", error);
-    await supabase.from("orders").update({ status: "out_of_stock" }).eq("id", orderId);
-    return NextResponse.json({ error: "Not enough stock" }, { status: 400 });
-  }
+      await transporter.sendMail({
+        from: `"Ashirovinc" <${process.env.MAIL_USER}>`,
+        to: orderRow.email,
+        subject: `Payment Confirmation - Order #${orderId}`,
+        html: `
+          <h2>Hello ${orderRow.name},</h2>
+          <p>We’ve received your payment for order <strong>#${orderId}</strong>.</p>
+          <p>Total: <strong>₦${Number(orderRow.total_amount).toLocaleString()}</strong></p>
+          <p>Your order is now being processed. Thank you for shopping with Ashirovinc!</p>
+        `,
+      });
 
-  return NextResponse.json({ received: true }, { status: 200 });
-}
+      return NextResponse.json({ received: true }, { status: 200 });
+    }
 
-
-    // You can handle failed or abandoned payments here too
+    // Other Paystack events
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (err) {
     console.error("Webhook error:", err);

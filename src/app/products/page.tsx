@@ -63,7 +63,7 @@ export default function HomePage() {
     fetchProducts();
   }, []);
 
-  if (loading || navigating) return <FullPageLoader />;
+  if (loading || navigating) return <FullPageLoader text="loading..." />;
 
   const brands = Array.from(new Set(products.map((p) => p.brand)));
   const filteredProducts =

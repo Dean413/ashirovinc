@@ -15,7 +15,6 @@ export default function CheckoutPage() {
   const router = useRouter()
   const { cartItems, getTotalItems, clearCart } = useCart();
   const totalPrice = cartItems.reduce( (sum, item) => sum + item.price * item.quantity, 0);
-  const [selectedOption, setSelectedOption] = useState("")
   const supabase = createClientComponentClient();
   const nigeriaStates = getAllStates()
   const [loading, setLoading] = useState(false)
@@ -32,7 +31,7 @@ export default function CheckoutPage() {
     email: "",
     phone: "",
     address: "",
-    delivery: ["ship", "pickup"],
+    delivery: "",
     country: "",
     state: ""
   });
@@ -44,7 +43,7 @@ export default function CheckoutPage() {
   };
 
   const handlePaystackPayment = () => {
-    if (!details.email || !details.name || !details.phone || !details.address) {
+    if (!details.email || !details.name || !details.phone || !details.address || !details.delivery) {
       alert("Please fill in all required details.");
       return;
     }
@@ -181,6 +180,7 @@ export default function CheckoutPage() {
           <input
             type="email"
             name="email"
+            required
             value={details.email}
             onChange={handleChange}
             className="border p-2 rounded w-full"
@@ -196,6 +196,7 @@ export default function CheckoutPage() {
           <label className="block text-sm font-medium mb-1">State</label>
           <select
             name="state"
+            required
             value={details.state}
             onChange={handleChange}
             className="border rounded p-2 w-full"
@@ -214,6 +215,7 @@ export default function CheckoutPage() {
           <input
             type="tel"
             name="phone"
+            required
             value={details.phone}
             onChange={handleChange}
             className="border p-2 rounded w-full"
@@ -226,6 +228,7 @@ export default function CheckoutPage() {
         <label className="block text-sm font-medium mb-1">Address</label>
         <textarea
           name="address"
+          required
           value={details.address}
           onChange={handleChange}
           className="border p-2 rounded w-full"
@@ -239,15 +242,15 @@ export default function CheckoutPage() {
         <div className="flex gap-4">
           <label className="flex items-center gap-2">
             <input
+              required
               type="radio"
               name="deliveryMethod"
-              value={details.delivery[1]}
-              checked={selectedOption === details.delivery[1]}
+              value="ship"
+              checked={details.delivery === "ship"}
               onChange={(e) => {
-                setSelectedOption(e.target.value);
                 setDetails((prev) => ({
                   ...prev,
-                  deliveryMethod: e.target.value,
+                  delivery: e.target.value,
                 }));
               }}
             />
@@ -256,15 +259,15 @@ export default function CheckoutPage() {
 
           <label className="flex items-center gap-2">
             <input
+              required
               type="radio"
               name="deliveryMethod"
-              value={details.delivery[0]}
-              checked={selectedOption === details.delivery[0]}
+              value="pickup"
+              checked={details.delivery === "pickup"}
               onChange={(e) => {
-                setSelectedOption(e.target.value);
                 setDetails((prev) => ({
                   ...prev,
-                  deliveryMethod: e.target.value,
+                  delivery: e.target.value,
                 }));
               }}
             />

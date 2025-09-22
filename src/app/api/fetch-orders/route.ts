@@ -2,16 +2,22 @@
 import { NextRequest, NextResponse } from "next/server";
 // import { supabase } from "@/lib/supabaseclient";
 import { createClient } from '@supabase/supabase-js'
+import { supabase } from "@/lib/supabaseclient";
 
-export const supabase = createClient(
+export const supabaseR = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY! // server-side key
 )
 
 export async function GET(req: NextRequest) {
+  const { data: { user } } = await supabase.auth.getUser();
+        if (!user || user.user_metadata?.role !== "admin") {
+          return NextResponse.json({error: "Access denied"})
+        }
+
   try {
     // fetch orders
-    const { data: orders, error: ordersError } = await supabase
+    const { data: orders, error: ordersError } = await supabaseR
       .from("orders")
       .select("*")
       .order("id", { ascending: true });
@@ -19,7 +25,7 @@ export async function GET(req: NextRequest) {
     if (ordersError) throw ordersError;
 
     // fetch all order items
-    const { data: items, error: itemsError } = await supabase
+    const { data: items, error: itemsError } = await supabaseR
       .from("order_items")
       .select("*")
       .order("id", { ascending: true });
