@@ -34,7 +34,7 @@ export async function POST(req: Request) {
   .from("orders")
   .update({
     status: "paid",
-    paystack_reference: event.data.reference,
+    reference: event.data.reference,
   })
   .eq("id", orderId);
 
