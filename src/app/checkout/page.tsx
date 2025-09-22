@@ -54,7 +54,7 @@ export default function CheckoutPage() {
     }
 
     const handler = (window as any).PaystackPop.setup({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
+      key: process.env.PAYSTACK_SECRET_KEY,
       email: details.email,
       amount: totalPrice * 100, // Paystack expects kobo
       currency: "NGN",
