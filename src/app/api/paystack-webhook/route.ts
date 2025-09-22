@@ -166,13 +166,7 @@ try {
 
   const items = orderItems ?? []; // default to empty array
 
-  // Customer email
-  await transporter.sendMail({
-    from: `"Ashirovinc" <${process.env.EMAIL_USER}>`,
-    to: orderRow.email,
-    subject: `Order Confirmation - #${orderId}`,
-    html: `...customer email html...`,
-  });
+  
 
   // ✅ Owner email (send after customer)
   await transporter.sendMail({
