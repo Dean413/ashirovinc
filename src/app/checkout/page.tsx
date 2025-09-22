@@ -78,9 +78,11 @@ export default function CheckoutPage() {
     }
 
     const orderId = await createPendingOrder(); // get the DB id first
+   
 
     const handler = (window as any).PaystackPop.setup({
       key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
+      
       email: details.email,
       amount: totalPrice * 100, // Paystack expects kobo
       currency: "NGN",
@@ -89,38 +91,38 @@ export default function CheckoutPage() {
       metadata: {
       order_id: orderId,   // ✅ Paystack will send this back in the webhook
     },
-      callback: async function (response: any) {
+
+      
+
+      callback: function (response: any) {
   setLoading(true);
+
   alert("Payment successful. Reference: " + response.reference);
 
-  const orderData = {
-    items: cartItems,
-    total: totalPrice,
-    details,
-    reference: response.reference,
-  };
-  localStorage.setItem("lastOrder", JSON.stringify(orderData));
-
-  // ✅ Update the existing order instead of inserting a new one
-  await fetch(`/api/update-order`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      orderId,                 // the id returned from createPendingOrder
+  (async () => {
+    const orderData = {
+      items: cartItems,
+      total: totalPrice,
+      details,
       reference: response.reference,
-      status: "paid",
-    }),
-  });
+    };
+    localStorage.setItem("lastOrder", JSON.stringify(orderData));
 
-  router.push("/success");
-  clearCart();
-},
+    await fetch("/api/update-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId,
+        reference: response.reference,
+        status: "paid",
+      }),
+    });
 
+    router.push("/success");
+    clearCart();
+  })().catch(console.error);
+}
 
-
-      onClose: function () {
-        alert("Payment was cancelled.");
-      },
     });
     handler.openIframe();
   };
