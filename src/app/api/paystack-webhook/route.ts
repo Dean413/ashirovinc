@@ -30,23 +30,14 @@ export async function POST(req: Request) {
     if (event.event === "charge.success") {
       const orderId = event.data.metadata.order_id;
 
-      // 1️⃣ Confirm order in DB (no .select())
-      const { error: confirmError } = await supabase.rpc("confirm_order", {
-        order_id: orderId,
-        reference: event.data.reference,
-      });
+      const { error: confirmError } = await supabase
+  .from("orders")
+  .update({
+    status: "paid",
+    paystack_reference: event.data.reference,
+  })
+  .eq("id", orderId);
 
-      if (confirmError) {
-        console.error("Stock update failed:", confirmError);
-        await supabase
-          .from("orders")
-          .update({ status: "out_of_stock" })
-          .eq("id", orderId);
-        return NextResponse.json(
-          { error: "Not enough stock" },
-          { status: 400 }
-        );
-      }
 
       // 2️⃣ Fetch customer email & name
       const { data: orderRow, error: fetchError } = await supabase
@@ -70,7 +61,7 @@ export async function POST(req: Request) {
   });
 
       await transporter.sendMail({
-        from: `"Ashirovinc" <${process.env.MAIL_USER}>`,
+        from: `"Ashirovinc" <${process.env.EMAIL_USER}>`,
         to: orderRow.email,
         subject: `Payment Confirmation - Order #${orderId}`,
         html: `
