@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       // 2️⃣ Decrement stock
       const { data: orderItems, error: fetchItemsError } = await supabase
         .from("order_items") // assuming you have an order_items table
-        .select("product_id, quantity")
+        .select("product_id, price, product_name, quantity")
         .eq("order_id", orderId);
 
       if (fetchItemsError) console.error("Fetching order items failed:", fetchItemsError);
@@ -53,6 +53,8 @@ export async function POST(req: Request) {
         const { error: stockError } = await supabase.rpc("decrement_stock", {
           product_id: item.product_id,
           qty: item.quantity,
+          product_name: item.product_name,
+          price: item.price
         });
         if (stockError) console.error("Stock decrement failed:", stockError);
       }
