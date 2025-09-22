@@ -273,7 +273,7 @@ export default function CheckoutPage() {
                 }));
               }}
             />
-            <span>Pickup</span>
+            <span>Delivery</span>
           </label>
 
           <label className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export default function CheckoutPage() {
                 }));
               }}
             />
-            <span>Shipping</span>
+            <span>Pickup</span>
           </label>
         </div>
       </div>
