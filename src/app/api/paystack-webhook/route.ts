@@ -57,10 +57,33 @@ export async function POST(req: Request) {
         if (stockError) console.error("Stock decrement failed:", stockError);
       }
 
+      // 2.5️⃣ Get user_id to clear cart
+      const { data: orderData, error: orderDataError } = await supabase
+        .from("orders")
+        .select("user_id")
+        .eq("id", orderId)
+        .single();
+
+      if (orderDataError) {
+        console.error("Fetching order for cart deletion failed:", orderDataError);
+      } else {
+        const userId = orderData.user_id;
+        const { error: clearCartError } = await supabase
+          .from("cart")
+          .delete()
+          .eq("user_id", userId);
+
+        if (clearCartError) console.error("Clearing cart failed:", clearCartError);
+        else console.log("Cart cleared for user:", userId);
+      }
+
+
+      
+
       // 3️⃣ Fetch customer info
       const { data: orderRow, error: fetchError } = await supabase
         .from("orders")
-        .select("email, name, total_amount")
+        .select("email, name, total_amount, phone, delivery_address")
         .eq("id", orderId)
         .single();
 
@@ -69,6 +92,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ received: true }, { status: 200 });
       }
 
+      
       // 4️⃣ Send confirmation email
       try {
         const transporter = nodemailer.createTransport({
@@ -79,17 +103,50 @@ export async function POST(req: Request) {
           },
         });
 
-        await transporter.sendMail({
-          from: `"Ashirovinc" <${process.env.EMAIL_USER}>`,
-          to: orderRow.email,
-          subject: `Payment Confirmation - Order #${orderId}`,
-          html: `
-            <h2>Hello ${orderRow.name},</h2>
-            <p>We’ve received your payment for order <strong>#${orderId}</strong>.</p>
-            <p>Total: <strong>₦${Number(orderRow.total_amount).toLocaleString()}</strong></p>
-            <p>Your order is now being processed. Thank you for shopping with Ashirovinc!</p>
-          `,
-        });
+        const items = orderItems ?? []; // default to empty array
+
+await transporter.sendMail({
+  from: `"Ashirovinc" <${process.env.EMAIL_USER}>`,
+  to: orderRow.email,
+  subject: `Order Confirmation - #${orderId}`,
+  html: `
+    <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 8px;">
+      <h2 style="color: #1E3A8A;">Hi ${orderRow.name},</h2>
+      <p>Thank you for shopping with <strong>Ashirovinc</strong>! Your order <strong>#${orderId}</strong> has been confirmed successfully.</p>
+      
+      <h3 style="color: #1E3A8A; border-bottom: 1px solid #eee; padding-bottom: 5px;">Order Details</h3>
+      <ul>
+        ${items
+          .map(
+            (item: any) => `
+            <li style="margin-bottom: 10px;">
+              <strong>${item.product_name}</strong><br/>
+              Quantity: ${item.quantity}<br/>
+              Price: ₦${Number(item.price).toLocaleString()}
+            </li>`
+          )
+          .join("")}
+      </ul>
+
+      <p><strong>Total Paid:</strong> ₦${Number(orderRow.total_amount).toLocaleString()}</p>
+      <p>Your order will be processed and shipped as soon as possible. You will receive a notification once it’s ready for collection/delivery.</p>
+
+      <h3 style="color: #1E3A8A; border-bottom: 1px solid #eee; padding-bottom: 5px;">Delivery Details</h3>
+      <p>
+        <strong>Recipient:</strong> ${orderRow.name} <br/>
+        <strong>Phone:</strong> ${orderRow.phone || "N/A"} <br/>
+        <strong>Delivery Method:</strong> Collection / Shipping <br/>
+        <strong>Address:</strong> ${orderRow.delivery_address || "N/A"}
+      </p>
+
+      <p style="margin-top: 20px;">You can track your order in your Ashirovinc account. If you wish to cancel your order, please do so before it’s shipped.</p>
+
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;"/>
+      <p style="font-size: 12px; color: #999;">Happy Shopping!<br/>Warm Regards, <br/>Ashirovinc Team</p>
+    </div>
+  `,
+});
+
       } catch (emailErr) {
         console.error("Email send failed:", emailErr);
       }
