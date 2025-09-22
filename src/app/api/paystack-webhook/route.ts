@@ -34,7 +34,7 @@ export async function POST(req: Request) {
   .from("orders")
   .update({
     status: "paid",
-    reference: event.data.reference,
+    paystack_reference: event.data.reference,
   })
   .eq("id", orderId);
 
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       const { data: orderRow, error: fetchError } = await supabase
         .from("orders")
         .select("email, name, total_amount")
-        .eq("reference", orderId)
+        .eq("id", orderId)
         .single();
 
       if (fetchError) {
