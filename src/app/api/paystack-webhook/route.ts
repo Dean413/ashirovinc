@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
     // ✅ Handle successful payment
     if (event.event === "charge.success") {
-      const orderId = Number(event.data.metadata.order_id);
+      const orderId = (event.data.metadata.order_id);
 
       // 1️⃣ Update order status & reference
       const { error: confirmError } = await supabase
