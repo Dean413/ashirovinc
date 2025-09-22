@@ -22,7 +22,7 @@ export async function POST(req: Request) {
           email: details.email,
           phone: details.phone,
           address: details.address,
-          delivery_method: details.deliveryMethod,
+          delivery_method: details.delivery,
           reference,
         },
       ])
