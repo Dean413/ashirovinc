@@ -263,7 +263,7 @@ export default function CheckoutPage() {
             <input
               required
               type="radio"
-              name="deliveryMethod"
+              name="delivery"
               value="ship"
               checked={details.delivery === "ship"}
               onChange={(e) => {
@@ -280,7 +280,7 @@ export default function CheckoutPage() {
             <input
               required
               type="radio"
-              name="deliveryMethod"
+              name="delivery"
               value="pickup"
               checked={details.delivery === "pickup"}
               onChange={(e) => {
@@ -339,6 +339,7 @@ export default function CheckoutPage() {
       </p>
       <button
         onClick={handlePaystackPayment}
+        disabled={!paystackLoaded}
         className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
       >
         Pay Now
@@ -347,13 +348,13 @@ export default function CheckoutPage() {
     
 
     {/* Paystack Script */}
-    <form>
+    
       <Script
       src="https://js.paystack.co/v1/inline.js"
       strategy="afterInteractive"
       onLoad={() => setPaystackLoaded(true)}
     />
-    </form>
+   
     
   </div>
 );
