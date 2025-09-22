@@ -43,7 +43,30 @@ export default function CheckoutPage() {
     setDetails({ ...details, [e.target.name]: e.target.value });
   };
 
-  const handlePaystackPayment = () => {
+  const createPendingOrder = async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const res = await fetch("/api/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      cartItems,
+      total: totalPrice,
+      details,
+      reference: null,          // no reference yet
+      userId: user?.id || null,
+      status: "pending",
+    }),
+  });
+
+  const { orderId } = await res.json();
+  return orderId;
+};
+
+
+  const handlePaystackPayment = async () => {
     if (!details.email || !details.name || !details.phone || !details.address || !details.delivery) {
       alert("Please fill in all required details.");
       return;
@@ -54,6 +77,8 @@ export default function CheckoutPage() {
       return;
     }
 
+    const orderId = await createPendingOrder(); // get the DB id first
+
     const handler = (window as any).PaystackPop.setup({
       key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
       email: details.email,
@@ -61,6 +86,9 @@ export default function CheckoutPage() {
       currency: "NGN",
       firstname: details.name,
       phone: details.phone,
+      metadata: {
+      order_id: orderId,   // ✅ Paystack will send this back in the webhook
+    },
       callback: function (response: any) {(async () => {
         setLoading(true)
       alert("Payment successful. Reference: " + response.reference);
@@ -91,7 +119,10 @@ export default function CheckoutPage() {
     reference: response.reference,
     userId: user?.id || null // if logged in
   }),
+  
 });
+
+
 
     router.push("/success");
     clearCart();
