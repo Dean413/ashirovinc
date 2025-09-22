@@ -115,6 +115,7 @@ export default function CheckoutPage() {
         orderId,
         reference: response.reference,
         status: "paid",
+        cartItems,
       }),
     });
 

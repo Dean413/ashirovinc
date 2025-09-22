@@ -3,10 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import FullPageLoader from "../component/page-reloader";
+import { useCart } from "@/context/cartcontext";
 
 export default function SuccessPage() {
+  const {clearCart} = useCart()
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Clear cart when user lands on success page
+    clearCart();
+  }, []);
+
 
   useEffect(() => {
     const savedOrder = localStorage.getItem("lastOrder");

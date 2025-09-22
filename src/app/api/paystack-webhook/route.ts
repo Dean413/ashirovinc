@@ -28,18 +28,36 @@ export async function POST(req: Request) {
 
     // ✅ Handle successful payment
     if (event.event === "charge.success") {
-      const orderId = event.data.metadata.order_id;
+      const orderId = Number(event.data.metadata.order_id);
 
+      // 1️⃣ Update order status & reference
       const { error: confirmError } = await supabase
-  .from("orders")
-  .update({
-    status: "paid",
-    reference: event.data.reference,
-  })
-  .eq("id", orderId);
+        .from("orders")
+        .update({
+          status: "paid",
+          reference: event.data.reference,
+        })
+        .eq("id", orderId);
 
+      if (confirmError) console.error("Order update failed:", confirmError);
 
-      // 2️⃣ Fetch customer email & name
+      // 2️⃣ Decrement stock
+      const { data: orderItems, error: fetchItemsError } = await supabase
+        .from("order_items") // assuming you have an order_items table
+        .select("product_id, quantity")
+        .eq("order_id", orderId);
+
+      if (fetchItemsError) console.error("Fetching order items failed:", fetchItemsError);
+
+      for (const item of orderItems || []) {
+        const { error: stockError } = await supabase.rpc("decrement_stock", {
+          product_id: item.product_id,
+          qty: item.quantity,
+        });
+        if (stockError) console.error("Stock decrement failed:", stockError);
+      }
+
+      // 3️⃣ Fetch customer info
       const { data: orderRow, error: fetchError } = await supabase
         .from("orders")
         .select("email, name, total_amount")
@@ -51,26 +69,30 @@ export async function POST(req: Request) {
         return NextResponse.json({ received: true }, { status: 200 });
       }
 
-      // 3️⃣ Send confirmation email
-      const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+      // 4️⃣ Send confirmation email
+      try {
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
 
-      await transporter.sendMail({
-        from: `"Ashirovinc" <${process.env.EMAIL_USER}>`,
-        to: orderRow.email,
-        subject: `Payment Confirmation - Order #${orderId}`,
-        html: `
-          <h2>Hello ${orderRow.name},</h2>
-          <p>We’ve received your payment for order <strong>#${orderId}</strong>.</p>
-          <p>Total: <strong>₦${Number(orderRow.total_amount).toLocaleString()}</strong></p>
-          <p>Your order is now being processed. Thank you for shopping with Ashirovinc!</p>
-        `,
-      });
+        await transporter.sendMail({
+          from: `"Ashirovinc" <${process.env.EMAIL_USER}>`,
+          to: orderRow.email,
+          subject: `Payment Confirmation - Order #${orderId}`,
+          html: `
+            <h2>Hello ${orderRow.name},</h2>
+            <p>We’ve received your payment for order <strong>#${orderId}</strong>.</p>
+            <p>Total: <strong>₦${Number(orderRow.total_amount).toLocaleString()}</strong></p>
+            <p>Your order is now being processed. Thank you for shopping with Ashirovinc!</p>
+          `,
+        });
+      } catch (emailErr) {
+        console.error("Email send failed:", emailErr);
+      }
 
       return NextResponse.json({ received: true }, { status: 200 });
     }

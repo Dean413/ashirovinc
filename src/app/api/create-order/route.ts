@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         {
           user_id: userId || null,
           total_amount: total,
-          status: "paid",
+          status: "pending",
           name: details.name,
           email: details.email,
           phone: details.phone,
