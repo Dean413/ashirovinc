@@ -23,8 +23,6 @@ export default function CheckoutPage() {
   const sortedCountries = countries.sort((a, b) =>
     a.name.common.localeCompare(b.name.common)
   );
-   console.log("Paystack key:", process.env.NEXT_PUBLIC_PAYSTACK_KEY);
-
   
 
   const [details, setDetails] = useState({
@@ -65,7 +63,6 @@ export default function CheckoutPage() {
   return orderId;
 };
 
-
   const handlePaystackPayment = async () => {
     if (!details.email || !details.name || !details.phone || !details.address || !details.delivery) {
       alert("Please fill in all required details.");
@@ -95,7 +92,7 @@ export default function CheckoutPage() {
       
 
       callback: function (response: any) {
-  setLoading(true);
+      setLoading(true);
 
   alert("Payment successful. Reference: " + response.reference);
 
