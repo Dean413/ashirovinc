@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, ShoppingCart, X } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,10 +28,29 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { getTotalItems, clearCart } = useCart();
   const supabase = createClientComponentClient();
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
   const isDashboard = pathname?.startsWith("/dashboard/client-dashboard");
+
+  // ✅ Detect click outside
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+      if (open && sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [open]);
+
 
   useEffect(() => {
     const getUser = async () => {
@@ -177,6 +196,7 @@ export default function Navbar() {
         <AnimatePresence>
           {open && (
             <motion.div
+              ref={sidebarRef}
               initial={{ x: "-100%", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-100%", opacity: 0 }}
@@ -195,47 +215,34 @@ export default function Navbar() {
                 {isDashboard && user ? (
                   <>
                     <li>
-                      <Link href="/dashboard/client-dashboard/orders" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
-                        Orders
-                      </Link>
+                      <Link href="/dashboard/client-dashboard/orders" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Orders</Link>
                     </li>
                     <li>
-                      <Link href="/dashboard/client-dashboard/settings" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
-                        Settings
-                      </Link>
+                      <Link href="/dashboard/client-dashboard/settings" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Settings</Link>
                     </li>
                     <li>
-                      <Link href="/products" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
-                        Shop
-                      </Link>
+                      <Link href="/products" onClick={() => setOpen(false)} className="hover:text-gray-300 transition"> Shop</Link>
                     </li>
                     <li>
-                      <button onClick={signOut} className="rounded-full bg-white text-red-400 p-2 w-[80%] mx-auto text-center transition">
-                        Sign Out
-                      </button>
+                      <button onClick={signOut} className="rounded-full bg-white text-red-400 p-2 w-[80%] mx-auto text-center transition">Sign Out</button>
                     </li>
                   </>
                 ) : (
                   <>
                     <li>
-                      <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
-                        Home
-                      </Link>
+                      <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Home</Link>
+                    </li>
+                     <li>
+                      <Link href="/services" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Services</Link>
                     </li>
                     <li>
-                      <Link href="/shop" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
-                        Shop
-                      </Link>
+                      <Link href="/about" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">About</Link>
                     </li>
                     <li>
-                      <Link href="/about" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
-                        About
-                      </Link>
+                      <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Contact</Link>
                     </li>
-                    <li>
-                      <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">
-                        Contact
-                      </Link>
+                     <li>
+                      <Link href="/reviews" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Reviews</Link>
                     </li>
                     <div className="rounded-full bg-white text-blue-900 p-2 w-[80%] mx-auto text-center font-bold">
                       <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
