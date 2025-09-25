@@ -95,7 +95,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex flex-1 justify-center md:justify-start">
-            <Image src="/company-logo.png" alt="logo" width={150} height={100} />
+            <Image src="/company-logo.png" alt="logo" width={150} height={100} style={{ width: "200px", height: "auto" }} />
           </Link>
 
           {/* Menu */}
@@ -171,9 +171,9 @@ export default function Navbar() {
             <>
             <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"} className="hidden md:flex items-center space-x-4 ml-4">
               {user ? 
-              <FaUserCheck size={24} className="text-blue-900" /> 
+              <FaUserCheck size={24} className="text-blue-900 mr-2" /> 
               : 
-              <FaUser size={24} className="text-blue-900" />}
+              <FaUser size={24} className="text-blue-900 mr-2" />}
             </Link>
             <SearchBar />
             </>
@@ -227,7 +227,11 @@ export default function Navbar() {
                       <button onClick={signOut} className="rounded-full bg-white text-red-400 p-2 w-[80%] mx-auto text-center transition">Sign Out</button>
                     </li>
                   </>
-                ) : (
+                ) 
+                
+                : 
+                
+                (
                   <>
                     <li>
                       <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Home</Link>

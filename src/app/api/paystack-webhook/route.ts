@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/lib/supabaseServer";
 import nodemailer from "nodemailer";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function POST(req: Request) {
   try {
@@ -31,7 +27,7 @@ export async function POST(req: Request) {
       const orderId = (event.data.metadata.order_id);
 
       // 1️⃣ Update order status & reference
-      const { error: confirmError } = await supabase
+      const { error: confirmError } = await supabaseAdmin
         .from("orders")
         .update({
           status: "paid",
@@ -42,7 +38,7 @@ export async function POST(req: Request) {
       if (confirmError) console.error("Order update failed:", confirmError);
 
       // 2️⃣ Decrement stock
-      const { data: orderItems, error: fetchItemsError } = await supabase
+      const { data: orderItems, error: fetchItemsError } = await supabaseAdmin
         .from("order_items") // assuming you have an order_items table
         .select("product_id, price, product_name, quantity, product_image")
         .eq("order_id", orderId);
@@ -50,7 +46,7 @@ export async function POST(req: Request) {
       if (fetchItemsError) console.error("Fetching order items failed:", fetchItemsError);
 
       for (const item of orderItems || []) {
-        const { error: stockError } = await supabase.rpc("decrement_stock", {
+        const { error: stockError } = await supabaseAdmin.rpc("decrement_stock", {
           product_id: item.product_id,
           qty: item.quantity,
           product_name: item.product_name,
@@ -61,7 +57,7 @@ export async function POST(req: Request) {
       }
 
       // 2.5️⃣ Get user_id to clear cart
-      const { data: orderData, error: orderDataError } = await supabase
+      const { data: orderData, error: orderDataError } = await supabaseAdmin
         .from("orders")
         .select("user_id")
         .eq("id", orderId)
@@ -71,7 +67,7 @@ export async function POST(req: Request) {
         console.error("Fetching order for cart deletion failed:", orderDataError);
       } else {
         const userId = orderData.user_id;
-        const { error: clearCartError } = await supabase
+        const { error: clearCartError } = await supabaseAdmin
           .from("cart")
           .delete()
           .eq("user_id", userId);
@@ -84,7 +80,7 @@ export async function POST(req: Request) {
       
 
       // 3️⃣ Fetch customer info
-      const { data: orderRow, error: fetchError } = await supabase
+      const { data: orderRow, error: fetchError } = await supabaseAdmin
         .from("orders")
         .select("email, name, total_amount, phone, delivery_method, address")
         .eq("id", orderId)

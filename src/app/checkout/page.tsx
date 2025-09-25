@@ -13,6 +13,7 @@ import FullPageLoader from "../component/page-reloader";
 
 export default function CheckoutPage() {
   const router = useRouter()
+  const [isPaying, setIsPaying] = useState(false);
   const { cartItems, getTotalItems, clearCart } = useCart();
   const totalPrice = cartItems.reduce( (sum, item) => sum + item.price * item.quantity, 0);
   const supabase = createClientComponentClient();
@@ -73,6 +74,7 @@ export default function CheckoutPage() {
       alert("Paystack script not loaded yet. Please try again.");
       return;
     }
+    setIsPaying(true)
 
     const orderId = await createPendingOrder(); // get the DB id first
    
@@ -338,12 +340,16 @@ export default function CheckoutPage() {
         SubTotal ({getTotalItems()} items): ₦{totalPrice.toLocaleString()}
       </p>
       <button
-        onClick={handlePaystackPayment}
-        disabled={!paystackLoaded}
-        className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
-      >
-        Pay Now
-      </button>
+          onClick={handlePaystackPayment}
+          disabled={!paystackLoaded || isPaying}
+          className={`bg-blue-600 text-white px-6 py-3 rounded transition ${
+            !paystackLoaded || isPaying
+              ? "opacity-60 cursor-not-allowed"
+              : "hover:bg-blue-700"
+          }`}
+        >
+          {isPaying ? "Processing…" : "Pay Now"}
+        </button>
     </div>
     
 

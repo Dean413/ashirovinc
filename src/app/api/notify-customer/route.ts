@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import { createClient } from "@supabase/supabase-js";
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { supabaseAdmin } from "@/lib/supabaseServer";
 
 export async function POST(req: Request) {
   try {
     const { email, name, orderId, deliveryMethod, address } = await req.json();
 
-    const { data: orderItems, error: fetchItemsError } = await supabase
+    const { data: orderItems, error: fetchItemsError } = await supabaseAdmin
         .from("order_items") // assuming you have an order_items table
         .select("product_id, price, product_name, quantity, product_image")
         .eq("order_id", orderId);

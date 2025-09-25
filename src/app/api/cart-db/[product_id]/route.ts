@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { supabaseAdmin } from "@/lib/supabaseServer";
 
 export async function DELETE(
   req: NextRequest,
@@ -17,7 +12,7 @@ export async function DELETE(
   // const id = Number(product_id)   ❌
   const id = product_id;
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("cart")
     .delete()
     .eq("product_id", id);

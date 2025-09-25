@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaWhatsapp } from "react-icons/fa";
 
@@ -10,7 +11,11 @@ export default function Footer() {
         
         {/* Logo / About */}
         <div>
-          <h2 className="text-2xl font-bold">AshirovInc</h2>
+          
+          <Link href="/" className="flex flex-1 justify-center md:justify-start">
+            <Image src="/company-logo.png" alt="logo" width={150} height={150} style={{ width: "200px", height: "auto" }} />
+          </Link>
+          
           <p className="mt-4 text-sm text-gray-200">
             Affordable laptops and gadgets at unbeatable prices.
             Trusted by thousands across Nigeria.

@@ -119,7 +119,7 @@ export default function HomePage() {
                           <Image
                             src={product.image_url[currentIndex]}
                             alt={product.name}
-                            fill
+                            fill sizes="100vw"
                             style={{ objectFit: "cover" }}
                             className="w-full h-full"
                           />
