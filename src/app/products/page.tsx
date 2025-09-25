@@ -66,46 +66,41 @@ export default function HomePage() {
   if (loading || navigating) return <FullPageLoader text="loading..." />;
 
   const brands = Array.from(new Set(products.map((p) => p.brand)));
-  const filteredProducts =
-    selectedBrand && selectedBrand !== "All"
-      ? products.filter((p) => p.brand === selectedBrand)
-      : products;
+  const filteredProducts = selectedBrand && selectedBrand !== "All" ? products.filter((p) => p.brand === selectedBrand) : products;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Carousel />
-
       {/* Brand Filter */}
       <section className="px-6 py-8">
         <div className="flex flex-wrap justify-center gap-3">
-          <button
-            className={`px-4 py-2 rounded-lg font-medium transition ${
-              !selectedBrand || selectedBrand === "All"
-                ? "bg-blue-900 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setSelectedBrand("All")}
-          >
-            All
+          <button className={`px-4 py-2 rounded-lg font-medium transition ${!selectedBrand || selectedBrand === "All" ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"}`}
+            onClick={() => setSelectedBrand("All")}> All
           </button>
 
           {brands.map((brand) => (
-            <button
-              key={brand}
-              className={`px-4 py-2 rounded-lg font-medium transition ${
-                selectedBrand === brand ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"
-              }`}
-              onClick={() => setSelectedBrand(brand)}
-            >
-              {brand}
+            <button key={brand} className={`px-4 py-2 rounded-lg font-medium transition ${selectedBrand === brand ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"}`}
+              onClick={() => setSelectedBrand(brand)}>{brand}
             </button>
           ))}
         </div>
       </section>
 
+        {/*intro*/}
+        <section className="py-16 px-6 text-center bg-gradient-to-r from-blue-50 to-blue-100">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4">
+            Welcome to Ashirovinc
+          </h1>
+          <p className="max-w-2xl mx-auto text-gray-600 text-lg">
+            Your one-stop shop for affordable, high-quality used laptops and computers
+            in Nigeria. Browse our carefully curated selection and find your next device today.
+          </p>
+        </section>
+
+
       {/* Featured Products */}
       <section className="py-10 px-6">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-10">Featured Products</h2>
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-10">Products</h2>
 
         {filteredProducts.length === 0 ? (
           <p className="text-center text-gray-500">No products found.</p>

@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       // 2️⃣ Decrement stock
       const { data: orderItems, error: fetchItemsError } = await supabase
         .from("order_items") // assuming you have an order_items table
-        .select("product_id, price, product_name, quantity")
+        .select("product_id, price, product_name, quantity, product_image")
         .eq("order_id", orderId);
 
       if (fetchItemsError) console.error("Fetching order items failed:", fetchItemsError);
@@ -54,7 +54,8 @@ export async function POST(req: Request) {
           product_id: item.product_id,
           qty: item.quantity,
           product_name: item.product_name,
-          price: item.price
+          price: item.price,
+          product_image: item.product_image
         });
         if (stockError) console.error("Stock decrement failed:", stockError);
       }
@@ -116,19 +117,35 @@ export async function POST(req: Request) {
             <h2 style="color: #1E3A8A;">Hi ${orderRow.name},</h2>
             <p>Thank you for shopping with <strong>Ashirovinc</strong>! Your order <strong>#${orderId}</strong> has been confirmed successfully.</p>
             
-            <h3 style="color: #1E3A8A; border-bottom: 1px solid #eee; padding-bottom: 5px;">Order Details</h3>
-            <ul>
-              ${items
-                .map(
-                  (item: any) => `
-                  <li style="margin-bottom: 10px;">
-                    <strong>${item.product_name}</strong><br/>
-                    Quantity: ${item.quantity}<br/>
-                    Price: ₦${Number(item.price).toLocaleString()}
-                  </li>`
-                )
-                .join("")}
-            </ul>
+            <h3 style="color:#1E3A8A; border-bottom:1px solid #ddd; padding-bottom:4px;">Order Details</h3>
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#e5e7eb;">
+          <th style="text-align:left; padding:8px;">Product</th>
+          <th style="text-align:center; padding:8px;">Qty</th>
+          <th style="text-align:right; padding:8px;">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${items
+          .map(
+            (item: any) => `
+            <tr>
+              <td style="padding:8px; border-bottom:1px solid #eee;">
+                ${item.product_image
+                  ? `<img src="${item.product_image}" alt="${item.product_name}" width="50" style="vertical-align:middle; margin-right:8px; border-radius:4px;">`
+                  : ""}
+                ${item.product_name}
+              </td>
+              <td style="text-align:center; padding:8px; border-bottom:1px solid #eee;">${item.quantity}</td>
+              <td style="text-align:right; padding:8px; border-bottom:1px solid #eee;">₦${Number(
+                item.price
+              ).toLocaleString()}</td>
+            </tr>`
+          )
+          .join("")}
+      </tbody>
+    </table>
 
             <p><strong>Total Paid:</strong> ₦${Number(orderRow.total_amount).toLocaleString()}</p>
             <p>Your order will be processed and shipped as soon as possible. You will receive a notification once it’s ready for collection/delivery.</p>

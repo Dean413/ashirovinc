@@ -14,6 +14,7 @@ type OrderItem = {
 type Order = {
   id: string;
   name: string;
+  email: string;
   total_amount: number;
   status: string;
   reference: string;
@@ -23,6 +24,7 @@ type Order = {
   created_at: string;
   user_id: string;
   items?: OrderItem[];
+  phone: string
 };
 
 export default function AdminOrders() {
@@ -131,17 +133,21 @@ export default function AdminOrders() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
+      <div className="overflow-x-auto max-w-full">
+        <table className="w-full border-collapse border border-gray-300 text-sm">
           <thead>
             <tr className="bg-gray-100">
               <th className="border px-2 py-1">Order ID</th>
               <th className="border px-2 py-1">Customer</th>
-              <th className="border px-2 py-1">Total</th>
-              <th className="border px-2 py-1">Payment_status</th>
+              <th className="border px-2 py-1">Phone Number</th>
               <th className="border px-2 py-1">Address</th>
               <th className="border px-2 py-1">Delivery Method</th>
-              <th className="border px-2 py-1">Delivery Status</th>
+                 <th className="border px-2 py-1">Delivery Status</th>
+              {/* <th className="border px-2 py-1">Email</th>  */}
+              <th className="border px-2 py-1">Total</th>
+              <th className="border px-2 py-1">Status</th>
+              
+           
               <th className="border px-2 py-1">Reference</th>
               <th className="border px-2 py-1">Date</th>
               <th className="border px-2 py-1">Actions</th>
@@ -152,6 +158,23 @@ export default function AdminOrders() {
               <tr key={order.id} className="hover:bg-gray-50">
                 <td className="border px-2 py-1">{order.id}</td>
                 <td className="border px-2 py-1">{order.name}</td>
+                <td className="border px-2 py-1">{order.phone}</td>
+                <td className="border px-2 py-1">{order.address}</td>
+                 <td className="border px-2 py-1">{order.delivery_method}</td>
+                 <td className="border px-2 py-1">
+                  <span
+                    className={`px-2 py-1 rounded text-white ${
+                      order.delivery_status === "pending"
+                        ? "bg-yellow-500"
+                        : order.delivery_status === "delivered"
+                        ? "bg-green-600"
+                        : "bg-gray-400"
+                    }`}
+                  >
+                    {order.delivery_status}
+                  </span>
+                </td>
+                {/* <td className="border px-2 py-1">{order.email}</td> */}
                 <td className="border px-2 py-1">₦{order.total_amount?.toLocaleString() || 0}</td>
                 <td className="border px-2 py-1">
                   <span
@@ -166,21 +189,8 @@ export default function AdminOrders() {
                     {order.status}
                   </span>
                 </td>
-                <td className="border px-2 py-1">{order.address}</td>
-                <td className="border px-2 py-1">{order.delivery_method}</td>
-                <td className="border px-2 py-1">
-                  <span
-                    className={`px-2 py-1 rounded text-white ${
-                      order.delivery_status === "pending"
-                        ? "bg-yellow-500"
-                        : order.delivery_status === "delivered"
-                        ? "bg-green-600"
-                        : "bg-gray-400"
-                    }`}
-                  >
-                    {order.delivery_status}
-                  </span>
-                </td>
+               
+                
                 <td className="border px-2 py-1">{order.reference}</td>
                 <td className="border px-2 py-1">{new Date(order.created_at).toLocaleString()}</td>
                 <td className="border px-2 py-1 flex gap-2">
@@ -202,6 +212,33 @@ export default function AdminOrders() {
                   >
                     {order.delivery_status === "pending" ? "Mark Delivered" : "Mark Pending"}
                   </button>
+
+                  {/* ✨ NEW: Notify Customer button */}
+  <button
+    className="px-2 py-1 rounded bg-purple-600 text-white hover:bg-purple-700"
+    onClick={async () => {
+      try {
+        const res = await fetch("/api/notify-customer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: order.email,   // or wherever you store the customer's email
+            name: order.name,
+            orderId: order.id,
+            deliveryMethod: order.delivery_method,
+            address: order.address,
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to send email");
+        alert("Notification email sent to customer.");
+      } catch (err: any) {
+        alert(err.message);
+      }
+    }}
+  >
+    Notify Customer
+  </button>
 
                   <button
                     className="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700"

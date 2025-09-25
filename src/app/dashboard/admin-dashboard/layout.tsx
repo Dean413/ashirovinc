@@ -9,7 +9,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className={`bg-white shadow-md ${open ? "w-64" : "w-20"} transition-all`}>
+      <aside className={`bg-white shadow-md ${open ? "w-40" : "w-20"} transition-all`}>
         <div className="p-4 font-bold text-xl">Admin</div>
         <nav className="flex flex-col mt-4 gap-2">
           <Link href="/dashboard/admin-dashboard" className="px-4 py-2 hover:bg-gray-200 rounded">Dashboard</Link>
