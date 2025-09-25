@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaMicrochip, FaMemory, FaHdd, FaDesktop, FaExclamationTriangle } from "react-icons/fa";
-
+import { ToastContainer, toast } from "react-toastify";   // ✅ NEW
+import 'react-toastify/dist/ReactToastify.css'; 
 import Carousel from "../component/carousel";
 import FullPageLoader from "../component/page-reloader";
 import { supabase } from "@/lib/supabaseclient";
@@ -70,6 +71,17 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      <ToastContainer
+        position="top-center"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Carousel />
       {/* Brand Filter */}
       <section className="px-6 py-8">
@@ -193,11 +205,30 @@ export default function HomePage() {
                     </Link>
 
                     {/* Add to Cart Button */}
-                    <button onClick={() => addToCart({id: product.id, name: product.name, price: product.price, quantity: 1, image: product.image_url[0], brand: product.brand, maxStock: product.stock,})}
-                      disabled={currentQuantity >= product.stock}
-                      className={`mt-4 px-4 py-2 rounded-lg transition w-full ${ currentQuantity >= product.stock ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
-                      Add to Cart
-                    </button>
+                    <button
+                  onClick={() => {
+                    addToCart({
+                      id: product.id,
+                      name: product.name,
+                      price: product.price,
+                      quantity: 1,
+                      image: product.image_url[0],
+                      brand: product.brand,
+                      maxStock: product.stock,
+                    });
+
+                    // ✅ Show toast
+                    toast.success(`${product.name} added to cart!`);
+                  }}
+                  disabled={currentQuantity >= product.stock}
+                  className={`mt-4 px-4 py-2 rounded-lg transition w-full ${
+                    currentQuantity >= product.stock
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
+                >
+                  Add to Cart
+                </button>
                   </div>
                 </div>
               );
