@@ -12,7 +12,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
   // 🔹 1. Check what we get on first mount
   supabase.auth.getSession().then(({ data }) => {
-    console.log("🔑 Initial getSession():", data.session?.user);
     setUser(data.session?.user ?? null);
     setIsLoaded(true);
   });
@@ -20,7 +19,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // 🔹 2. Log every auth state change
   const { data: authListener } = supabase.auth.onAuthStateChange(
     (event, session) => {
-      console.log("🔁 onAuthStateChange event:", event, "session:", session?.user);
       setUser(session?.user ?? null);
       setIsLoaded(true);
     }

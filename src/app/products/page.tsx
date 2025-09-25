@@ -100,40 +100,35 @@ export default function HomePage() {
 
       {/* Featured Products */}
       <section className="py-10 px-6">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-10">Products</h2>
+        <h2 className="text-4xl font-bold text-gray-800 text-center mb-10">Products</h2>
 
-        {filteredProducts.length === 0 ? (
-          <p className="text-center text-gray-500">No products found.</p>
-        ) : (
+        {filteredProducts.length === 0 ? (<p className="text-center text-gray-500">No products found.</p>) : 
+          (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {filteredProducts.map((product) => {
               const currentIndex = currentImages[product.id] || 0;
               const currentQuantity = cartItems.find((item) => item.id === product.id)?.quantity ?? 0;
 
               return (
-                <div
-                  key={product.id}
-                  className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col"
-                >
+                <div key={product.id} className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col">
                   {/* Product Image & Link */}
-                  <div
-                    className="w-full relative h-64 md:h-72 lg:h-96 cursor-pointer"
-                    onClick={() => setNavigating(true)}
-                  >
+                  <div className="w-full relative h-64 md:h-72 lg:h-96 cursor-pointer" onClick={() => setNavigating(true)}>
                     <Link href={`/products/${product.slug}`}>
-                      {product.image_url?.length ? (
-                        <Image
-                          src={product.image_url[currentIndex]}
-                          alt={product.name}
-                          fill
-                          style={{ objectFit: "cover" }}
-                          className="w-full h-full"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                          No Image
-                        </div>
-                      )}
+                      {product.image_url?.length ? 
+                        (
+                          <Image
+                            src={product.image_url[currentIndex]}
+                            alt={product.name}
+                            fill
+                            style={{ objectFit: "cover" }}
+                            className="w-full h-full"
+                          />
+                        ) 
+                        : 
+                        (
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">No Image</div>
+                        )
+                      }
                     </Link>
                   </div>
 
@@ -146,18 +141,22 @@ export default function HomePage() {
 
                       {/* Stock Status */}
                       <div className="mt-1">
-                        {product.stock > 20 ? (
-                          <p className="text-gray-500">In Stock</p>
-                        ) : product.stock >= 11 ? (
-                          <p className="text-red-500">Few units left</p>
-                        ) : product.stock === 0 ? (
-                          <p className="text-red-500">Out of stock</p>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <FaExclamationTriangle className="text-red-400" />
-                            <p className="text-red-500">{product.stock} units left</p>
-                          </div>
-                        )}
+                        {product.stock > 20 ? 
+                          (
+                            <p className="text-gray-500">In Stock</p>
+                          ) 
+                          : product.stock >= 11 ? 
+                          (
+                            <p className="text-red-500">Few units left</p>
+                          ) : product.stock === 0 ? (
+                            <p className="text-red-500">Out of stock</p>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <FaExclamationTriangle className="text-red-400" />
+                              <p className="text-red-500">{product.stock} units left</p>
+                            </div>
+                          )
+                        }
                       </div>
 
                       {/* Product Specs */}
@@ -194,25 +193,9 @@ export default function HomePage() {
                     </Link>
 
                     {/* Add to Cart Button */}
-                    <button
-                      onClick={() =>
-                        addToCart({
-                          id: product.id,
-                          name: product.name,
-                          price: product.price,
-                          quantity: 1,
-                          image: product.image_url[0],
-                          brand: product.brand,
-                          maxStock: product.stock,
-                        })
-                      }
+                    <button onClick={() => addToCart({id: product.id, name: product.name, price: product.price, quantity: 1, image: product.image_url[0], brand: product.brand, maxStock: product.stock,})}
                       disabled={currentQuantity >= product.stock}
-                      className={`mt-4 px-4 py-2 rounded-lg transition w-full ${
-                        currentQuantity >= product.stock
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
-                    >
+                      className={`mt-4 px-4 py-2 rounded-lg transition w-full ${ currentQuantity >= product.stock ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
                       Add to Cart
                     </button>
                   </div>
@@ -223,5 +206,5 @@ export default function HomePage() {
         )}
       </section>
     </div>
-  );
+  )
 }

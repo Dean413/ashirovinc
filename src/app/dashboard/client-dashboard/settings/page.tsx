@@ -3,11 +3,15 @@
 import { useState, useEffect } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
+import FullPageLoader from "@/app/component/page-reloader";
+import Swal from "sweetalert2"
+import SpinnerButton from "@/app/component/spinner";
 
 export default function SettingsPage() {
   const supabase = createClientComponentClient();
   const router = useRouter();
-
+  const [updatingName, setUpdatingName] = useState(false);
+  const [updatingEmail, setUpdatingEmail] = useState(false);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -16,14 +20,11 @@ export default function SettingsPage() {
   // Load current user data
   useEffect(() => {
     (async () => {
-      console.log("🔎 Fetching current user…");
       const { data: { user }, error } = await supabase.auth.getUser();
-      console.log("➡️ getUser result:", { user, error });
 
       if (user) {
         setEmail(user.email ?? "");
         const displayName = (user.user_metadata as any)?.display_name ?? "";
-        console.log("➡️ Existing display_name:", displayName);
         setName(displayName);
       }
       setLoading(false);
@@ -31,56 +32,85 @@ export default function SettingsPage() {
   }, [supabase]);
 
   // Update display name
-  const updateName = async () => {
-    console.log("📝 Updating display_name to:", name);
-    const { data, error } = await supabase.auth.updateUser({
-      data: { display_name: name },
+const updateName = async () => {
+  setUpdatingName(true);
+  const { data, error } = await supabase.auth.updateUser({
+    data: { display_name: name },
+  });
+  setUpdatingName(false);
+
+  if (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Name update failed",
+      text: error.message,
     });
-    console.log("➡️ updateUser result:", { data, error });
+    return
+  }
 
-    if (error) {
-      setMessage(error.message);
-      return;
-    }
+  Swal.fire({
+    icon: "success",
+    title: "Name updated",
+    text: `Your display name is now “${name}”.`,
+    timer: 2000,
+    showConfirmButton: false,
+  });
 
-    // Show the new value from returned user object
-    const updatedName =
-      (data.user?.user_metadata as any)?.display_name ?? "NO_NAME_RETURNED";
-    console.log("➡️ Updated display_name from updateUser:", updatedName);
-    setName(updatedName);
-    setMessage("Name updated ✅");
-  };
+  const updatedName =
+    (data.user?.user_metadata as any)?.display_name ?? "NO_NAME_RETURNED";
+  setName(updatedName);
+  setMessage("Name updated ✅");
+};
 
-  // Update email
-  const updateEmail = async () => {
-    console.log("📝 Updating email to:", email);
-    const { data, error } = await supabase.auth.updateUser({ email });
-    console.log("➡️ updateUser email result:", { data, error });
 
-    setMessage(
-      error
-        ? error.message
-        : "Check your inbox to confirm the new email address ✅"
-    );
-  };
+
+// Update email
+const updateEmail = async () => {
+  setUpdatingEmail(true);
+  const { data, error } = await supabase.auth.updateUser({ email });
+  setUpdatingEmail(false);
+
+  if (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Name update failed",
+      text: error.message,
+    });
+    return
+  }
+
+ Swal.fire({
+    icon: "info",
+    title: "Confirm your inbox",
+    text: "Check your email to confirm the new address ✅",
+  });
+};
+
 
   // Delete account
   const deleteAccount = async () => {
-    if (!confirm("This will permanently delete your account. Continue?")) return;
+   const result = await Swal.fire({
+    title: "Delete account?",
+    text: "This action cannot be undone!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  });
 
-    console.log("🗑️ Deleting account…");
+  if (!result.isConfirmed) return;
+
     const res = await fetch("/api/delete-user", { method: "POST" });
-    console.log("➡️ delete-user response:", res.status);
     if (res.ok) {
       await supabase.auth.signOut();
       router.push("/");
     } else {
-      setMessage("Failed to delete account");
+      Swal.fire("Error", "Failed to delete account", "error");
     }
   };
 
-  if (loading) return <p className="p-6">Loading…</p>;
-
+  if (loading) return <FullPageLoader text="loading" />
   return (
     <div className="max-w-md mx-auto p-6 space-y-8">
       <h1 className="text-2xl font-bold mb-4">Account Settings</h1>
@@ -98,10 +128,14 @@ export default function SettingsPage() {
         />
         <button
           onClick={updateName}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Update Name
+          disabled={updatingName}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-60 flex items-center justify-center gap-2">
+          {updatingName && (
+            <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          )}
+          {updatingName ? "Updating…" : "Update Name"}
         </button>
+
       </div>
 
       {/* Email */}
@@ -115,10 +149,16 @@ export default function SettingsPage() {
         />
         <button
           onClick={updateEmail}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Update Email
+          disabled={updatingEmail}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-60 flex items-center justify-center gap-2">
+          {updatingEmail && (
+            <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          )}
+          {updatingName ? "Updating…" : "Update Email"}
         </button>
+
+        
+
       </div>
 
       {/* Danger Zone */}

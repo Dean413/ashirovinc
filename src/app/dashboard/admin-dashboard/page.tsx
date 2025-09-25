@@ -22,19 +22,19 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
   const [actionLoading, setActionLoading] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false)
 
   useEffect(() => {
     const checkAdmin = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user || user.user_metadata?.role !== "admin") {
-        router.replace("/sign-in");
-      } else {
+      if (user && user.user_metadata?.role === "admin") {
+        setHasAccess(true);
         await fetchProducts();
       }
       setLoading(false);
     };
     checkAdmin();
-  }, [router]);
+  }, [supabase]);
 
   const fetchProducts = async () => {
     const { data, error } = await supabase.from("products").select("*");
@@ -56,6 +56,24 @@ export default function AdminDashboard() {
   };
 
   if (loading) return <FullPageLoader />;
+
+   if (!hasAccess) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[70vh] text-center p-6">
+        <h1 className="text-2xl font-bold mb-4">No Access</h1>
+        <p className="text-gray-600 mb-6">
+          You do not have permission to view this page.
+        </p>
+        <button
+          onClick={() => router.push("/")}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Go Back Home
+        </button>
+      </div>
+    );
+  }
+
 
   return (
     <div className="p-6">

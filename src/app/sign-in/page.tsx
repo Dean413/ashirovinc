@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseclient";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function SignInPage() {
 
@@ -121,6 +122,7 @@ export default function SignInPage() {
             >
               {loading ? "Verifying..." : "Verify OTP"}
             </button>
+            <button type="button" onClick={() => {setStep("email"); setOtp(""); setEmail("")}} className="text-blue-700 underline text-sm mt-2 cursor-pointer">Not your email?</button>
           </form>
         )}
 

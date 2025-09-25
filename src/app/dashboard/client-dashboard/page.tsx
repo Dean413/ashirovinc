@@ -90,8 +90,8 @@ export default function ClientDashboard() {
     getUserAndOrders();
   }, [supabase, router]);
 
-  // ✅ Show loader BEFORE rendering orders
-  if (loading) return <FullPageLoader />;
+  
+  if (loading) return <FullPageLoader text="Loading dashboard" />;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -139,16 +139,20 @@ export default function ClientDashboard() {
                   <span className="px-3 py-1 text-sm rounded-full bg-green-100 text-green-700 font-medium">
                     {order.status}
                   </span>
-                  <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-700 font-medium">
-                    {order.delivery_status || "pending delivery"}
+                  <span className="px-3 py-1 text-sm rounded-full ">
+                   {order.delivery_status === "pending" ? (
+                    <p className="bg-blue-100 text-blue-700 font-medium">Pending delivery</p>
+                   ): (
+                    <p className="bg-green-100 text-green-700 font-medium">Delivered</p>
+                   )}
                   </span>
                 </div>
               </div>
 
               {/* Order Total */}
               <div className="mt-4">
-                <p className="text-gray-700">
-                  <span className="font-semibold">💰 Total:</span> ₦{order.total_amount}
+                <p className="text-black-700">
+                  <span className="font-bold">💰 Total:</span> ₦{order.total_amount.toLocaleString()}
                 </p>
               </div>
 
@@ -179,7 +183,7 @@ export default function ClientDashboard() {
                       <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                     </div>
 
-                    <p className="font-semibold text-gray-700">₦{item.price}</p>
+                    <p className="font-semibold text-gray-700">₦{item.price.toLocaleString()}</p>
                   </li>
                 ))}
               </ul>

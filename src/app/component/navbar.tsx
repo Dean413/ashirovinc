@@ -50,7 +50,7 @@ export default function Navbar() {
   const signOut = async () => {
     clearCart();
     await supabase.auth.signOut();
-    router.push("/sign-in");
+    router.push("/");
   };
 
   return (
@@ -58,9 +58,7 @@ export default function Navbar() {
       {/* Top Header */}
       <header className="bg-blue-950 text-white py-2 px-4 sticky top-0 z-50">
         <div className="relative max-w-7xl mx-auto flex items-center justify-end gap-4 text-xs md:text-sm">
-          <span className="absolute left-[30%] md:left-1/2 transform -translate-x-1/2 font-semibold">
-            WELCOME TO ASHIROV TECHNOLOGY
-          </span>
+          <span className="absolute left-[30%] md:left-1/2 transform -translate-x-1/2 font-semibold">WELCOME TO ASHIROV TECHNOLOGY</span>
           <div className="flex items-center gap-3">
             <FaFacebook className="hover:text-gray-300 transition" />
             <FaTwitter className="hover:text-gray-300 transition" />
@@ -74,12 +72,7 @@ export default function Navbar() {
       <nav className="bg-white shadow-md px-6 flex items-center justify-between sticky top-7 z-50">
         <div className="container mx-auto flex items-center justify-between">
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setOpen(!open)}
-            className="md:hidden p-2 rounded hover:bg-gray-100 focus:outline-none"
-          >
-            {open ? <X size={28} /> : <Menu size={28} />}
-          </button>
+          <button onClick={() => setOpen(!open)} className="md:hidden p-2 rounded hover:bg-gray-100 focus:outline-none">{open ? <X size={28} /> : <Menu size={28} />}</button>
 
           {/* Logo */}
           <Link href="/" className="flex flex-1 justify-center md:justify-start">
@@ -90,50 +83,51 @@ export default function Navbar() {
           {isDashboard && user ? (
             <ul className="hidden md:flex items-center justify-center flex-1 space-x-6 text-gray-700 font-medium">
               <li>
-                <Link href="/dashboard/client-dashboard" className="hover:text-blue-700 transition">
-                  Orders
-                </Link>
+                <Link href="/dashboard/client-dashboard" className="hover:text-blue-700 transition">Orders</Link>
               </li>
               <li>
-                <Link href="/dashboard/client-dashboard/settings" className="hover:text-blue-700 transition">
-                  Settings
-                </Link>
+                <Link href="/dashboard/client-dashboard/settings" className="hover:text-blue-700 transition">Settings</Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-blue-700 transition">
-                  Shop
-                </Link>
+                <Link href="/products" className="hover:text-blue-700 transition">Shop</Link>
               </li>
               <li>
-                <button onClick={signOut} className="text-red-600 hover:text-red-400 transition">
-                  Sign Out
-                </button>
+                <button onClick={signOut} className="text-red-600 hover:text-red-400 transition">Sign Out</button>
               </li>
+
               {/* Admin Dashboard Link */}
               {user?.user_metadata?.role === "admin" && (
-                <Link href="/dashboard/admin-dashboard" className="font-semibold">
-                  Admin Dashboard
-                </Link>
+                <Link href="/dashboard/admin-dashboard" className="font-semibold">Admin Dashboard</Link>
               )}
+
               <li>
                 <Link href="/dashboard/client-dashboard/settings">
-                {getAvatarOrInitials(user) ? (
-                  <Image
-                    src={getAvatarOrInitials(user)}
-                    alt="Profile picture"
-                    width={40}
-                    height={40}
-                    className="w-10 h-10 rounded-full object-cover shadow-md"
-                  />
-                ) : (
-                  <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold cursor-pointer shadow-md">
-                    {getInitials(user)}
-                  </div>
-                )}
+                  {getAvatarOrInitials(user) ? 
+                  (
+                    <Image
+                      src={getAvatarOrInitials(user)}
+                      alt="Profile picture"
+                      width={40}
+                      height={40}
+                      className="w-10 h-10 rounded-full object-cover shadow-md"
+                    />
+                  ) 
+                  
+                  : 
+                  
+                  (
+                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold cursor-pointer shadow-md">
+                      {getInitials(user)}
+                    </div>
+                  )}
                 </Link>
               </li>
             </ul>
-          ) : (
+          ) 
+          
+          : 
+          
+          (
             <ul className="hidden md:flex items-center space-x-6 text-gray-700 font-medium absolute left-1/2 transform -translate-x-1/2">
               <li>
                 <Link href="/products" className="hover:text-blue-700 transition">Home</Link>
@@ -145,17 +139,25 @@ export default function Navbar() {
                 <Link href="/contact" className="hover:text-blue-700 transition">Contact</Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-blue-700 transition">Shop</Link>
+                <Link href="/services" className="hover:text-blue-700 transition">Services</Link>
+              </li>
+              <li>
+                <Link href="/reviews" className="hover:text-blue-700 transition">Reviews</Link>
               </li>
             </ul>
           )}
 
           {/* User icon for non-dashboard */}
           {!isDashboard && (
-            <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"} className="hidden md:flex items-center space-x-2 ml-4">
-              {user ? <FaUserCheck size={24} className="text-blue-900" /> : <FaUser size={24} className="text-blue-900" />}
-              <SearchBar />
+            <>
+            <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"} className="hidden md:flex items-center space-x-4 ml-4">
+              {user ? 
+              <FaUserCheck size={24} className="text-blue-900" /> 
+              : 
+              <FaUser size={24} className="text-blue-900" />}
             </Link>
+            <SearchBar />
+            </>
           )}
 
           {/* Cart Icon */}

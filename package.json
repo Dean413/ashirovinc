@@ -29,6 +29,7 @@
     "react-slick": "^0.31.0",
     "save": "^2.9.0",
     "slick-carousel": "^1.8.1",
+    "sweetalert2": "^11.23.0",
     "tailwind-merge": "^3.3.1",
     "world-countries": "^5.1.0"
   },
