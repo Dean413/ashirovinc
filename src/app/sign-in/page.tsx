@@ -55,8 +55,6 @@ export default function SignInPage() {
 
       router.push("/dashboard/client-dashboard")
       setMessage("✅ Signed in successfully!");
-
-      console.log("User:", data.user);
     }
     setLoading(false);
   };

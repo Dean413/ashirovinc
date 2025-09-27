@@ -50,6 +50,8 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [products]);
 
+ 
+
   // Fetch products from Supabase
   useEffect(() => {
     const fetchProducts = async () => {
@@ -63,6 +65,8 @@ export default function HomePage() {
     };
     fetchProducts();
   }, []);
+
+  
 
   if (loading || navigating) return <FullPageLoader text="loading..." />;
 

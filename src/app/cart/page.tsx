@@ -133,7 +133,7 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <button onClick={() => removeFromCart(item.id)} className="flex gap-2 items-center text-red-500">
+                <button onClick={() => removeFromCart(item.id)} className="flex gap-2 items-center text-red-500 cursor-pointer">
                   Remove <FaTrash />
                 </button>
               </li>

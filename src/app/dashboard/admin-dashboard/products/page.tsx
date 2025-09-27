@@ -10,7 +10,7 @@ interface Product {
   price?: number;
   stock?: number;
   image_url?: string[];
-  description?: string;
+  description?: string[];
   display?: string;
   ram?: string;
   storage?: string;

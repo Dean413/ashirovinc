@@ -73,7 +73,6 @@ export async function POST(req: Request) {
           .eq("user_id", userId);
 
         if (clearCartError) console.error("Clearing cart failed:", clearCartError);
-        else console.log("Cart cleared for user:", userId);
       }
 
 
@@ -212,8 +211,6 @@ try {
       </div>
     `,
   });
-
-  console.log("Customer and owner emails sent for order:", orderId);
 
 } catch (emailErr) {
   console.error("Email send failed:", emailErr);

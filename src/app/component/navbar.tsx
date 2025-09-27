@@ -111,7 +111,7 @@ export default function Navbar() {
                 <Link href="/products" className="hover:text-blue-700 transition">Shop</Link>
               </li>
               <li>
-                <button onClick={signOut} className="text-red-600 hover:text-red-400 transition">Sign Out</button>
+                <button onClick={signOut} className="text-red-600 hover:text-red-400 transition cursor-pointer">Sign Out</button>
               </li>
 
               {/* Admin Dashboard Link */}

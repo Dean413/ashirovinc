@@ -9,7 +9,7 @@ interface Product {
   price?: number;
   stock?: number;
   image_url?: string[];
-  description?: string;
+  description?: string[];
   display?: string;
   ram?: string;
   storage?: string;
@@ -28,7 +28,7 @@ export default function ProductForm({ fetchProducts, editProduct, clearEdit }: P
     price: undefined,
     stock: undefined,
     image_url: [],
-    description: "",
+    description: [],
     display: "",
     ram: "",
     storage: "",
@@ -79,19 +79,25 @@ export default function ProductForm({ fetchProducts, editProduct, clearEdit }: P
   };
 
   // Submit product (insert or update)
-  const handleSubmit = async () => {
-    if (!form.name || !form.price) return alert("Name and price are required.");
+ const handleSubmit = async () => {
+    if (!form.name || !form.price)
+      return alert("Name and price are required.");
     setLoading(true);
 
     try {
-      const res = await fetch("/api/add-products", {
-        method: "POST",
+      const url = editProduct
+        ? `/api/add-products/${form.id}`
+        : "/api/add-products";
+      const method = editProduct ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
       const text = await res.text();
-      let data;
+      let data: any;
       try {
         data = JSON.parse(text);
       } catch {
@@ -110,7 +116,7 @@ export default function ProductForm({ fetchProducts, editProduct, clearEdit }: P
         price: undefined,
         stock: undefined,
         image_url: [],
-        description: "",
+        description: [],
         display: "",
         ram: "",
         storage: "",
@@ -156,11 +162,20 @@ export default function ProductForm({ fetchProducts, editProduct, clearEdit }: P
         className="border px-2 py-1 rounded"
       />
       <textarea
-        placeholder="Description"
-        value={form.description}
-        onChange={(e) => setForm({ ...form, description: e.target.value })}
-        className="border px-2 py-1 rounded"
-      />
+  placeholder="Description (one item per line)"
+  value={form.description?.join("\n") || ""} // show each item on a new line
+  onChange={(e) =>
+    setForm({
+      ...form,
+      description: e.target.value
+        .split("\n")
+      
+        
+    })
+  }
+  className="border px-2 py-1 rounded"
+/>
+
       <input
         type="text"
         placeholder="Display"

@@ -46,7 +46,6 @@ export default function AdminOrders() {
       if (res.ok) setOrders(data.orders || []);
       else throw new Error(data.error || "Failed to fetch orders");
     } catch (err: any) {
-      console.log("Fetch orders error:", err);
       alert(err.message);
     } finally {
       setLoading(false);
