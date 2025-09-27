@@ -1,7 +1,10 @@
 "use client";
 
+import { DeleteOrderButton, NotifyCustomerButton, ToggleDeliveryButton } from "@/app/component/admin-actions";
 import FullPageLoader from "@/app/component/page-reloader";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 type OrderItem = {
   id: string;
@@ -34,6 +37,8 @@ export default function AdminOrders() {
   const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "delivered">("all");
   const [searchTerm, setSearchTerm] = useState("");
 
+
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
@@ -49,34 +54,6 @@ export default function AdminOrders() {
       alert(err.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const deleteOrder = async (orderId: string) => {
-    if (!confirm("Delete this order?")) return;
-    try {
-      const res = await fetch(`/api/delete-order?id=${orderId}`, { method: "DELETE" });
-      const data = await res.json();
-      if (res.ok) fetchOrders();
-      else throw new Error(data.error || "Failed to delete order");
-    } catch (err: any) {
-      alert(err.message);
-    }
-  };
-
-  const toggleDeliveryStatus = async (orderId: string, currentStatus: string) => {
-    const newStatus = currentStatus === "pending" ? "delivered" : "pending";
-    try {
-      const res = await fetch("/api/update-delivery", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, status: newStatus }),
-      });
-      const data = await res.json();
-      if (res.ok) fetchOrders();
-      else throw new Error(data.error || "Failed to update delivery status");
-    } catch (err: any) {
-      alert(err.message);
     }
   };
 
@@ -162,29 +139,14 @@ export default function AdminOrders() {
                  <td className="border px-2 py-1">{order.delivery_method}</td>
                  <td className="border px-2 py-1">
                   <span
-                    className={`px-2 py-1 rounded text-white ${
-                      order.delivery_status === "pending"
-                        ? "bg-yellow-500"
-                        : order.delivery_status === "delivered"
-                        ? "bg-green-600"
-                        : "bg-gray-400"
-                    }`}
-                  >
+                    className={`px-2 py-1 rounded text-white ${ order.delivery_status === "pending" ? "bg-yellow-500" : order.delivery_status === "delivered"  ? "bg-green-600" : "bg-gray-400"}`}>
                     {order.delivery_status}
                   </span>
                 </td>
                 {/* <td className="border px-2 py-1">{order.email}</td> */}
                 <td className="border px-2 py-1">₦{order.total_amount?.toLocaleString() || 0}</td>
                 <td className="border px-2 py-1">
-                  <span
-                    className={`px-2 py-1 rounded text-white ${
-                      order.status === "pending"
-                        ? "bg-yellow-500"
-                        : order.status === "completed"
-                        ? "bg-green-600"
-                        : "bg-gray-400"
-                    }`}
-                  >
+                  <span className={`px-2 py-1 rounded text-white ${ order.status === "pending" ? "bg-yellow-500" : order.status === "completed" ? "bg-green-600" : "bg-gray-400"  }`}>
                     {order.status}
                   </span>
                 </td>
@@ -193,58 +155,13 @@ export default function AdminOrders() {
                 <td className="border px-2 py-1">{order.reference}</td>
                 <td className="border px-2 py-1">{new Date(order.created_at).toLocaleString()}</td>
                 <td className="border px-2 py-1 flex gap-2">
-                  <button
-                    className="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
-                    onClick={() => {
-                      setExpandedOrder(expandedOrder === order.id ? null : order.id)
-                      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth", })
-                    }}
-                  >
+                  <button className="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                    onClick={() => { setExpandedOrder(expandedOrder === order.id ? null : order.id); window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth", }) }}>
                     {expandedOrder === order.id ? "Hide Items" : "View Items"}
                   </button>
-
-                  <button
-                    className="px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700"
-                    onClick={() =>
-                      toggleDeliveryStatus(order.id, order.delivery_status)
-                    }
-                  >
-                    {order.delivery_status === "pending" ? "Mark Delivered" : "Mark Pending"}
-                  </button>
-
-                  {/* ✨ NEW: Notify Customer button */}
-  <button
-    className="px-2 py-1 rounded bg-purple-600 text-white hover:bg-purple-700"
-    onClick={async () => {
-      try {
-        const res = await fetch("/api/notify-customer", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: order.email,   // or wherever you store the customer's email
-            name: order.name,
-            orderId: order.id,
-            deliveryMethod: order.delivery_method,
-            address: order.address,
-          })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to send email");
-        alert("Notification email sent to customer.");
-      } catch (err: any) {
-        alert(err.message);
-      }
-    }}
-  >
-    Notify Customer
-  </button>
-
-                  <button
-                    className="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700"
-                    onClick={() => deleteOrder(order.id)}
-                  >
-                    Delete
-                  </button>
+                  <ToggleDeliveryButton orderId={order.id} currentStatus={order.delivery_status} onStatusChange={fetchOrders}/>
+                  <NotifyCustomerButton order={order} />
+                 <DeleteOrderButton orderId={order.id} onDelete={fetchOrders} />
                 </td>
               </tr>
             ))}
@@ -253,21 +170,9 @@ export default function AdminOrders() {
 
         {/* Pagination Controls */}
         <div className="mt-4 flex justify-center gap-2">
-          <button
-            className="px-3 py-1 border rounded disabled:opacity-50"
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Prev
-          </button>
-          <span className="px-3 py-1">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            className="px-3 py-1 border rounded disabled:opacity-50"
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
+          <button className="px-3 py-1 border rounded disabled:opacity-50" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Prev</button>
+          <span className="px-3 py-1">Page {currentPage} of {totalPages}</span>
+          <button className="px-3 py-1 border rounded disabled:opacity-50" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
             Next
           </button>
         </div>
@@ -276,35 +181,37 @@ export default function AdminOrders() {
         {paginatedOrders.map(
           (order) =>
             expandedOrder === order.id && (
-              <div
-                key={order.id + "-items"}
-                className="mt-2 mb-4 border rounded bg-gray-50 p-4"
-              >
+              <div key={order.id + "-items"} className="mt-2 mb-4 border rounded bg-gray-50 p-4">
                 <h3 className="font-semibold mb-2">Order Items</h3>
-                {order.items?.length ? (
-                  <table className="w-full border-collapse border border-gray-300">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border px-2 py-1">Product</th>
-                        <th className="border px-2 py-1">Price</th>
-                        <th className="border px-2 py-1">Quantity</th>
-                        <th className="border px-2 py-1">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {order.items.map((item) => (
-                        <tr key={item.id}>
-                          <td className="border px-2 py-1">{item.product_name}</td>
-                          <td className="border px-2 py-1">₦{item.price.toLocaleString()}</td>
-                          <td className="border px-2 py-1">{item.quantity}</td>
-                          <td className="border px-2 py-1">₦{(item.price * item.quantity).toLocaleString()}</td>
+                {order.items?.length ? 
+                  (
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border px-2 py-1">Product</th>
+                          <th className="border px-2 py-1">Price</th>
+                          <th className="border px-2 py-1">Quantity</th>
+                          <th className="border px-2 py-1">Total</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <p>No items found for this order.</p>
-                )}
+                      </thead>
+
+                      <tbody>
+                        {order.items.map((item) => (
+                          <tr key={item.id}>
+                            <td className="border px-2 py-1">{item.product_name}</td>
+                            <td className="border px-2 py-1">₦{item.price.toLocaleString()}</td>
+                            <td className="border px-2 py-1">{item.quantity}</td>
+                            <td className="border px-2 py-1">₦{(item.price * item.quantity).toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) 
+                  : 
+                  (
+                    <p>No items found for this order.</p>
+                   )
+                }
               </div>
             )
         )}

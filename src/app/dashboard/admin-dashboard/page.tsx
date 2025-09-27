@@ -6,6 +6,7 @@ import FullPageLoader from "@/app/component/page-reloader";
 import { supabase } from "@/lib/supabaseclient";
 
 import AdminProducts from "./products/page";
+import SearchBar from "@/app/component/search-bar";
 
 interface Product {
   id: number;
@@ -22,6 +23,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
   const [actionLoading, setActionLoading] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [hasAccess, setHasAccess] = useState(false)
 
   useEffect(() => {
@@ -45,8 +47,9 @@ export default function AdminDashboard() {
   const deleteProduct = async (id: number) => {
     if (!confirm("Delete this product?")) return;
     setActionLoading(true);
-    const res = await fetch(`/api/products/delete`, {
+    const res = await fetch(`/api/delete-products`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     });
     const result = await res.json();
@@ -55,7 +58,9 @@ export default function AdminDashboard() {
     setActionLoading(false);
   };
 
-  if (loading) return <FullPageLoader />;
+  const brands = Array.from(new Set(products.map((p) => p.brand)));
+  const filteredProducts = selectedBrand && selectedBrand !== "All" ? products.filter((p) => p.brand === selectedBrand) : products;
+  if (loading) return <FullPageLoader text="Loading Admin Dashboard..." />;
 
    if (!hasAccess) {
     return (
@@ -78,10 +83,27 @@ export default function AdminDashboard() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+      <SearchBar />
+       {/* Brand Filter */}
+      <section className="px-6 py-8">
+        <div className="flex flex-wrap justify-center gap-3">
+          <button className={`px-4 py-2 rounded-lg font-medium transition ${!selectedBrand || selectedBrand === "All" ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"}`}
+            onClick={() => setSelectedBrand("All")}> All
+          </button>
+
+          {brands.map((brand) => (
+            <button key={brand} className={`px-4 py-2 rounded-lg font-medium transition ${selectedBrand === brand ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"}`}
+              onClick={() => setSelectedBrand(brand)}>{brand}
+            </button>
+          ))}
+        </div>
+      </section>
 
       
 
       <h2 className="text-xl font-semibold mt-6 mb-2">Products</h2>
+      
+      
       <table className="w-full border">
         <thead>
           <tr className="bg-gray-100">
@@ -93,7 +115,7 @@ export default function AdminDashboard() {
           </tr>
         </thead>
         <tbody>
-          {products.map((p) => (
+          {filteredProducts.map((p) => (
             <tr key={p.id} className="border-b">
               <td className="p-2">{p.name}</td>
               <td className="p-2">{p.brand}</td>

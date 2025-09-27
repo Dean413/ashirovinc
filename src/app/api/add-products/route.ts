@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { name, brand, price, stock, image_url, description, display, ram, storage } = body;
+    const { name, brand, price, stock, image_url, description, display, ram, storage, processor } = body;
 
     if (!name || !price) {
       return NextResponse.json({ error: "Name and price are required" }, { status: 400 });
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const { error } = await supabaseAdmin
       .from("products")
       .insert([
-        { name, brand, price, stock, image_url, description, display, ram, storage },
+        { name, brand, price, stock, image_url, description, display, ram, storage, processor  },
       ]);
 
     if (error) throw error;

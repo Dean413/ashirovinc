@@ -9,6 +9,7 @@ import {getAllStates} from "nigeria-states"
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import FullPageLoader from "../component/page-reloader";
+import { toast } from "react-toastify";
 
 
 export default function CheckoutPage() {
@@ -66,12 +67,12 @@ export default function CheckoutPage() {
 
   const handlePaystackPayment = async () => {
     if (!details.email || !details.name || !details.phone || !details.address || !details.delivery) {
-      alert("Please fill in all required details.");
+      toast.error("Please fill in all required details.");
       return;
     }
 
     if (!(window as any).PaystackPop) {
-      alert("Paystack script not loaded yet. Please try again.");
+      toast.error("Paystack script not loaded yet. Please try again.");
       return;
     }
     setIsPaying(true)
@@ -96,7 +97,7 @@ export default function CheckoutPage() {
       callback: function (response: any) {
       setLoading(true);
 
-  alert("Payment successful. Reference: " + response.reference);
+  toast.success("Payment successful. Reference: " + response.reference);
 
   (async () => {
     const orderData = {

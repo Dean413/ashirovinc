@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 interface Product {
   id?: number;
   name: string;
   brand: string;
   price?: number;
+  processor?: string;
   stock?: number;
   image_url?: string[];
   description?: string[];
@@ -22,6 +24,8 @@ interface ProductFormProps {
 }
 
 export default function ProductForm({ fetchProducts, editProduct, clearEdit }: ProductFormProps) {
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
   const [form, setForm] = useState<Product>({
     name: "",
     brand: "",
@@ -31,6 +35,7 @@ export default function ProductForm({ fetchProducts, editProduct, clearEdit }: P
     description: [],
     display: "",
     ram: "",
+    processor: "",
     storage: "",
   });
 
@@ -81,7 +86,7 @@ export default function ProductForm({ fetchProducts, editProduct, clearEdit }: P
   // Submit product (insert or update)
  const handleSubmit = async () => {
     if (!form.name || !form.price)
-      return alert("Name and price are required.");
+      return toast.error("Name and price are required.");
     setLoading(true);
 
     try {
@@ -106,6 +111,13 @@ export default function ProductForm({ fetchProducts, editProduct, clearEdit }: P
       }
 
       if (!res.ok) throw new Error(data.error || "Failed to save product");
+      if (editProduct){
+        toast.success("product updated successfully")
+      }
+
+      else {
+        toast.success("product added successfully")
+      }
 
       await fetchProducts();
 
@@ -119,20 +131,21 @@ export default function ProductForm({ fetchProducts, editProduct, clearEdit }: P
         description: [],
         display: "",
         ram: "",
+        processor: "",
         storage: "",
       });
 
       // Clear edit state
       if (clearEdit) clearEdit();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow flex flex-col gap-2">
+    <div className="bg-white p-4 rounded shadow flex flex-col gap-2 mb-5">
       <input
         type="text"
         placeholder="Product Name"
@@ -162,19 +175,11 @@ export default function ProductForm({ fetchProducts, editProduct, clearEdit }: P
         className="border px-2 py-1 rounded"
       />
       <textarea
-  placeholder="Description (one item per line)"
-  value={form.description?.join("\n") || ""} // show each item on a new line
-  onChange={(e) =>
-    setForm({
-      ...form,
-      description: e.target.value
-        .split("\n")
-      
-        
-    })
-  }
-  className="border px-2 py-1 rounded"
-/>
+        placeholder="Description (one item per line)"
+        value={form.description?.join("\n") || ""} // show each item on a new line
+        onChange={(e) => setForm({...form, description: e.target.value .split("\n") })}
+        className="border px-2 py-1 rounded"
+      />
 
       <input
         type="text"
@@ -195,6 +200,14 @@ export default function ProductForm({ fetchProducts, editProduct, clearEdit }: P
         placeholder="Storage"
         value={form.storage}
         onChange={(e) => setForm({ ...form, storage: e.target.value })}
+        className="border px-2 py-1 rounded"
+      />
+
+       <input
+        type="text"
+        placeholder="processor"
+        value={form.processor}
+        onChange={(e) => setForm({ ...form, processor: e.target.value })}
         className="border px-2 py-1 rounded"
       />
 

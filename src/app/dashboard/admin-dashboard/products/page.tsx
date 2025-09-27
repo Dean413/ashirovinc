@@ -2,6 +2,10 @@
 import { useEffect, useState } from "react";
 import ProductForm from "@/app/component/product-form";
 import { supabase } from "@/lib/supabaseclient";
+import SearchBar from "@/app/component/search-bar";
+import FullPageLoader from "@/app/component/page-reloader";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 interface Product {
   id: number;
@@ -20,6 +24,12 @@ export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+
+  const brands = Array.from(new Set(products.map((p) => p.brand)));
+  const filteredProducts = selectedBrand && selectedBrand !== "All" ? products.filter((p) => p.brand === selectedBrand) : products;
 
   const fetchProducts = async () => {
     const { data, error } = await supabase.from("products").select("*").order("id");
@@ -34,7 +44,19 @@ export default function AdminProducts() {
   }, []);
 
   const deleteProduct = async (id: number) => {
-  if (!confirm("Delete this product?")) return;
+  const result = await Swal.fire({
+    title: "Delete this product?",
+    text: "This action cannot be undone.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#dc2626", // red
+    cancelButtonColor: "#6b7280",  // gray
+    confirmButtonText: "Yes, delete it",
+  });
+
+  // If user cancels, do nothing
+  if (!result.isConfirmed) return;
+  setDeletingId(id)
 
   try {
     const res = await fetch("/api/delete-products", {
@@ -42,16 +64,20 @@ export default function AdminProducts() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     });
+
     const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || "Failed to delete product");
 
-    if (data.error) throw new Error(data.error);
-
-    await fetchProducts();
+    toast.success("Product deleted successfully");
+    await fetchProducts(); // refresh the list
   } catch (err: any) {
-    alert(err.message);
+    toast.error(err.message || "Something went wrong");
+  } finally {
+    setDeletingId(null)
   }
 };
 
+  if (loading) return <FullPageLoader text="Loading..." />
 
   return (
     <div className="p-8">
@@ -61,6 +87,22 @@ export default function AdminProducts() {
         fetchProducts={fetchProducts}
         editProduct={editingProduct || undefined}
       />
+
+      <SearchBar  />
+       {/* Brand Filter */}
+      <section className="px-6 py-8">
+        <div className="flex flex-wrap justify-center gap-3">
+          <button className={`px-4 py-2 rounded-lg font-medium transition ${!selectedBrand || selectedBrand === "All" ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"}`}
+            onClick={() => setSelectedBrand("All")}> All
+          </button>
+
+          {brands.map((brand) => (
+            <button key={brand} className={`px-4 py-2 rounded-lg font-medium transition ${selectedBrand === brand ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"}`}
+              onClick={() => setSelectedBrand(brand)}>{brand}
+            </button>
+          ))}
+        </div>
+      </section>
 
       <table className="w-full bg-white shadow rounded mt-6">
         <thead>
@@ -73,7 +115,7 @@ export default function AdminProducts() {
           </tr>
         </thead>
         <tbody>
-          {products.map((p) => (
+          {filteredProducts.map((p) => (
             <tr key={p.id} className="border-b hover:bg-gray-50">
               <td className="p-2">{p.name}</td>
               <td className="p-2">{p.brand}</td>
@@ -81,11 +123,24 @@ export default function AdminProducts() {
               <td className="p-2">{p.stock}</td>
               <td className="p-2 flex gap-2">
                 <button
-                  onClick={() => deleteProduct(p.id)}
-                  className="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700"
-                >
-                  Delete
-                </button>
+      onClick={() => deleteProduct(p.id)}
+      disabled={deletingId === p.id}
+      className="bg-red-600 text-white px-3 py-1 rounded"
+    >
+      {deletingId === p.id ? (
+        <svg
+          className="animate-spin h-4 w-4 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+        </svg>
+      ) : (
+        `${deletingId ? "Deleting..." : "Delete"}`
+      )}
+    </button>
 
                 <button
                   onClick={() => { setEditingProduct(p);
