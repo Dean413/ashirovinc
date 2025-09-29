@@ -198,14 +198,23 @@ try {
           <strong>Address:</strong> ${orderRow.delivery_method === "pickup" ? "ADDRESS Suite 045 Orago(Lozumba) commercial complex area 10 Garki (Opposite Garki Sec School, Abuja)" : orderRow.address || "N/A"}
         </p>
         <h3 style="color: #1E3A8A;">Products Ordered</h3>
-        <ul>
-          ${items.map((item: any) => `
-            <li style="margin-bottom: 10px;">
-              <strong>${item.product_name}</strong><br/>
-              Quantity: ${item.quantity}<br/>
-              Price: ₦${Number(item.price).toLocaleString()}
-            </li>`).join('')}
-        </ul>
+        <tbody>
+           ${items.map( (item: any) => `
+            <tr>
+              <td style="padding:8px; border-bottom:1px solid #eee;">
+                ${item.product_image
+                  ? `<img src="${item.product_image}" alt="${item.product_name}" width="50" style="vertical-align:middle; margin-right:8px; border-radius:4px;">`
+                  : ""}
+                ${item.product_name}
+              </td>
+              <td style="text-align:center; padding:8px; border-bottom:1px solid #eee;">${item.quantity}</td>
+              <td style="text-align:right; padding:8px; border-bottom:1px solid #eee;">₦${Number(
+                item.price
+              ).toLocaleString()}</td>
+            </tr>`
+          )
+          .join("")}
+        </tbody>
         <p><strong>Total Paid:</strong> ₦${Number(orderRow.total_amount).toLocaleString()}</p>
         <p style="font-size: 12px; color: #999;">This is an automated notification from Ashirovinc.</p>
       </div>
