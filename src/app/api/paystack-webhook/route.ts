@@ -183,7 +183,7 @@ try {
   // ✅ Owner email (send after customer)
   await transporter.sendMail({
     from: `"Ashirovinc Store" <${process.env.EMAIL_USER}>`,
-    to: process.env.EMAIL_USER, // owner
+    to: "ashirov@ashirovinc.com", // owner
     subject: `New Order Received - #${orderId}`,
     html: `
       <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 8px;">

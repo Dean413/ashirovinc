@@ -9,6 +9,9 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabaseclient";
 import { useCart } from "@/context/cartcontext";
 import FullPageLoader from "@/app/component/page-reloader";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+
 
 interface Product {
   id: number;
@@ -27,7 +30,10 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const { slug } = use(params);
   const [product, setProduct] = useState<Product | null>(null);
   const sliderRef = useRef<Slider | null>(null);
+  const [open, setOpen] = useState(false)
+  const [currentIndex, setCurrentIndex] = useState(0);
 
+  
   useEffect(() => {
     const fetchProduct = async () => {
       const { data, error } = await supabase
@@ -49,22 +55,15 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const isOutOfStock = currentQuantity >= maxStock;
 
   const NextArrow = ({ onClick }: any) => (
-    <button
-      onClick={onClick}
-      className="absolute right-2 top-1/2 -translate-y-1/2 z-20 hidden md:flex
-                 items-center justify-center w-10 h-10 bg-black/30 text-white text-3xl
-                 rounded-full hover:bg-black/50 transition"
-    >
+    <button onClick={onClick} className="absolute right-2 top-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-10 h-10 bg-black/30
+       text-white text-3xl rounded-full hover:bg-black/50 transition">
       ❯
     </button>
   );
+ 
   const PrevArrow = ({ onClick }: any) => (
-    <button
-      onClick={onClick}
-      className="absolute left-2 top-1/2 -translate-y-1/2 z-20 hidden md:flex
-                 items-center justify-center w-10 h-10 bg-black/30 text-white text-3xl
-                 rounded-full hover:bg-black/50 transition"
-    >
+    <button onClick={onClick}
+      className="absolute left-2 top-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-10 h-10 bg-black/30 text-white text-3xl rounded-full hover:bg-black/50 transition">
       ❮
     </button>
   );
@@ -97,20 +96,23 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                         alt={`${product.name} ${idx + 1}`}
                         fill
                         className="object-cover bg-gray-100"
+                        onClick={() => {setOpen(true); setCurrentIndex(idx)}}
                       />
                     </div>
                   ))}
                 </Slider>
+                 <Lightbox
+                    open={open}
+                    close={() => setOpen(false)}
+                    index={currentIndex}
+                    slides={product.image_url.map((url) => ({ src: url }))}
+                  />
 
                 {/* Thumbnails */}
                 <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 gap-2 mt-6">
                   {product.image_url.map((thumb, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => sliderRef.current?.slickGoTo(idx)}
-                      className="cursor-pointer border border-gray-200 rounded-lg overflow-hidden
-                                 hover:ring-2 hover:ring-blue-500 transition"
-                    >
+                    <div key={idx} onClick={() => sliderRef.current?.slickGoTo(idx)} className="cursor-pointer border border-gray-200 rounded-lg overflow-hiddenhover:ring-2 
+                      hover:ring-blue-500 transition">
                       <Image
                         src={thumb}
                         alt={`Thumbnail ${idx + 1}`}

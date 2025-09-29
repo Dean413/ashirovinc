@@ -29,6 +29,7 @@ export default function BrandPage({ params }: { params: Promise<{ brand: string 
   const [products, setProducts] = useState<Product[]>([]);
   const [currentImages, setCurrentImages] = useState<{ [id: number]: number }>({});
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
 
   // Auto-loop images every 7s
   useEffect(() => {

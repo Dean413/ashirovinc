@@ -139,8 +139,9 @@ export default function HomePage() {
 
                   {/* Product Info */}
                   <div className="p-4 flex flex-col flex-1">
+                    <Link href={`/products/brand/${encodeURIComponent(product.brand)}` } className="text-gray-500">{product.brand}</Link>
                     <Link href={`/products/${product.slug}`} onClick={() => setNavigating(true)}>
-                      <small className="text-gray-500">{product.brand}</small>
+                     
                       <h3 className="text-lg font-semibold text-gray-800 mt-1">{product.name}</h3>
                       <p className="text-blue-600 font-bold mt-2">₦{product.price?.toLocaleString()}</p>
 
