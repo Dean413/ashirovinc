@@ -148,7 +148,7 @@ export default function Navbar() {
           
           (
             <ul className="hidden md:flex items-center space-x-6 text-gray-700 font-medium absolute left-1/2 transform -translate-x-1/2">
-              <li>
+              {/* <li>
                 <Link href="/products" className="hover:text-blue-700 transition">Home</Link>
               </li>
               <li>
@@ -162,12 +162,12 @@ export default function Navbar() {
               </li>
               <li>
                 <Link href="/reviews" className="hover:text-blue-700 transition">Reviews</Link>
-              </li>
+              </li> */}
             </ul>
           )}
 
           {/* User icon for non-dashboard */}
-          {!isDashboard && (
+          {/* {!isDashboard && (
             <>
             <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"} className="hidden md:flex items-center space-x-4 ml-4">
               {user ? 
@@ -177,10 +177,10 @@ export default function Navbar() {
             </Link>
             <SearchBar />
             </>
-          )}
+          )} */}
 
           {/* Cart Icon */}
-          {!isDashboard && (
+          {/* {!isDashboard && (
             <Link href="/cart" className="relative ml-4">
               <ShoppingCart className="h-6 w-6 text-blue-600" />
               {getTotalItems() > 0 && (
@@ -189,7 +189,7 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-          )}
+          )} */}
         </div>
 
         {/* Mobile Sidebar */}
@@ -208,10 +208,10 @@ export default function Navbar() {
               </button>
 
               <div className="flex items-center rounded-lg mb-6">
-                <SearchBar />
+                {/* <SearchBar /> */}
               </div>
 
-              <ul className="space-y-4 text-lg font-medium">
+              {/* <ul className="space-y-4 text-lg font-medium">
                 {isDashboard && user ? (
                   <>
                     <li>
@@ -232,30 +232,30 @@ export default function Navbar() {
                 : 
                 
                 (
-                  <>
-                    <li>
-                      <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Home</Link>
-                    </li>
-                     <li>
-                      <Link href="/services" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Services</Link>
-                    </li>
-                    <li>
-                      <Link href="/about" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">About</Link>
-                    </li>
-                    <li>
-                      <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Contact</Link>
-                    </li>
-                     <li>
-                      <Link href="/reviews" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Reviews</Link>
-                    </li>
-                    <div className="rounded-full bg-white text-blue-900 p-2 w-[80%] mx-auto text-center font-bold">
-                      <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
-                        {user ? "Account" : "Sign In"}
-                      </Link>
-                    </div>
-                  </>
+                  // <>
+                  //   <li>
+                  //     <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Home</Link>
+                  //   </li>
+                  //    <li>
+                  //     <Link href="/services" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Services</Link>
+                  //   </li>
+                  //   <li>
+                  //     <Link href="/about" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">About</Link>
+                  //   </li>
+                  //   <li>
+                  //     <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Contact</Link>
+                  //   </li>
+                  //    <li>
+                  //     <Link href="/reviews" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Reviews</Link>
+                  //   </li>
+                  //   <div className="rounded-full bg-white text-blue-900 p-2 w-[80%] mx-auto text-center font-bold">
+                  //     <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
+                  //       {user ? "Account" : "Sign In"}
+                  //     </Link>
+                  //   </div>
+                  // </>
                 )}
-              </ul>
+              </ul> */}
             </motion.div>
           )}
         </AnimatePresence>
