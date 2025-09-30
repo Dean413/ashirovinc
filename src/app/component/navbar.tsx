@@ -91,7 +91,7 @@ export default function Navbar() {
       <nav className="bg-white shadow-md px-6 flex items-center justify-between sticky top-7 z-50">
         <div className="container mx-auto flex items-center justify-between">
           {/* Mobile Menu Button */}
-          <button onClick={() => setOpen(!open)} className="md:hidden p-2 rounded hover:bg-gray-100 focus:outline-none">{open ? <X size={28} /> : <Menu size={28} />}</button>
+          {/* <button onClick={() => setOpen(!open)} className="md:hidden p-2 rounded hover:bg-gray-100 focus:outline-none">{open ? <X size={28} /> : <Menu size={28} />}</button> */}
 
           {/* Logo */}
           <Link href="/" className="flex flex-1 justify-center md:justify-start">
@@ -203,9 +203,9 @@ export default function Navbar() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="fixed top-0 left-0 h-full w-72 bg-blue-900 p-6 text-white z-50 shadow-lg flex flex-col space-y-6"
             >
-              <button onClick={() => setOpen(false)} className="self-end text-white focus:outline-none">
+              {/* <button onClick={() => setOpen(false)} className="self-end text-white focus:outline-none">
                 <X size={28} />
-              </button>
+              </button> */}
 
               <div className="flex items-center rounded-lg mb-6">
                 {/* <SearchBar /> */}
