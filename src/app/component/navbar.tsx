@@ -180,7 +180,7 @@ export default function Navbar() {
           )} */}
 
           {/* Cart Icon */}
-          {/* {!isDashboard && (
+          {!isDashboard && (
             <Link href="/cart" className="relative ml-4">
               <ShoppingCart className="h-6 w-6 text-blue-600" />
               {getTotalItems() > 0 && (
@@ -189,7 +189,7 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-          )} */}
+          )}
         </div>
 
         {/* Mobile Sidebar */}
