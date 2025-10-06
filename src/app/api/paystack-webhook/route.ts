@@ -144,6 +144,7 @@ export async function POST(req: Request) {
 
             <p><strong>Total Paid:</strong> ₦${Number(orderRow.total_amount).toLocaleString()}</p>
             <p>Your order will be processed and shipped as soon as possible. You will receive a notification once it’s ready for collection/delivery.</p>
+           
 
             <h3 style="color: #1E3A8A; border-bottom: 1px solid #eee; padding-bottom: 5px;">Delivery Details</h3>
             <p>
@@ -158,7 +159,7 @@ export async function POST(req: Request) {
             
             </p>
 
-            <p style="margin-top: 20px;">You can track your order in your Ashirovinc account. If you wish to cancel your order, please do so before it’s shipped.</p>
+            <p style="margin-top: 20px;">You can track your order in your Ashirovinc account if you have registered an account with us or visit www.ashirovinc.com/track-order. If you wish to cancel your order, please do so before it’s shipped.</p>
 
             <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;"/>
             <p style="font-size: 12px; color: #999;">Happy Shopping!<br/>Warm Regards, <br/>Ashirovinc Team</p>
