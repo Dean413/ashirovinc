@@ -10,6 +10,7 @@ interface RepairForm {
   bookTitle: string;
   description: string;
   preferredDate: string;
+  images?: File[];
 }
 
 export default function BookRepair() {
@@ -20,7 +21,7 @@ export default function BookRepair() {
     bookTitle: "",
     description: "",
     preferredDate: "",
-
+    images: [],
   });
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +32,11 @@ export default function BookRepair() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
- 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const files = Array.from(e.target.files);
+    setForm((prev) => ({ ...prev, images: files }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +49,9 @@ export default function BookRepair() {
       formData.append("bookTitle", form.bookTitle);
       formData.append("description", form.description);
       formData.append("preferredDate", form.preferredDate);
-     
+      form.images?.forEach((file) => {
+        formData.append(`images`, file);
+      });
 
       const res = await fetch("/api/book-repair", {
         method: "POST",
@@ -60,6 +67,7 @@ export default function BookRepair() {
           bookTitle: "",
           description: "",
           preferredDate: "",
+          images: [],
         });
       } else {
         const err = await res.json();
@@ -142,10 +150,10 @@ export default function BookRepair() {
             className="w-full border border-gray-200 rounded-xl px-4 py-3 shadow-sm focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50"
           />
 
-          <div className="grid md:grid-cols-1 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                Preferred Date for Drop off
+                Preferred Date
               </label>
               <input
                 type="date"
@@ -157,7 +165,22 @@ export default function BookRepair() {
               />
             </div>
 
-           
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">
+                Upload Photos (optional)
+              </label>
+              <div className="flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-xl px-4 py-6 bg-gray-50 hover:border-blue-400 transition">
+                <UploadCloud className="text-blue-500" size={24} />
+                <input
+                  type="file"
+                  name="images"
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  multiple
+                  className="text-sm text-gray-500"
+                />
+              </div>
+            </div>
           </div>
 
           <button

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-export const runtime = "nodejs"; // Ensures Nodemailer works properly in Next.js app router
-
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -21,7 +19,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Configure your transporter (prefer App Password or custom SMTP)
+    // Setup transporter (use your SMTP, not Gmail unless with App Passwords)
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -30,10 +28,22 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Send the mail (no attachments)
+    // Attachments (images)
+    const attachments: any[] = [];
+    const images = formData.getAll("images");
+    for (const img of images) {
+      if (img instanceof File) {
+        const buffer = Buffer.from(await img.arrayBuffer());
+        attachments.push({
+          filename: img.name,
+          content: buffer,
+        });
+      }
+    }
+
     await transporter.sendMail({
       from: `"Ashirov Inc Repairs" <${process.env.EMAIL_USER}>`,
-      to: "support@ashirovinc.com",
+      to: "ashirovinc@gmail.com",
       replyTo: email,
       subject: `Repair Request: ${bookTitle} from ${name}`,
       html: `
@@ -45,6 +55,7 @@ export async function POST(req: NextRequest) {
         <p><strong>Preferred Date:</strong> ${preferredDate}</p>
         <p><strong>Description:</strong> ${description}</p>
       `,
+      attachments,
     });
 
     return NextResponse.json(
