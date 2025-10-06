@@ -5,11 +5,12 @@ import { useState, useEffect, useRef } from "react";
 import { Menu, ShoppingCart, X } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaFacebook, FaTwitter, FaInstagram, FaWhatsapp, FaUser, FaUserCheck } from "react-icons/fa";
+import { FaFacebook, FaTwitter, FaInstagram, FaWhatsapp, FaUser, FaUserCheck, FaTiktok } from "react-icons/fa";
 import SearchBar from "./search-bar";
 import { useCart } from "@/context/cartcontext";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter, usePathname } from "next/navigation";
+import {Typewriter} from "react-simple-typewriter"
 
 const getInitials = (user: any) => {
   const fullName = user.user_metadata?.full_name;
@@ -77,12 +78,25 @@ export default function Navbar() {
       {/* Top Header */}
       <header className="bg-blue-950 text-white py-2 px-4 sticky top-0 z-50">
         <div className="relative max-w-7xl mx-auto flex items-center justify-end gap-4 text-xs md:text-sm">
-          <span className="absolute left-[30%] md:left-1/2 transform -translate-x-1/2 font-semibold">WELCOME TO ASHIROV TECHNOLOGY</span>
+          <span className="absolute left-[30%] md:left-1/2 transform -translate-x-1/2 font-semibold">
+          <Typewriter
+            words=
+            {
+              ['Welcome to Ashirov Inc',
+                'Affordable Quality Laptops in Nigeria',
+                'Your Trusted Source for UK-Used Computers',
+                'Get the Best Deals on Reliable Tech',
+                'Shop Smart, Work Faster with Ashirov Inc'
+              ]
+            } loop={false} cursor cursorStyle="|" typeSpeed={50} deleteSpeed={50} delaySpeed={2000}
+          />
+          </span>
           <div className="flex items-center gap-3">
-            <FaFacebook className="hover:text-gray-300 transition" />
-            <FaTwitter className="hover:text-gray-300 transition" />
-            <FaInstagram className="hover:text-gray-300 transition" />
-            <FaWhatsapp className="hover:text-gray-300 transition" />
+            <a href="https://www.facebook.com/share/17XYXACYee/" target="_blank" className="hover:text-blue-400"><FaFacebook /></a>          
+            <a href="https://www.tiktok.com/@ashirov_inc_" target="_blank"  className="hover:text-black"><FaTiktok /></a>
+            <a href="https://x.com/ASHirov_inc_?t=zgCQtUsVgTbFi-FcQZ99AA&s=09" target="_blank" className="hover:text-blue-600"><FaTwitter /></a>          
+            <a href="https://www.instagram.com/ashirov_inc_?igsh=MTUxN2lzcmp3a2hu" target="_blank" className="hover:text-red-500"><FaInstagram /></a>         
+            <a href="https://wa.me/2348156959605?text=Hello%2C%20I%20saw%20your%20website%20and%20wanted%20to%20chat!" target="_blank" className="hover:text-green-500"><FaWhatsapp /></a>                   
           </div>
         </div>
       </header>

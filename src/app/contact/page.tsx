@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { MapPin, Phone, Mail, Globe } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -8,7 +9,7 @@ export default function Contact() {
     email: "",
     message: "",
   });
-  const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -18,7 +19,7 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus("Sending...");
+    setLoading(true);
 
     try {
       const res = await fetch("/api/contact", {
@@ -28,13 +29,15 @@ export default function Contact() {
       });
 
       if (res.ok) {
-        setStatus("✅ Message sent successfully!");
+        toast.success("Message sent successfully!");
         setFormData({ name: "", email: "", message: "" });
       } else {
-        setStatus("❌ Failed to send. Try again later.");
+        toast.error("Failed to send. Try again later.");
       }
     } catch (error) {
-      setStatus("❌ Error sending message.");
+      toast.error("Error sending message.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,7 +56,7 @@ export default function Contact() {
         {/* Google Map */}
         <div className="rounded-2xl overflow-hidden shadow-xl h-[400px] md:h-[500px]">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.2954145779067!2d7.481053475066002!3d9.036793791024873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x104e0bad2ccd69f5%3A0x15ba286caeeaaca7!2sASHirov%20Technology!5e0!3m2!1sen!2sng!4v1759378572098!5m2!1sen!2sng"
+           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.2954145779067!2d7.481053475066002!3d9.036793791024873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x104e0bad2ccd69f5%3A0x15ba286caeeaaca7!2sASHirov%20Technology!5e0!3m2!1sen!2sng!4v1759378572098!5m2!1sen!2sng"
             width="100%"
             height="100%"
             className="border-0 w-full h-full"
@@ -68,16 +71,13 @@ export default function Contact() {
           <div className="flex items-start p-5 bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition">
             <MapPin className="w-6 h-6 text-blue-600 mt-1 mr-4" />
             <p className="text-gray-700">
-              <strong>Address:</strong> Lozumba Commercial Complex, Suit 120
-              Orago Commercial Complex, Kam Salem Street, Area 10 Garki Abuja,
-              FCT Suit 120, Orago, 6 Awka St, Garki, Abuja 900246, Federal
-              Capital Territory
+              <strong>Address:</strong> Lozumba Commercial Complex, Suit 120...
             </p>
           </div>
           <div className="flex items-center p-5 bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition">
             <Phone className="w-6 h-6 text-blue-600 mr-4" />
             <p className="text-gray-700">
-              <strong>Phone/WhatsApp:</strong> +234 [Insert Phone Number]
+              <strong>Phone/WhatsApp:</strong> +234 815 695 9605
             </p>
           </div>
           <div className="flex items-center p-5 bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition">
@@ -150,14 +150,15 @@ export default function Contact() {
 
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white font-semibold px-6 py-3 rounded-lg transition"
+          disabled={loading}
+          className={`w-full font-semibold px-6 py-3 rounded-lg transition text-white ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90"
+          }`}
         >
-          🚀 Send Message
+          {loading ? "⏳ Sending..." : "🚀 Send Message"}
         </button>
-
-        {status && (
-          <p className="text-sm mt-3 text-center text-gray-600">{status}</p>
-        )}
       </form>
     </div>
   );

@@ -165,8 +165,8 @@ export async function POST(req: Request) {
           </div>
         `,
       });
-
-      // 4️⃣ Send confirmation email to customer
+ 
+      
 try {
   const transporter = nodemailer.createTransport({
     service: "gmail",

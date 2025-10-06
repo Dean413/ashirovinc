@@ -6,6 +6,7 @@ import SearchBar from "@/app/component/search-bar";
 import FullPageLoader from "@/app/component/page-reloader";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: number;
@@ -21,11 +22,13 @@ interface Product {
 }
 
 export default function AdminProducts() {
+  const router = useRouter()
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [hasAccess, setHasAccess] = useState(false)
 
 
   const brands = Array.from(new Set(products.map((p) => p.brand)));
@@ -77,6 +80,22 @@ export default function AdminProducts() {
   }
 };
 
+  if (!hasAccess) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[70vh] text-center p-6">
+        <h1 className="text-2xl font-bold mb-4">No Access</h1>
+        <p className="text-gray-600 mb-6">
+          You do not have permission to view this page.
+        </p>
+        <button
+          onClick={() => router.push("/")}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Go Back Home
+        </button>
+      </div>
+    );
+  }
   if (loading) return <FullPageLoader text="Loading..." />
 
   return (

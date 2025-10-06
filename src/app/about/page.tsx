@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Cpu, Package, Users } from "lucide-react";
+import Image from "next/image";
 
 export default function About() {
   return (
@@ -49,50 +50,68 @@ export default function About() {
       <h2 className="text-3xl font-bold text-gray-800 mt-16 mb-6 text-center">
         Our Operations
       </h2>
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* Card 1 */}
-        <div className="bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl transition">
-          <div className="h-48 bg-gray-200 flex items-center justify-center">
-            {/* Placeholder for actual image */}
-            <span className="text-gray-400 text-xl">Image of systems being repaired</span>
-          </div>
-          <div className="p-5">
-            <Cpu className="w-6 h-6 text-blue-600 mb-2" />
-            <h3 className="font-semibold text-lg mb-2">Repairs & Maintenance</h3>
-            <p className="text-gray-600 text-sm">
-              All laptops are tested, repaired if needed, and certified before sale.
-            </p>
-          </div>
-        </div>
+     <div className="grid md:grid-cols-3 gap-8">
+  {/* Card 1 */}
+  <div className="bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl transition">
+    <div className="h-78 bg-gray-200 overflow-hidden">
+      <Image
+        src="/system-repair.jpg"
+        alt="System Repair"
+        width={400}
+        height={400}
+        className="object-cover w-full h-full"
+      />
+    </div>
+    <div className="p-5">
+      <Cpu className="w-6 h-6 text-blue-600 mb-2" />
+      <h3 className="font-semibold text-lg mb-2">Repairs & Maintenance</h3>
+      <p className="text-gray-600 text-sm">
+       Maintenance and repair, Installation services
+      </p>
+    </div>
+  </div>
 
-        {/* Card 2 */}
-        <div className="bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl transition">
-          <div className="h-48 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400 text-xl">Image of shipping/packaging</span>
-          </div>
-          <div className="p-5">
-            <Package className="w-6 h-6 text-blue-600 mb-2" />
-            <h3 className="font-semibold text-lg mb-2">Packaging & Delivery</h3>
-            <p className="text-gray-600 text-sm">
-              Devices are securely packaged and shipped nationwide with tracking.
-            </p>
-          </div>
-        </div>
+  {/* Card 2 */}
+  <div className="bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl transition">
+    <div className="h-78 bg-gray-200 overflow-hidden">
+      <Image
+        src="/order-package.jpg"
+        alt="Order Packaging"
+        width={400}
+        height={400}
+        className="object-cover w-full h-full"
+      />
+    </div>
+    <div className="p-5">
+      <Package className="w-6 h-6 text-blue-600 mb-2" />
+      <h3 className="font-semibold text-lg mb-2">Packaging & Delivery</h3>
+      <p className="text-gray-600 text-sm">
+        Devices are securely packaged and shipped nationwide with tracking.
+      </p>
+    </div>
+  </div>
 
-        {/* Card 3 */}
-        <div className="bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl transition">
-          <div className="h-48 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400 text-xl">Image of happy customers</span>
-          </div>
-          <div className="p-5">
-            <Users className="w-6 h-6 text-blue-600 mb-2" />
-            <h3 className="font-semibold text-lg mb-2">Customer Satisfaction</h3>
-            <p className="text-gray-600 text-sm">
-              We prioritize trust and support, ensuring every customer is happy.
-            </p>
-          </div>
-        </div>
-      </div>
+  {/* Card 3 */}
+  <div className="bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl transition">
+    <div className="h-78 bg-gray-200 overflow-hidden">
+      <Image
+        src="/satisfied-customer.jpg"
+        alt="Happy Customers"
+        width={400}
+        height={400}
+        className="object-cover w-full h-full"
+      />
+    </div>
+    <div className="p-5">
+      <Users className="w-6 h-6 text-blue-600 mb-2" />
+      <h3 className="font-semibold text-lg mb-2">Customer Satisfaction</h3>
+      <p className="text-gray-600 text-sm">
+        We prioritize trust and support, ensuring every customer is happy.
+      </p>
+    </div>
+  </div>
+</div>
+
     </div>
   );
 }

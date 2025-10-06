@@ -23,7 +23,7 @@ export default function ReturnPolicy() {
         <section>
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">✅ Eligibility</h2>
           <ul className="list-disc list-inside space-y-2 text-gray-600">
-            <li>Returns accepted within <span className="font-medium">7 days</span> of delivery.</li>
+            <li>Returns accepted within <span className="font-medium"> warranty period (30 days</span> of delivery).</li>
             <li>Item must be in its original condition with all accessories.</li>
             <li>Packaging should be intact (including manuals, chargers, etc.).</li>
           </ul>
@@ -37,6 +37,7 @@ export default function ReturnPolicy() {
             <li>Physical damage caused by misuse or accidents.</li>
             <li>Accessories (batteries, chargers, etc.) unless faulty on delivery.</li>
             <li>Items that have been tampered with or repaired by a third party.</li>
+            <li>Items that have exceeded the warranty period (1 month)</li>
           </ul>
         </section>
 
@@ -56,6 +57,8 @@ export default function ReturnPolicy() {
             <span className="font-medium">5–10 business days</span> to your original 
             payment method.
           </p>
+
+          <p><strong>Note:</strong> A 15% fee will be charged for refunds.</p>
         </section>
 
         {/* Exchanges */}
@@ -90,7 +93,7 @@ export default function ReturnPolicy() {
             >
               support@ashirovinc.com
             </a>{" "}
-            or call <span className="font-medium">+234-XXX-XXX-XXXX</span>.
+            or call <span className="font-medium">+234 815 695 9605</span>.
           </p>
         </section>
       </div>

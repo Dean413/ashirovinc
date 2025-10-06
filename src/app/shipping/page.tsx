@@ -33,8 +33,8 @@ export default function Shipping() {
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-2">🚛 Delivery Time</h2>
             <ul className="list-disc list-inside space-y-2 text-gray-600">
-              <li>Lagos: <span className="font-medium">2–5 working days</span>.</li>
-              <li>Outside Lagos: <span className="font-medium">3–7 working days</span>.</li>
+              <li>Abuja: <span className="font-medium">2–5 working days</span>.</li>
+              <li>Outside Abuja: <span className="font-medium">3–7 working days</span>.</li>
             </ul>
           </div>
         </section>

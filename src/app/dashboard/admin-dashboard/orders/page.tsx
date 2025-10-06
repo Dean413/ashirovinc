@@ -3,8 +3,8 @@
 import { DeleteOrderButton, NotifyCustomerButton, ToggleDeliveryButton } from "@/app/component/admin-actions";
 import FullPageLoader from "@/app/component/page-reloader";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
+
 
 type OrderItem = {
   id: string;
@@ -31,11 +31,13 @@ type Order = {
 };
 
 export default function AdminOrders() {
+  const router = useRouter()
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "delivered">("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [hasAccess, setHasAccess] = useState(false)
 
 
 
@@ -64,6 +66,23 @@ export default function AdminOrders() {
   if (loading) return <FullPageLoader text="fetching orders..." />
   if (orders.length === 0)
     return <p className="p-6 text-gray-500">No orders found.</p>;
+
+  if (!hasAccess) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[70vh] text-center p-6">
+        <h1 className="text-2xl font-bold mb-4">No Access</h1>
+        <p className="text-gray-600 mb-6">
+          You do not have permission to view this page.
+        </p>
+        <button
+          onClick={() => router.push("/")}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Go Back Home
+        </button>
+      </div>
+    );
+  }
 
   // Apply filters: delivery_status + search
   const filteredOrders = orders.filter(order => {

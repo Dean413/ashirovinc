@@ -12,12 +12,12 @@ export default function FAQ() {
     {
       question: "Do your laptops come with warranty?",
       answer:
-        "Yes, some laptops come with limited warranty (varies per product). Warranty details are stated in the product description.",
+        "Yes, our laptops come with a limited warranty period of 30 days.",
     },
     {
       question: "How long does delivery take?",
       answer:
-        "Delivery within Lagos takes 2–5 working days, while outside Lagos takes 3–7 working days.",
+        "Delivery within Abuja takes 2–5 working days, while outside Abuja takes 3–7 working days.",
     },
     {
       question: "Do you deliver nationwide?",
@@ -27,12 +27,12 @@ export default function FAQ() {
     {
       question: "What payment methods do you accept?",
       answer:
-        "We accept Paystack, Flutterwave, and bank transfers for safe and secure transactions.",
+        "We accept Paystack, and bank transfers for safe and secure transactions.",
     },
     {
       question: "Can I return a laptop if it’s faulty?",
       answer:
-        "Yes, you can return within 7 days if the laptop is faulty or not as described. Please check our Return Policy for details.",
+        "Yes, you can return within 30 days if the laptop is faulty or not as described. Please check our Return Policy for details.",
     },
   ];
 
