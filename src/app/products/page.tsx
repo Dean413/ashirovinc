@@ -24,12 +24,14 @@ interface Product {
   display?: string;
   slug: string;
   stock: number;
+  category: string;
 }
 
 export default function HomePage() {
   const { addToCart, cartItems } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [currentImages, setCurrentImages] = useState<{ [id: number]: number }>({});
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [navigating, setNavigating] = useState(false);
@@ -58,7 +60,7 @@ export default function HomePage() {
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false }).neq("type", "SRC");
 
       if (data && !error) setProducts(data as Product[]);
       setLoading(false);
@@ -70,26 +72,85 @@ export default function HomePage() {
 
   if (loading || navigating) return <FullPageLoader text="loading..." />;
 
+  // Get unique brands and categories
   const brands = Array.from(new Set(products.map((p) => p.brand)));
-  const filteredProducts = selectedBrand && selectedBrand !== "All" ? products.filter((p) => p.brand === selectedBrand) : products;
+  const categories = Array.from(new Set(products.map((p) => p.category)));
+
+  // Filter products by selected brand AND category
+  const filteredProducts = products.filter((p) => {
+    const brandMatch = !selectedBrand || selectedBrand === "All" || p.brand === selectedBrand;
+    const categoryMatch = !selectedCategory || selectedCategory === "All" || p.category === selectedCategory;
+    return brandMatch && categoryMatch;
+  });
+
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Carousel />
-      {/* Brand Filter */}
       <section className="px-6 py-8">
-        <div className="flex flex-wrap justify-center gap-3">
-          <button className={`px-4 py-2 rounded-lg font-medium transition ${!selectedBrand || selectedBrand === "All" ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"}`}
-            onClick={() => setSelectedBrand("All")}> All
-          </button>
+  <div className="flex flex-col items-center gap-6">
+    {/* All button */}
+    <button
+      className={`px-4 py-2 rounded-lg font-medium transition ${
+        (!selectedBrand && !selectedCategory) || (selectedBrand === "All" && selectedCategory === "All")
+          ? "bg-blue-900 text-white"
+          : "bg-gray-200 text-gray-700"
+      }`}
+      onClick={() => {
+        setSelectedBrand("All");
+        setSelectedCategory("All");
+      }}
+    >
+      All
+    </button>
 
-          {brands.map((brand) => (
-            <button key={brand} className={`px-4 py-2 rounded-lg font-medium transition ${selectedBrand === brand ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"}`}
-              onClick={() => setSelectedBrand(brand)}>{brand}
-            </button>
+    {/* Dropdowns */}
+    <div className="flex flex-col md:flex-row gap-6 w-full justify-center items-center">
+      
+
+      {/* Category Dropdown */}
+      <div className="flex flex-col items-center">
+        <label className="font-semibold mb-2" htmlFor="category-select">
+          Category
+        </label>
+        <select
+          id="category-select"
+          value={selectedCategory || ""}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">select</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
           ))}
-        </div>
-      </section>
+        </select>
+      </div>
+
+      {/* Brand Dropdown */}
+      <div className="flex flex-col items-center">
+        <label className="font-semibold mb-2" htmlFor="brand-select">
+          Brand
+        </label>
+        <select
+          id="brand-select"
+          value={selectedBrand || ""}
+          onChange={(e) => setSelectedBrand(e.target.value)}
+          className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">select</option>
+          {brands.map((brand) => (
+            <option key={brand} value={brand}>
+              {brand}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  </div>
+</section>
+
 
         {/*intro*/}
         <section className="py-16 px-6 text-center bg-gradient-to-r from-blue-50 to-blue-100">
