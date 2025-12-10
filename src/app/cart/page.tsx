@@ -42,23 +42,61 @@ export default function CartPage() {
   };
 
   const handleCheckout = async () => {
-    setLoading(true);
-    try {
-      if (cartItems.some((c) => c.quantity === 0)) {
-        alert("Each item must have quantity greater than 0");
+  setLoading(true);
+
+  try {
+    // 1️⃣ validate quantity > 0
+    if (cartItems.some((c) => c.quantity === 0)) {
+      alert("Each item must have quantity greater than 0");
+      setLoading(false);
+      return;
+    }
+
+    // 2️⃣ validate inventory
+    const isValid = await validateCart();
+    if (!isValid) {
+      setLoading(false);
+      return;
+    }
+
+    // 3️⃣ fetch serials for each product
+    const serialAssignments: Record<number, any[]> = {};
+
+    for (const item of cartItems) {
+      const { data: serials, error } = await supabase
+        .from("product_units")
+        .select("*")
+        .eq("product_id", item.id)
+        .eq("status", "available")
+        
+
+      if (error) throw error;
+
+      if (!serials || serials.length < item.quantity) {
+        alert(
+          `Not enough serials for ${item.name}. Only ${serials?.length ?? 0} available.`
+        );
         setLoading(false);
         return;
       }
 
-      const isValid = await validateCart();
-      if (isValid) router.push("/checkout");
-      else setLoading(false);
-    } catch (err) {
-      console.error("Checkout failed", err);
-      alert("Something went wrong. Please try again.");
-      setLoading(false);
+      serialAssignments[item.id] = serials;
     }
-  };
+
+    // 4️⃣ temporarily store serials in localStorage for the checkout page
+    localStorage.setItem("serial_reservations", JSON.stringify(serialAssignments));
+
+    // (Optionally also reduce stock here or wait until payment)
+
+    router.push("/checkout");
+  } catch (e) {
+    console.error("Checkout error:", e);
+    alert("Something went wrong.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
