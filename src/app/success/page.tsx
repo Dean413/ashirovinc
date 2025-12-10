@@ -18,9 +18,7 @@ export default function SuccessPage() {
 
   useEffect(() => {
     const savedOrder = localStorage.getItem("lastOrder");
-    if (savedOrder) {
-      setOrder(JSON.parse(savedOrder));
-    }
+    if (savedOrder) {setOrder(JSON.parse(savedOrder));}
     setLoading(false);
   }, []);
 
@@ -40,13 +38,8 @@ export default function SuccessPage() {
   return (
     <div className="max-w-3xl mx-auto p-6">
       <div className="bg-white shadow rounded-lg p-6 text-center">
-        <h1 className="text-3xl font-bold text-green-600 mb-4">
-          🎉 Payment Successful!
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Thank you <span className="font-semibold">{order.details.name}</span> for your order.
-        </p>
-
+        <h1 className="text-3xl font-bold text-green-600 mb-4">🎉 Payment Successful!</h1>
+        <p className="text-gray-600 mb-6">Thank you <span className="font-semibold">{order.details.name}</span> for your order.</p>
         <div className="bg-gray-50 p-4 rounded-lg mb-6">
           <h2 className="text-lg font-semibold mb-3">Order Summary</h2>
           <ul className="space-y-2 text-left">
@@ -57,9 +50,7 @@ export default function SuccessPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 font-bold">
-            Total: ₦{order.total.toLocaleString()}
-          </p>
+          <p className="mt-3 font-bold">Total: ₦{order.total.toLocaleString()}</p>
         </div>
 
         <div className="bg-gray-50 p-4 rounded-lg mb-6 text-left">
@@ -68,13 +59,7 @@ export default function SuccessPage() {
           <p><strong>Phone:</strong> {order.details.phone}</p>
           <p><strong>Address:</strong> {order.details.address}</p>
         </div>
-
-        <Link
-          href="/products"
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          Continue Shopping
-        </Link>
+        <Link href="/products" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">Continue Shopping</Link>
       </div>
     </div>
   );

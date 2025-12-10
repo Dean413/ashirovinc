@@ -105,7 +105,7 @@ export default function Navbar() {
       <nav className="bg-white shadow-md px-6 flex items-center justify-between sticky top-7 z-50">
         <div className="container mx-auto flex items-center justify-between">
           {/* Mobile Menu Button */}
-          {/* <button onClick={() => setOpen(!open)} className="md:hidden p-2 rounded hover:bg-gray-100 focus:outline-none">{open ? <X size={28} /> : <Menu size={28} />}</button> */}
+          { <button onClick={() => setOpen(!open)} className="md:hidden p-2 rounded hover:bg-gray-100 focus:outline-none">{open ? <X size={28} /> : <Menu size={28} />}</button> }
 
           {/* Logo */}
           <Link href="/" className="flex flex-1 justify-center md:justify-start">
@@ -162,7 +162,7 @@ export default function Navbar() {
           
           (
             <ul className="hidden md:flex items-center space-x-6 text-gray-700 font-medium absolute left-1/2 transform -translate-x-1/2">
-              {/* <li>
+              <li>
                 <Link href="/products" className="hover:text-blue-700 transition">Home</Link>
               </li>
               <li>
@@ -176,12 +176,12 @@ export default function Navbar() {
               </li>
               <li>
                 <Link href="/reviews" className="hover:text-blue-700 transition">Reviews</Link>
-              </li> */}
+              </li> 
             </ul>
           )}
 
           {/* User icon for non-dashboard */}
-          {/* {!isDashboard && (
+           {!isDashboard && (
             <>
             <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"} className="hidden md:flex items-center space-x-4 ml-4">
               {user ? 
@@ -191,7 +191,7 @@ export default function Navbar() {
             </Link>
             <SearchBar />
             </>
-          )} */}
+          )} 
 
           {/* Cart Icon */}
           {!isDashboard && (
@@ -217,15 +217,15 @@ export default function Navbar() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="fixed top-0 left-0 h-full w-72 bg-blue-900 p-6 text-white z-50 shadow-lg flex flex-col space-y-6"
             >
-              {/* <button onClick={() => setOpen(false)} className="self-end text-white focus:outline-none">
+              { <button onClick={() => setOpen(false)} className="self-end text-white focus:outline-none">
                 <X size={28} />
-              </button> */}
+              </button>}
 
               <div className="flex items-center rounded-lg mb-6">
-                {/* <SearchBar /> */}
+                {<SearchBar />}
               </div>
 
-              {/* <ul className="space-y-4 text-lg font-medium">
+              {<ul className="space-y-4 text-lg font-medium">
                 {isDashboard && user ? (
                   <>
                     <li>
@@ -246,30 +246,30 @@ export default function Navbar() {
                 : 
                 
                 (
-                  // <>
-                  //   <li>
-                  //     <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Home</Link>
-                  //   </li>
-                  //    <li>
-                  //     <Link href="/services" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Services</Link>
-                  //   </li>
-                  //   <li>
-                  //     <Link href="/about" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">About</Link>
-                  //   </li>
-                  //   <li>
-                  //     <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Contact</Link>
-                  //   </li>
-                  //    <li>
-                  //     <Link href="/reviews" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Reviews</Link>
-                  //   </li>
-                  //   <div className="rounded-full bg-white text-blue-900 p-2 w-[80%] mx-auto text-center font-bold">
-                  //     <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
-                  //       {user ? "Account" : "Sign In"}
-                  //     </Link>
-                  //   </div>
-                  // </>
+                  <>
+                    <li>
+                      <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Home</Link>
+                    </li>
+                     <li>
+                      <Link href="/services" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Services</Link>
+                    </li>
+                    <li>
+                      <Link href="/about" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">About</Link>
+                    </li>
+                    <li>
+                      <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Contact</Link>
+                    </li>
+                     <li>
+                      <Link href="/reviews" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Reviews</Link>
+                    </li>
+                    <div className="rounded-full bg-white text-blue-900 p-2 w-[80%] mx-auto text-center font-bold">
+                      <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
+                        {user ? "Account" : "Sign In"}
+                      </Link>
+                    </div>
+                  </>
                 )}
-              </ul> */}
+              </ul>}
             </motion.div>
           )}
         </AnimatePresence>

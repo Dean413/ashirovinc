@@ -20,50 +20,29 @@ export default function CheckoutPage() {
   const supabase = createClientComponentClient();
   const nigeriaStates = getAllStates()
   const [loading, setLoading] = useState(false)
-
-  
-  const sortedCountries = countries.sort((a, b) =>
-    a.name.common.localeCompare(b.name.common)
-  );
-  
-
-  const [details, setDetails] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    delivery: "",
-    country: "",
-    state: ""
-  });
-
+  const sortedCountries = countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+  const [details, setDetails] = useState({name: "", email: "", phone: "", address: "", delivery: "", country: "", state: ""});
   const [paystackLoaded, setPaystackLoaded] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setDetails({ ...details, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {setDetails({ ...details, [e.target.name]: e.target.value });};
 
   const createPendingOrder = async () => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const { data: { user }, } = await supabase.auth.getUser();
+    const res = await fetch("/api/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cartItems,
+        total: totalPrice,
+        details,
+        reference: null, // no reference yet
+        userId: user?.id || null,
+        status: "pending",
+      }),
+    });
 
-  const res = await fetch("/api/create-order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      cartItems,
-      total: totalPrice,
-      details,
-      reference: null,          // no reference yet
-      userId: user?.id || null,
-      status: "pending",
-    }),
-  });
-
-  const { orderId } = await res.json();
-  return orderId;
-};
+    const { orderId } = await res.json(); 
+      return orderId;
+    };
 
   const handlePaystackPayment = async () => {
     if (!details.email || !details.name || !details.phone || !details.address || !details.delivery) {
@@ -78,292 +57,253 @@ export default function CheckoutPage() {
     setIsPaying(true)
 
     const orderId = await createPendingOrder(); // get the DB id first
-   
-
+    
     const handler = (window as any).PaystackPop.setup({
       key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
-      
+        
       email: details.email,
       amount: totalPrice * 100, // Paystack expects kobo
       currency: "NGN",
       firstname: details.name,
       phone: details.phone,
-      metadata: {
-      order_id: orderId,   // ✅ Paystack will send this back in the webhook
-    },
-
-      
-
+      metadata: {order_id: orderId,},   // ✅ Paystack will send this back in the webhook,
       callback: function (response: any) {
-      setLoading(true);
+        setLoading(true);
+        toast.success("Payment successful. Reference: " + response.reference);
 
-  toast.success("Payment successful. Reference: " + response.reference);
+        (async () => {
+          const orderData = {
+            items: cartItems,
+            total: totalPrice,
+            details,
+            reference: response.reference,
+          };
+          localStorage.setItem("lastOrder", JSON.stringify(orderData));
 
-  (async () => {
-    const orderData = {
-      items: cartItems,
-      total: totalPrice,
-      details,
-      reference: response.reference,
-    };
-    localStorage.setItem("lastOrder", JSON.stringify(orderData));
+          await fetch("/api/update-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              orderId,
+              reference: response.reference,
+              status: "paid",
+              cartItems,
+            }),
+          });
 
-    await fetch("/api/update-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        orderId,
-        reference: response.reference,
-        status: "paid",
-        cartItems,
-      }),
-    });
-
-    router.push("/success");
-    clearCart();
-  })().catch(console.error);
-}
-
+          router.push("/success");
+          clearCart();
+        })().catch(console.error);
+      }
     });
     handler.openIframe();
   };
 
   if (loading) return <FullPageLoader />
-
   if (cartItems.length === 0) return <p className="p-6">Your cart is empty.</p>;
 
   return (
-  <div className="max-w-4xl mx-auto p-4 flex flex-col gap-8">
-    <h1 className="text-3xl font-bold">Checkout</h1>
+    <div className="max-w-4xl mx-auto p-4 flex flex-col gap-8">
+      <h1 className="text-3xl font-bold">Checkout</h1>
 
-    {/* Cart Items */}
-    <div className="bg-white shadow rounded p-4 flex flex-col gap-4">
-      <h2 className="text-xl font-semibold">Your Cart</h2>
-      {cartItems.map((item) => (
-        <div key={item.id} className="flex gap-4 items-center border-b pb-4">
-          {item.image && (
-            <Image
-              src={item.image}
-              alt={item.name}
-              width={80}
-              height={80}
-              className="rounded"
-            />
-          )}
-          <div className="flex-1">
-            {item.brand && (
-              <p className="text-gray-500 text-sm">{item.brand}</p>
+      {/* Cart Items */}
+      <div className="bg-white shadow rounded p-4 flex flex-col gap-4">
+        <h2 className="text-xl font-semibold">Your Cart</h2>
+        {cartItems.map((item) => (
+          <div key={item.id} className="flex gap-4 items-center border-b pb-4">
+            {item.image && (
+              <Image
+                src={item.image}
+                alt={item.name}
+                width={80}
+                height={80}
+                className="rounded"
+              />
             )}
-            <p className="font-bold">{item.name}</p>
-            <p>₦{item.price.toLocaleString()}</p>
-            <p>Qty: {item.quantity}</p>
-            <p>Total: ₦{(item.price * item.quantity).toLocaleString()}</p>
+            <div className="flex-1">
+              {item.brand && (<p className="text-gray-500 text-sm">{item.brand}</p>)}
+                <p className="font-bold">{item.name}</p>
+                <p>₦{item.price.toLocaleString()}</p>
+                <p>Qty: {item.quantity}</p>
+                <p>Total: ₦{(item.price * item.quantity).toLocaleString()}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* User Details */}
+      <div className="bg-white shadow rounded p-6 flex flex-col gap-6">
+        <h2 className="text-xl font-semibold">Your Details</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Full Name</label>
+            <input
+              type="text"
+              name="name"
+              value={details.name}
+              onChange={handleChange}
+              className="border p-2 rounded w-full"
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Country</label>
+            <select
+              name="country"
+              value={details.country}
+              onChange={handleChange}
+              className="border rounded p-2 w-full">
+              <option value="">-- Select your country --</option>
+              {sortedCountries.map((country: any) => (
+                <option key={country.cca2} value={country.cca2}>
+                  {country.name.common}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              required
+              value={details.email}
+              onChange={handleChange}
+              className="border p-2 rounded w-full"
+              placeholder="Enter your email"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">State</label>
+            <select
+              name="state"
+              required
+              value={details.state}
+              onChange={handleChange}
+              className="border rounded p-2 w-full">
+              <option value="">-- Select your state --</option>
+              {nigeriaStates.map((state: any) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </select>
+          </div>
+            
+          <div>
+            <label className="block text-sm font-medium mb-1">Phone</label>
+            <input
+              type="tel"
+              name="phone"
+              required
+              value={details.phone}
+              onChange={handleChange}
+              className="border p-2 rounded w-full"
+              placeholder="Enter your phone number"
+            />
           </div>
         </div>
-      ))}
-    </div>
 
-    {/* User Details */}
-    <div className="bg-white shadow rounded p-6 flex flex-col gap-6">
-      <h2 className="text-xl font-semibold">Your Details</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Full Name</label>
-          <input
-            type="text"
-            name="name"
-            value={details.name}
+          <label className="block text-sm font-medium mb-1">Address</label>
+          <textarea
+            name="address"
+            required
+            value={details.address}
             onChange={handleChange}
             className="border p-2 rounded w-full"
-            placeholder="Enter your full name"
+            placeholder="Enter your full delivery address"
           />
         </div>
 
+        {/* Delivery Method */}
         <div>
-          <label className="block text-sm font-medium mb-1">Country</label>
-          <select
-            name="country"
-            value={details.country}
-            onChange={handleChange}
-            className="border rounded p-2 w-full"
-          >
-            <option value="">-- Select your country --</option>
-            {sortedCountries.map((country: any) => (
-              <option key={country.cca2} value={country.cca2}>
-                {country.name.common}
-              </option>
-            ))}
-          </select>
-        </div>
+          <p className="text-sm font-medium mb-2">Delivery Method</p>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2">
+              <input
+                required
+                type="radio"
+                name="delivery"
+                value="ship"
+                checked={details.delivery === "ship"}
+                onChange={(e) => {
+                  setDetails((prev) => ({
+                    ...prev,
+                    delivery: e.target.value,
+                  }));
+                }}
+              />
+              <span>Delivery</span>
+            </label>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Email</label>
-          <input
-            type="email"
-            name="email"
-            required
-            value={details.email}
-            onChange={handleChange}
-            className="border p-2 rounded w-full"
-            placeholder="Enter your email"
-          />
-        </div>
-
-        
-
-        
-
-        <div>
-          <label className="block text-sm font-medium mb-1">State</label>
-          <select
-            name="state"
-            required
-            value={details.state}
-            onChange={handleChange}
-            className="border rounded p-2 w-full"
-          >
-            <option value="">-- Select your state --</option>
-            {nigeriaStates.map((state: any) => (
-              <option key={state} value={state}>
-                {state}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium mb-1">Phone</label>
-          <input
-            type="tel"
-            name="phone"
-            required
-            value={details.phone}
-            onChange={handleChange}
-            className="border p-2 rounded w-full"
-            placeholder="Enter your phone number"
-          />
+            <label className="flex items-center gap-2">
+              <input
+                required
+                type="radio"
+                name="delivery"
+                value="pickup"
+                checked={details.delivery === "pickup"}
+                onChange={(e) => {
+                  setDetails((prev) => ({
+                    ...prev,
+                    delivery: e.target.value,
+                  }));
+                }}
+              />
+              <span>Pickup</span>
+            </label>
+          </div>
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Address</label>
-        <textarea
-          name="address"
-          required
-          value={details.address}
-          onChange={handleChange}
-          className="border p-2 rounded w-full"
-          placeholder="Enter your full delivery address"
-        />
-      </div>
-
-      {/* Delivery Method */}
-      <div>
-        <p className="text-sm font-medium mb-2">Delivery Method</p>
-        <div className="flex gap-4">
-          <label className="flex items-center gap-2">
-            <input
-              required
-              type="radio"
-              name="delivery"
-              value="ship"
-              checked={details.delivery === "ship"}
-              onChange={(e) => {
-                setDetails((prev) => ({
-                  ...prev,
-                  delivery: e.target.value,
-                }));
-              }}
-            />
-            <span>Delivery</span>
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input
-              required
-              type="radio"
-              name="delivery"
-              value="pickup"
-              checked={details.delivery === "pickup"}
-              onChange={(e) => {
-                setDetails((prev) => ({
-                  ...prev,
-                  delivery: e.target.value,
-                }));
-              }}
-            />
-            <span>Pickup</span>
-          </label>
+      {/* Payment Section */}
+      <div className="bg-white shadow rounded p-6 flex flex-col gap-4">
+        <h2 className="text-xl font-semibold">Payment</h2>
+        <h3 className="text-gray-500">Paystack</h3>
+        <p className="text-sm text-gray-500 flex items-center gap-1">
+          <span className="text-green-600">🔒</span> All transactions are secure and encrypted.
+        </p>
+        <div className="flex items-center flex-wrap gap-3 mt-2">
+          <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
+            <Image src="/visa-logo.jpg" alt="Visa" width={30} height={30} />
+          </div>
+          <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
+            <Image src="/master-card-logo.jpg" alt="Mastercard" width={30} height={30} />            
+          </div>
+          <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
+            <Image src="/mtn-logo.jpg" alt="MTN" width={30} height={30} />            
+          </div>
+          <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
+            <Image src="/airtel-logo.jpg" alt="Airtel Tigo" width={30} height={30} />              
+          </div>
+          {/* + More */}
+          <div className="text-sm text-gray-400">+3 more</div>
         </div>
+        <p className="text-sm text-gray-600 mt-4">
+          After clicking <strong>“Pay Now”</strong>, you will be redirected to Paystack to complete your purchase securely.
+        </p>
       </div>
-    </div>
 
-    {/* Payment Section */}
-<div className="bg-white shadow rounded p-6 flex flex-col gap-4">
-  <h2 className="text-xl font-semibold">Payment</h2>
-  <h3 className="text-gray-500">Paystack</h3>
-  <p className="text-sm text-gray-500 flex items-center gap-1">
-    <span className="text-green-600">🔒</span> All transactions are secure and encrypted.
-  </p>
-
-  <div className="flex items-center flex-wrap gap-3 mt-2">
-    
-    <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
-      <Image src="/visa-logo.jpg" alt="Visa" width={30} height={30} />
-     
-    </div>
-    <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
-      <Image src="/master-card-logo.jpg" alt="Mastercard" width={30} height={30} />
-     
-    </div>
-    <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
-      <Image src="/mtn-logo.jpg" alt="MTN" width={30} height={30} />
-     
-    </div>
-    <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
-      <Image src="/airtel-logo.jpg" alt="Airtel Tigo" width={30} height={30} />
-      
-    </div>
-    {/* + More */}
-    <div className="text-sm text-gray-400">+3 more</div>
-  </div>
-
-  <p className="text-sm text-gray-600 mt-4">
-    After clicking <strong>“Pay Now”</strong>, you will be redirected to Paystack to complete your purchase securely.
-  </p>
-</div>
-
-
-    {/* Subtotal & Pay */}
-    <div className="bg-white shadow rounded p-6 flex justify-between items-center">
-      <p className="font-semibold text-lg">
-        SubTotal ({getTotalItems()} items): ₦{totalPrice.toLocaleString()}
-      </p>
-      <button
-          onClick={handlePaystackPayment}
-          disabled={!paystackLoaded || isPaying}
-          className={`bg-blue-600 text-white px-6 py-3 rounded transition ${
-            !paystackLoaded || isPaying
-              ? "opacity-60 cursor-not-allowed"
-              : "hover:bg-blue-700"
-          }`}
-        >
+      {/* Subtotal & Pay */}
+      <div className="bg-white shadow rounded p-6 flex justify-between items-center">
+        <p className="font-semibold text-lg">
+          SubTotal ({getTotalItems()} items): ₦{totalPrice.toLocaleString()}
+        </p>
+        <button onClick={handlePaystackPayment} disabled={!paystackLoaded || isPaying}
+          className={`bg-blue-600 text-white px-6 py-3 rounded transition ${!paystackLoaded || isPaying ? "opacity-60 cursor-not-allowed"  : "hover:bg-blue-700"}`}>
           {isPaying ? "Processing…" : "Pay Now"}
         </button>
+      </div>
+      {/* Paystack Script */}
+        <Script
+        src="https://js.paystack.co/v1/inline.js"
+        strategy="afterInteractive"
+        onLoad={() => setPaystackLoaded(true)}
+      /> 
     </div>
-    
-
-    {/* Paystack Script */}
-    
-      <Script
-      src="https://js.paystack.co/v1/inline.js"
-      strategy="afterInteractive"
-      onLoad={() => setPaystackLoaded(true)}
-    />
-   
-    
-  </div>
-);
-
+  );
 }

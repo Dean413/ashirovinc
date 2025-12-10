@@ -10,19 +10,12 @@ interface SpinnerButtonProps {
   className?: string;
 }
 
-export default function SpinnerButton({
-  onClick,
-  loading = false,
-  disabled = false,
-  children,
-  className = "",
-}: SpinnerButtonProps) {
+export default function SpinnerButton({onClick, loading = false, disabled = false, children, className = "",}: SpinnerButtonProps) {
   return (
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className={`px-2 py-1 bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50 flex items-center justify-center w-8 h-8 ${className}`}
-    >
+      className={`px-2 py-1 bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50 flex items-center justify-center w-8 h-8 ${className}`}>
       {loading ? (
         <svg
           className="animate-spin h-4 w-4 text-white"

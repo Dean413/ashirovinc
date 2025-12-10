@@ -1,24 +1,13 @@
 "use client";
-
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 
 // --------- Toggle Delivery Button ----------
-export function ToggleDeliveryButton({
-  orderId,
-  currentStatus,
-  onStatusChange,
-}: {
-  orderId: string;
-  currentStatus: string;
-  onStatusChange: () => void;
-}) {
+export function ToggleDeliveryButton({orderId, currentStatus, onStatusChange,}: {orderId: string;currentStatus: string; onStatusChange: () => void;}) {
   const [loading, setLoading] = useState(false);
-
   const handleClick = async () => {
     const nextStatus = currentStatus === "pending" ? "delivered" : "pending";
-
     const result = await Swal.fire({
       title: `Change status to ${nextStatus}?`,
       icon: "question",
@@ -51,8 +40,7 @@ export function ToggleDeliveryButton({
     <button
       onClick={handleClick}
       disabled={loading}
-      className="px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 flex items-center gap-2 disabled:opacity-50"
-    >
+      className="px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 flex items-center gap-2 disabled:opacity-50">
       {loading && <Spinner />}
       {loading
         ? "Updating..."
@@ -64,15 +52,8 @@ export function ToggleDeliveryButton({
 }
 
 // --------- Delete Order Button ----------
-export function DeleteOrderButton({
-  orderId,
-  onDelete,
-}: {
-  orderId: string;
-  onDelete: () => void;
-}) {
+export function DeleteOrderButton({orderId, onDelete,}: {orderId: string; onDelete: () => void;}) {
   const [loading, setLoading] = useState(false);
-
   const handleClick = async () => {
     const result = await Swal.fire({
       title: "Delete this order?",
@@ -105,27 +86,15 @@ export function DeleteOrderButton({
     <button
       onClick={handleClick}
       disabled={loading}
-      className="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700 flex items-center gap-2 disabled:opacity-50"
-    >
+      className="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700 flex items-center gap-2 disabled:opacity-50">
       {loading && <Spinner />}
       {loading ? "Deleting..." : "Delete"}
     </button>
   );
 }
 
-export function NotifyCustomerButton({
-  order,
-}: {
-  order: {
-    id: string;
-    email: string;
-    name: string;
-    delivery_method: string;
-    address: string;
-  };
-}) {
+export function NotifyCustomerButton({order,}: {order: {id: string; email: string; name: string; delivery_method: string; address: string;};}) {
   const [loading, setLoading] = useState(false);
-
   const handleClick = async () => {
     const result = await Swal.fire({
       title: "Send email to customer?",
@@ -180,8 +149,7 @@ function Spinner() {
       className="animate-spin h-4 w-4 text-white"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      viewBox="0 0 24 24"
-    >
+      viewBox="0 0 24 24">
       <circle
         className="opacity-25"
         cx="12"
