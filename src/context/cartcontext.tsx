@@ -17,6 +17,9 @@ export type CartItem = {
   price: number;
   quantity: number;
   image: string;
+  ram?: string;
+  storage?: string;
+  display?: string;
   maxStock: number
   
 };
@@ -122,6 +125,9 @@ export function CartProvider({ userId, children }: CartProviderProps) {
       name: row.products?.name ?? "",
       price: row.products?.price ?? 0,
       image: row.products?.image_url?.[0],
+      ram: row.products?.ram,
+      storage: row.products?.storage,
+      display: row.products?.display,
       quantity: row.quantity,
       maxStock: row.products?.stock ?? 0,   // ✅ correct source
     }));

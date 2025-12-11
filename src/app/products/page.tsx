@@ -269,6 +269,9 @@ export default function HomePage() {
                       quantity: 1,
                       image: product.image_url[0],
                       brand: product.brand,
+                      ram: product.ram,
+                      storage: product.storage,
+                      display: product.display,
                       maxStock: product.stock,
                     });
 

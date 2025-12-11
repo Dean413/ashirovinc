@@ -222,7 +222,7 @@ export default function Navbar() {
               </button>}
 
               <div className="flex items-center rounded-lg mb-6">
-                {<SearchBar />}
+                <SearchBar />
               </div>
 
               {<ul className="space-y-4 text-lg font-medium">

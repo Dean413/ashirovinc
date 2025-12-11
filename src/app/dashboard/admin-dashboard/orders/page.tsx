@@ -4,6 +4,7 @@ import { DeleteOrderButton, NotifyCustomerButton, ToggleDeliveryButton } from "@
 import FullPageLoader from "@/app/component/page-reloader";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseclient";
 
 
 type OrderItem = {
@@ -38,8 +39,23 @@ export default function AdminOrders() {
   const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "delivered">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [hasAccess, setHasAccess] = useState(false)
+  const [role, setRole] = useState<string | null>(null); // null = loading
 
 
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      const userRole =
+        user?.user_metadata?.role ?? "user";
+
+      setRole(userRole);
+    };
+
+    fetchUserRole();
+  }, []);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -67,7 +83,7 @@ export default function AdminOrders() {
   if (orders.length === 0)
     return <p className="p-6 text-gray-500">No orders found.</p>;
 
-  if (!hasAccess) {
+  if (role !== "admin") {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] text-center p-6">
         <h1 className="text-2xl font-bold mb-4">No Access</h1>
