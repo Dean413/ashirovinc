@@ -60,7 +60,7 @@ export default function HomePage() {
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .order("created_at", { ascending: false }).neq("type", "SRC");
+        .order("created_at", { ascending: false }).neq("type", "SRCAP");
 
       if (data && !error) setProducts(data as Product[]);
       setLoading(false);
