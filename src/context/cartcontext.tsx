@@ -21,6 +21,7 @@ export type CartItem = {
   storage?: string;
   display?: string;
   maxStock: number
+  processor?: string,
   
 };
 
@@ -56,6 +57,8 @@ async function syncToDb(product_id: number, quantity: number) {
     console.error("Cart DB sync failed:", err);
   }
 }
+
+
 
 async function removeFromDb(product_id: number) {
   try {
@@ -109,11 +112,7 @@ export function CartProvider({ userId, children }: CartProviderProps) {
     product_id,
     quantity,
     products (
-      id,
-      name,
-      price,
-      stock,
-      image_url
+      *
     )
   `)
   .eq("user_id", userId);
@@ -125,9 +124,10 @@ export function CartProvider({ userId, children }: CartProviderProps) {
       name: row.products?.name ?? "",
       price: row.products?.price ?? 0,
       image: row.products?.image_url?.[0],
-      ram: row.products?.ram,
-      storage: row.products?.storage,
-      display: row.products?.display,
+      processor: row.processor ?? row.products?.processor ?? "",
+ram: row.ram ?? row.products?.ram ?? "",
+storage: row.storage ?? row.products?.storage ?? "",
+display: row.display ?? row.products?.display ?? "",
       quantity: row.quantity,
       maxStock: row.products?.stock ?? 0,   // ✅ correct source
     }));
@@ -183,13 +183,44 @@ export function CartProvider({ userId, children }: CartProviderProps) {
 };
 
 
-  const updateQuantity = (id: number, quantity: number) => {
-    setCartItems((prev) => {
-      const updated = prev.map((item) => (item.id === id ? { ...item, quantity } : item));
-      if (userId) syncToDb(id, quantity);
-      return updated;
-    });
-  };
+//  const updateQuantity = (
+//   id: number,
+//   quantity: number,
+//   newSerial?: string,
+//   removeLastSerial: boolean = false
+// ) => {
+//   setCartItems((prev) => {
+//     const updated = prev.map((item) => {
+//       if (item.id !== id) return item;
+
+//       let serial_number = item.serial_number || [];
+
+//       if (newSerial) serial_number = [...serial_number, newSerial];
+//       if (removeLastSerial) serial_number.pop();
+
+//       return { ...item, quantity };
+//     });
+
+//     if (userId) syncToDb(id, quantity);
+//     return updated;
+//   });
+// };
+
+
+ const updateQuantity = (id: number, quantity: number, ) => {
+  setCartItems((prev) => {
+    const updated = prev.map((item) => (item.id === id ? { ...item, quantity, } : item));
+
+    
+
+    if (userId) syncToDb(id, quantity);
+    return updated;
+  });
+};
+
+
+
+
 
   const removeFromCart = (id: number) => {
     setCartItems((prev) => {

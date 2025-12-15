@@ -53,7 +53,7 @@ export default function SignInPage() {
       await supabase.auth.getSession();
       router.refresh();  // ⬅️ important
 
-      router.push("/dashboard/client-dashboard")
+      router.push("/")
       setMessage("✅ Signed in successfully!");
     }
     setLoading(false);

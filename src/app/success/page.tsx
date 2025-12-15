@@ -28,7 +28,7 @@ export default function SuccessPage() {
     return (
       <div className="max-w-3xl mx-auto p-6 text-center">
         <h1 className="text-2xl font-bold mb-4">No order found</h1>
-        <Link href="/products" className="text-blue-600 hover:underline">
+        <Link href="/" className="text-blue-600 hover:underline">
           Go back home
         </Link>
       </div>
@@ -59,7 +59,7 @@ export default function SuccessPage() {
           <p><strong>Phone:</strong> {order.details.phone}</p>
           <p><strong>Address:</strong> {order.details.address}</p>
         </div>
-        <Link href="/products" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">Continue Shopping</Link>
+        <Link href="/" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">Continue Shopping</Link>
       </div>
     </div>
   );

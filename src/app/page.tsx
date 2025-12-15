@@ -9,7 +9,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import Carousel from "./component/carousel";
 import FullPageLoader from "./component/page-reloader";
 import { supabase } from "@/lib/supabaseclient";
+import { User } from "@supabase/supabase-js";
 import { useCart } from "@/context/cartcontext";
+import { useRouter } from "next/navigation";
+
+interface ProductUnit {
+  id: number;
+  product_id: number;
+  serial_number: string;
+  status: "available" | "sold";
+}
 
 interface Product {
   id: number;
@@ -25,7 +34,11 @@ interface Product {
   slug: string;
   stock: number;
   category: string;
+  product_units: ProductUnit[]
 }
+
+
+
 
 export default function HomePage() {
   const { addToCart, cartItems } = useCart();
@@ -35,7 +48,17 @@ export default function HomePage() {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [navigating, setNavigating] = useState(false);
-  
+  const [user, setUser] = useState<User | null>(null)
+
+  const router = useRouter();
+
+
+// Get user on mount
+useEffect(() => {
+  supabase.auth.getUser().then(({ data }) => {
+    setUser(data.user);
+  });
+}, []);
 
   // Rotate product images
   useEffect(() => {
@@ -59,7 +82,7 @@ export default function HomePage() {
     const fetchProducts = async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("*")
+        .select('*')
         .order("created_at", { ascending: false }).neq("type", "SRCAP");
 
       if (data && !error) setProducts(data as Product[]);
@@ -261,7 +284,19 @@ export default function HomePage() {
 
                     {/* Add to Cart Button */}
                     <button
-                  onClick={() => {
+                  onClick={ async() => {
+                    const { data } = await supabase.auth.getUser();
+                    const user = data.user;
+
+                    if (!user) {
+                      toast.info("Please sign in to add items to your cart.");
+                      router.push("/sign-in"); // or /auth/signin
+                      return;
+                    }
+
+                   
+
+                    
                     addToCart({
                       id: product.id,
                       name: product.name,
@@ -269,11 +304,19 @@ export default function HomePage() {
                       quantity: 1,
                       image: product.image_url[0],
                       brand: product.brand,
+                      processor: product.processor,
                       ram: product.ram,
                       storage: product.storage,
                       display: product.display,
                       maxStock: product.stock,
+
+                      
                     });
+
+                    
+
+                  
+                   
 
                     // ✅ Show toast
                     toast.success(`${product.name} added to cart!`);

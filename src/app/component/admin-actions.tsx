@@ -142,6 +142,60 @@ export function NotifyCustomerButton({order,}: {order: {id: string; email: strin
   );
 }
 
+
+
+export function RefundOrderButton({
+  orderId,
+  onRefund,
+}: {
+  orderId: string;
+  onRefund: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    const result = await Swal.fire({
+      title: "Refund this order?",
+      text: "This will mark the order as refunded, restore stock and serial numbers.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#16a34a", // green
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, refund",
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      setLoading(true);
+
+      const res = await fetch(`/api/refund-order?id=${orderId}`, {
+        method: "POST",
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Refund failed");
+
+      toast.success("Order refunded successfully");
+      onRefund(); // callback to update UI
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={loading}
+     className="px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 flex items-center gap-2 disabled:opacity-50">
+      {loading && <Spinner />}
+      {loading ? "Processing..." : "Refund Order"}
+    </button>
+  );
+}
+
+
 // --------- Small Spinner (shared) ----------
 function Spinner() {
   return (

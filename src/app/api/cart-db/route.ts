@@ -1,59 +1,100 @@
+// src/app/api/cart-db/route.ts
 import { NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
-  const supabase = createRouteHandlerClient({ cookies });
-  const { product_id, quantity } = await request.json();
+  try {
+    const cookieStore = await cookies(); // ✅ await
 
-  // Get current user from session cookie
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
-
-  // Upsert one row per user/product
-  const { error } = await supabase
-    .from("cart")
-    .upsert(
-      { user_id: user.id, product_id: product_id, quantity },
-      { onConflict: "user_id, product_id" }
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll(); // ✅ now works
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options) // ✅ now works
+            );
+          },
+        },
+      }
     );
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
+    const { product_id, quantity } = await request.json();
 
-  return NextResponse.json({ success: true });
+    const { data: { session }, error: sessErr } = await supabase.auth.getSession();
+
+    if (sessErr || !session)
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+
+    const userId = session.user.id;
+
+    const { error } = await supabase
+      .from("cart")
+      .upsert({ user_id: userId, product_id, quantity }, { onConflict: "user_id,product_id" });
+
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 400 });
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("POST /api/cart-db error:", err);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
 
+
 export async function DELETE(request: Request) {
-  const supabase = createRouteHandlerClient({ cookies });
-  const { product_id } = await request.json();
+  try {
+    const cookieStore = await cookies();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
 
-  if (userError || !user) {
-    // 🚨 Stop here before hitting the database
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    const { product_id } = await request.json();
+
+    const { data: { session }, error: sessErr } =
+      await supabase.auth.getSession();
+
+    if (sessErr || !session) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const userId = session.user.id;
+
+    const { error } = await supabase
+      .from("cart")
+      .delete()
+      .eq("user_id", userId)
+      .eq("product_id", product_id);
+
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 400 });
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("DELETE /api/cart-db error:", err);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
-
-  const { error } = await supabase
-    .from("cart")
-    .delete()
-    .eq("user_id", user.id)
-    .eq("product_id", product_id);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-
-  return NextResponse.json({ success: true });
 }

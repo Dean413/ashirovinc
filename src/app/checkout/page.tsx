@@ -7,9 +7,9 @@ import Script from "next/script";
 import countries from "world-countries"
 import {getAllStates} from "nigeria-states"
 import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import FullPageLoader from "../component/page-reloader";
 import { toast } from "react-toastify";
+import { supabase } from "@/lib/supabaseclient";
 
 
 export default function CheckoutPage() {
@@ -17,7 +17,6 @@ export default function CheckoutPage() {
   const [isPaying, setIsPaying] = useState(false);
   const { cartItems, getTotalItems, clearCart } = useCart();
   const totalPrice = cartItems.reduce( (sum, item) => sum + item.price * item.quantity, 0);
-  const supabase = createClientComponentClient();
   const nigeriaStates = getAllStates()
   const [loading, setLoading] = useState(false)
   const sortedCountries = countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
@@ -27,6 +26,7 @@ export default function CheckoutPage() {
 
   const createPendingOrder = async () => {
     const { data: { user }, } = await supabase.auth.getUser();
+    const serialAssignments = JSON.parse(localStorage.getItem("serial_reservations") || "{}");
     const res = await fetch("/api/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -37,6 +37,7 @@ export default function CheckoutPage() {
         reference: null, // no reference yet
         userId: user?.id || null,
         status: "pending",
+        serialAssignments,
       }),
     });
 
@@ -79,8 +80,9 @@ export default function CheckoutPage() {
             reference: response.reference,
           };
           localStorage.setItem("lastOrder", JSON.stringify(orderData));
-
+          const { data: { user }, } = await supabase.auth.getUser();
           await fetch("/api/update-order", {
+            
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -88,6 +90,7 @@ export default function CheckoutPage() {
               reference: response.reference,
               status: "paid",
               cartItems,
+              userId: user?.id || null
             }),
           });
 

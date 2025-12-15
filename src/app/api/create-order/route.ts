@@ -3,7 +3,7 @@ import { supabaseAdmin } from "@/lib/supabaseServer";
 
 export async function POST(req: Request) {
   try {
-    const { cartItems, total, details, reference, userId } = await req.json();
+    const { cartItems, serialAssignments, total, details, reference, userId } = await req.json();
 
     // 1. Insert order
     const { data: order, error: orderError } = await supabaseAdmin
@@ -26,6 +26,8 @@ export async function POST(req: Request) {
 
     if (orderError) throw orderError;
 
+    
+   
    
    // 2. Insert order items
 const orderItems = cartItems.map((item: any) => ({
@@ -35,6 +37,15 @@ const orderItems = cartItems.map((item: any) => ({
   product_image: item.image,      // ✅ add product image
   quantity: item.quantity,
   price: item.price,
+  ram: item.ram,
+  storage: item.storage,
+  processor: item.processor,
+  display: item.display,
+  serial_number: serialAssignments[item.id]
+  ?.slice(0, item.quantity)
+  .map((s: any) => s.serial_number)
+  .join(", ") || null,
+
 }));
 
 

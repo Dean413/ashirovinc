@@ -11,6 +11,7 @@ import { useCart } from "@/context/cartcontext";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter, usePathname } from "next/navigation";
 import {Typewriter} from "react-simple-typewriter"
+import { supabase } from "@/lib/supabaseclient";
 
 const getInitials = (user: any) => {
   const fullName = user.user_metadata?.full_name;
@@ -28,7 +29,6 @@ const getAvatarOrInitials = (user: any) => user.user_metadata?.avatar_url || use
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { getTotalItems, clearCart } = useCart();
-  const supabase = createClientComponentClient();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
@@ -122,7 +122,7 @@ export default function Navbar() {
                 <Link href="/dashboard/client-dashboard/settings" className="hover:text-blue-700 transition">Settings</Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-blue-700 transition">Shop</Link>
+                <Link href="/" className="hover:text-blue-700 transition">Shop</Link>
               </li>
               <li>
                 <button onClick={signOut} className="text-red-600 hover:text-red-400 transition cursor-pointer">Sign Out</button>
@@ -130,7 +130,7 @@ export default function Navbar() {
 
               {/* Admin Dashboard Link */}
               {user?.user_metadata?.role === "admin" && (
-                <Link href="/dashboard/admin-dashboard" className="font-semibold">Admin Dashboard</Link>
+                <Link href="/dashboard/admin" className="font-semibold">Admin Dashboard</Link>
               )}
 
               <li>
@@ -163,7 +163,7 @@ export default function Navbar() {
           (
             <ul className="hidden md:flex items-center space-x-6 text-gray-700 font-medium absolute left-1/2 transform -translate-x-1/2">
               <li>
-                <Link href="/products" className="hover:text-blue-700 transition">Home</Link>
+                <Link href="/" className="hover:text-blue-700 transition">Home</Link>
               </li>
               <li>
                 <Link href="/about" className="hover:text-blue-700 transition">About</Link>
@@ -172,10 +172,10 @@ export default function Navbar() {
                 <Link href="/contact" className="hover:text-blue-700 transition">Contact</Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-blue-700 transition">Services</Link>
+                <Link href="/book-repair" className="hover:text-blue-700 transition">Book a Repair</Link>
               </li>
               <li>
-                <Link href="/reviews" className="hover:text-blue-700 transition">Reviews</Link>
+                <Link href="/reviews" className="hover:text-blue-700 transition"></Link>
               </li> 
             </ul>
           )}
@@ -235,7 +235,7 @@ export default function Navbar() {
                       <Link href="/dashboard/client-dashboard/settings" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Settings</Link>
                     </li>
                     <li>
-                      <Link href="/products" onClick={() => setOpen(false)} className="hover:text-gray-300 transition"> Shop</Link>
+                      <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition"> Shop</Link>
                     </li>
                     <li>
                       <button onClick={signOut} className="rounded-full bg-white text-red-400 p-2 w-[80%] mx-auto text-center transition">Sign Out</button>
@@ -250,9 +250,7 @@ export default function Navbar() {
                     <li>
                       <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Home</Link>
                     </li>
-                     <li>
-                      <Link href="/services" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Services</Link>
-                    </li>
+                  
                     <li>
                       <Link href="/about" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">About</Link>
                     </li>
@@ -260,7 +258,7 @@ export default function Navbar() {
                       <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Contact</Link>
                     </li>
                      <li>
-                      <Link href="/reviews" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Reviews</Link>
+                      <Link href="/book-repair" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Book a Repair</Link>
                     </li>
                     <div className="rounded-full bg-white text-blue-900 p-2 w-[80%] mx-auto text-center font-bold">
                       <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>

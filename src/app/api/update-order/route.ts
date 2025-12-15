@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 
 export async function POST(req: Request) {
-  const { cartItems, orderId, reference, status } = await req.json();
+  const { cartItems, orderId, reference, status, userId } = await req.json();
 
-  // 1. Decrement stock
+  // 1. Decrement stock and mark units sold
   for (const item of cartItems) {
     const { error: stockError } = await supabaseAdmin.rpc("decrement_stock", {
       product_id: item.id,
@@ -12,13 +12,10 @@ export async function POST(req: Request) {
     });
 
     if (stockError) {
-      return NextResponse.json(
-        { error: stockError.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: stockError.message }, { status: 400 });
     }
 
-    // 2. Fetch available serials for the product
+    // Fetch available units
     const { data: units, error: fetchError } = await supabaseAdmin
       .from("product_units")
       .select("id")
@@ -27,10 +24,7 @@ export async function POST(req: Request) {
       .limit(item.quantity);
 
     if (fetchError) {
-      return NextResponse.json(
-        { error: fetchError.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: fetchError.message }, { status: 400 });
     }
 
     if (!units || units.length < item.quantity) {
@@ -42,30 +36,39 @@ export async function POST(req: Request) {
 
     const unitIds = units.map((u) => u.id);
 
-    // 3. Mark these units as sold
+    // Mark units as sold
     const { error: markError } = await supabaseAdmin
       .from("product_units")
       .update({ status: "sold" })
       .in("id", unitIds);
 
     if (markError) {
-      return NextResponse.json(
-        { error: markError.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: markError.message }, { status: 400 });
     }
   }
 
-  // 4. Update order
-  const { error } = await supabaseAdmin
+  // 2. Update the order
+  const { error: orderError } = await supabaseAdmin
     .from("orders")
     .update({ reference, status })
     .eq("id", orderId);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+  if (orderError) {
+    return NextResponse.json({ error: orderError.message }, { status: 400 });
+  }
+
+  // 3. Clear the user's cart
+  const { error: clearError } = await supabaseAdmin
+    .from("cart")
+    .delete()
+    .eq("user_id", userId);
+
+  if (clearError) {
+    return NextResponse.json(
+      { error: "Order completed but cart clearing failed: " + clearError.message },
+      { status: 400 }
+    );
   }
 
   return NextResponse.json({ success: true });
 }
-

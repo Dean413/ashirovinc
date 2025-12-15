@@ -1,6 +1,6 @@
 "use client";
 
-import { DeleteOrderButton, NotifyCustomerButton, ToggleDeliveryButton } from "@/app/component/admin-actions";
+import { DeleteOrderButton, NotifyCustomerButton, RefundOrderButton, ToggleDeliveryButton } from "@/app/component/admin-actions";
 import FullPageLoader from "@/app/component/page-reloader";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -37,6 +37,7 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "delivered">("all");
+  const [filterpaymentStatus, setfilterPaymentStatus] = useState<"all" | "pending" | "paid" | "refunded">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [hasAccess, setHasAccess] = useState(false)
   const [role, setRole] = useState<string | null>(null); // null = loading
@@ -102,16 +103,22 @@ export default function AdminOrders() {
 
   // Apply filters: delivery_status + search
   const filteredOrders = orders.filter(order => {
+    const matchesPaymentStatus = filterpaymentStatus === "all" ? true : order.status === filterpaymentStatus;
     const matchesStatus = filterStatus === "all" ? true : order.delivery_status === filterStatus;
     const orderIdMatch = order.id.toLowerCase().includes(searchTerm.toLowerCase());
     const referenceMatch = (order.reference || "").toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && (orderIdMatch || referenceMatch);
+    return matchesPaymentStatus && matchesStatus && (orderIdMatch || referenceMatch);
   });
+
+
+  const sortedOrders = [...filteredOrders].sort(
+  (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+);
 
   // Pagination calculation
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
   const startIndex = (currentPage - 1) * ordersPerPage;
-  const paginatedOrders = filteredOrders.slice(startIndex, startIndex + ordersPerPage);
+  const paginatedOrders = sortedOrders.slice(startIndex, startIndex + ordersPerPage);
 
   return (
     <div className="p-6">
@@ -129,6 +136,20 @@ export default function AdminOrders() {
             <option value="all">All</option>
             <option value="pending">Pending</option>
             <option value="delivered">Delivered</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="mr-2 font-semibold">Filter by Payment Status:</label>
+          <select
+            className="border px-2 py-1 rounded"
+            value={filterpaymentStatus}
+            onChange={(e) => setfilterPaymentStatus(e.target.value as any)}
+          >
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="Paid">Paid</option>
+            <option value="refunded">Refunded</option>
           </select>
         </div>
 
@@ -153,7 +174,7 @@ export default function AdminOrders() {
               <th className="border px-2 py-1">Phone Number</th>
               <th className="border px-2 py-1">Address</th>
               <th className="border px-2 py-1">Delivery Method</th>
-                 <th className="border px-2 py-1">Delivery Status</th>
+              <th className="border px-2 py-1">Delivery Status</th>
               {/* <th className="border px-2 py-1">Email</th>  */}
               <th className="border px-2 py-1">Total</th>
               <th className="border px-2 py-1">Status</th>
@@ -196,7 +217,18 @@ export default function AdminOrders() {
                   </button>
                   <ToggleDeliveryButton orderId={order.id} currentStatus={order.delivery_status} onStatusChange={fetchOrders}/>
                   <NotifyCustomerButton order={order} />
-                 <DeleteOrderButton orderId={order.id} onDelete={fetchOrders} />
+                
+                 {order.status === "pending" && (
+                    <DeleteOrderButton orderId={order.id} onDelete={fetchOrders} />
+                  )}
+
+{order.status === "paid" && (
+  <RefundOrderButton orderId={order.id} onRefund={fetchOrders} />
+)}
+
+{order.status === "refunded" && (
+  <span className="text-red-600 font-semibold">Refunded</span>
+)}
                 </td>
               </tr>
             ))}

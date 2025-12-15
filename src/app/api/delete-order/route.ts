@@ -1,24 +1,44 @@
-import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import { NextResponse } from "next/server";
 
-
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const orderId = searchParams.get("id");
 
-    if (!orderId) return NextResponse.json({ error: "Missing order id" }, { status: 400 });
+    if (!orderId) {
+      return NextResponse.json({ error: "Order ID required" }, { status: 400 });
+    }
 
-    // delete order items first
-    await supabaseAdmin.from("order_items").delete().eq("order_id", orderId);
+    // 1️⃣ Get order items (SERVER decides, not frontend)
+    const { data: order } = await supabaseAdmin
+  .from("orders")
+  .select("status")
+  .eq("id", orderId)
+  .single();
 
-    // delete order itself
-    const { error } = await supabaseAdmin.from("orders").delete().eq("id", orderId);
+if (order?.status === "paid") {
+  return NextResponse.json(
+    { error: "Paid orders cannot be deleted. Use refund instead." },
+    { status: 403 }
+  );
+}
 
-    if (error) throw error;
+    // 4️⃣ Delete order_items
+    await supabaseAdmin
+      .from("order_items")
+      .delete()
+      .eq("order_id", orderId);
+
+    // 5️⃣ Delete order
+    await supabaseAdmin
+      .from("orders")
+      .delete()
+      .eq("id", orderId);
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error(err);
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   }
 }

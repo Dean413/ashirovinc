@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import FullPageLoader from "@/app/component/page-reloader";
+import { supabase } from "@/lib/supabaseclient";
 
 
 type OrderItem = {
@@ -27,7 +27,7 @@ type Order = {
 };
 
 export default function ClientDashboard() {
-  const supabase = createClientComponentClient();
+  // const supabase = createClientComponentClient();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [user, setUser] = useState<any>(null);

@@ -1,12 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import FullPageLoader from "@/app/component/page-reloader";
+import { supabase } from "@/lib/supabaseclient";
 
 export default function AuthCallback() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -17,7 +16,7 @@ export default function AuthCallback() {
       if (data.session) {
         setLoading(false)
         // ✅ User is logged in → redirect to dashboard
-        router.push("/dashboard/client-dashboard");
+        router.push("/");
       } else {
         // ❌ Not logged in → back to sign-in
         router.push("/sign-in");

@@ -61,8 +61,9 @@ export default function CartPage() {
           setLoading(false);
           return;
         }
-        serialAssignments[item.id] = serials;
+        serialAssignments[item.id] = serials.slice(0, item.quantity);
       }
+      
       // 4️⃣ temporarily store serials in localStorage for the checkout page
       localStorage.setItem("serial_reservations", JSON.stringify(serialAssignments));
       router.push("/checkout");
@@ -77,6 +78,7 @@ export default function CartPage() {
 
   const handleIncrease = async (item: CartItem) => {
     setLoadingIds((prev) => [...prev, item.id]);
+    
     const { data: product, error } = await supabase.from("products").select("stock").eq("id", item.id).single();
     setLoadingIds((prev) => prev.filter((id) => id !== item.id));
    
@@ -93,7 +95,7 @@ export default function CartPage() {
   };
 
   const handleDecrease = (item: CartItem) => {
-    if (item.quantity > 1) updateQuantity(item.id, item.quantity - 1);
+    if (item.quantity > 1) updateQuantity(item.id, item.quantity - 1, );
     else removeFromCart(item.id);
   };
 
