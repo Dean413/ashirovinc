@@ -30,23 +30,23 @@ export async function POST(req: Request) {
    
    
    // 2. Insert order items
-const orderItems = cartItems.map((item: any) => ({
-  order_id: order.id,
-  product_id: item.id,
-  product_name: item.name,        // ✅ add product name
-  product_image: item.image,      // ✅ add product image
-  quantity: item.quantity,
-  price: item.price,
-  ram: item.ram,
-  storage: item.storage,
-  processor: item.processor,
-  display: item.display,
-  serial_number: serialAssignments[item.id]
-  ?.slice(0, item.quantity)
-  .map((s: any) => s.serial_number)
-  .join(", ") || null,
+    const orderItems = cartItems.map((item: any) => ({
+      order_id: order.id,
+      product_id: item.id,
+      product_name: item.name,        // ✅ add product name
+      product_image: item.image,      // ✅ add product image
+      quantity: item.quantity,
+      price: item.price,
+      ram: item.ram,
+      storage: item.storage,
+      processor: item.processor,
+      display: item.display,
+      serial_number: serialAssignments[item.id]
+      ?.slice(0, item.quantity)
+      .map((s: any) => s.serial_number)
+      .join(", ") || null,
 
-}));
+    }));
 
 
     const { error: itemsError } = await supabaseAdmin

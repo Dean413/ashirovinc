@@ -34,6 +34,7 @@ interface Product {
   slug: string;
   stock: number;
   category: string;
+  condition: string;
   product_units: ProductUnit[]
 }
 
@@ -227,6 +228,7 @@ useEffect(() => {
                     <Link href={`/products/${product.slug}`} onClick={() => setNavigating(true)}>
                      
                       <h3 className="text-lg font-semibold text-gray-800 mt-1">{product.name}</h3>
+                       <h3 className="text-gray-500 mt-1">{product.condition}</h3>
                       <p className="text-blue-600 font-bold mt-2">₦{product.price?.toLocaleString()}</p>
 
                       {/* Stock Status */}
@@ -251,27 +253,6 @@ useEffect(() => {
 
                       {/* Product Specs */}
                       <div className="flex flex-wrap gap-6 mt-3 text-gray-600 text-sm">
-                        {product.display && (
-                          <div className="flex flex-col items-center gap-1">
-                            <FaDesktop className="text-xl" />
-                            <span className="text-black font-semibold">{product.display}</span>
-                            <span className="text-xs text-gray-500">Display</span>
-                          </div>
-                        )}
-                        {product.ram && (
-                          <div className="flex flex-col items-center gap-1">
-                            <FaMemory className="text-xl" />
-                            <span className="text-black font-semibold">{product.ram}</span>
-                            <span className="text-xs text-gray-500">RAM</span>
-                          </div>
-                        )}
-                        {product.storage && (
-                          <div className="flex flex-col items-center gap-1">
-                            <FaHdd className="text-xl" />
-                            <span className="text-black font-semibold">{product.storage}</span>
-                            <span className="text-xs text-gray-500">Storage</span>
-                          </div>
-                        )}
                         {product.processor && (
                           <div className="flex flex-col items-center gap-1">
                             <FaMicrochip className="text-xl" />
@@ -279,6 +260,33 @@ useEffect(() => {
                             <span className="text-xs text-gray-500">Processor</span>
                           </div>
                         )}
+
+                        {product.storage && (
+                          <div className="flex flex-col items-center gap-1">
+                            <FaHdd className="text-xl" />
+                            <span className="text-black font-semibold">{product.storage}</span>
+                            <span className="text-xs text-gray-500">Storage</span>
+                          </div>
+                        )}
+
+                        {product.ram && (
+                          <div className="flex flex-col items-center gap-1">
+                            <FaMemory className="text-xl" />
+                            <span className="text-black font-semibold">{product.ram}</span>
+                            <span className="text-xs text-gray-500">RAM</span>
+                          </div>
+                        )}
+
+                        {product.display && (
+                          <div className="flex flex-col items-center gap-1">
+                            <FaDesktop className="text-xl" />
+                            <span className="text-black font-semibold">{product.display}</span>
+                            <span className="text-xs text-gray-500">Display</span>
+                          </div>
+                        )}
+                        
+                        
+                        
                       </div>
                     </Link>
 

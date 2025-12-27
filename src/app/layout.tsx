@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: {
-    default: "Ashirov Inc – Affordable Used Laptops & Computers in Nigeria",
+    default: "AshirovInc – Affordable Used Laptops & Computers in Nigeria",
     template: "%s | Ashirow Inc",
   },
   description:
@@ -25,10 +25,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "https://ashirovinc.com",
-    title: "Ashirow Inc – Affordable Used Laptops & Computers",
+    title: "AshirowInc – Affordable Used Laptops & Computers",
     description:
       "Get premium UK-used laptops and computers with warranty and fast nationwide delivery.",
-    siteName: "Ashirow Inc",
+      siteName: "AshirovInc",
     images: [
       {
         url: "https://ashirovinc.com/og-image.jpg",
