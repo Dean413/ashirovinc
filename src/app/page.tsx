@@ -329,9 +329,9 @@ useEffect(() => {
                     // ✅ Show toast
                     toast.success(`${product.name} added to cart!`);
                   }}
-                  disabled={currentQuantity >= product.stock}
+                  disabled={ currentQuantity >= product.stock}
                   className={`mt-4 px-4 py-2 rounded-lg transition w-full ${
-                    currentQuantity >= product.stock
+                      currentQuantity >= product.stock
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-blue-600 text-white hover:bg-blue-700"
                   }`}

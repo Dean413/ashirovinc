@@ -14,18 +14,23 @@ export async function POST(req: Request) {
     }
 
     // Create transporter (replace with your email provider credentials)
-    const transporter = nodemailer.createTransport({
-       service: "gmail",
-       auth: {
-         user: process.env.EMAIL_USER,
-         pass: process.env.EMAIL_PASS,
-       },
-     });
+   const transporter = nodemailer.createTransport({
+      host: "smtppro.zoho.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER2, //support@ashirovinc.com
+        pass: process.env.EMAIL_PASS2, // Zoho App Password
+      },
+      tls: {
+        rejectUnauthorized: true
+      }
+    });
 
     // Send mail
     await transporter.sendMail({
-      from: `"Ashirovinc" <${process.env.EMAIL_USER}>`, // sender info
-      to: "ashirovinc@gmail.com", // your company email
+      from: `"Ashirovinc" <${process.env.EMAIL_USER2}>`, // sender info
+      to: "support@ashirovinc.com", // your company email
       replyTo: email,
       subject: `New Contact Message from ${name}`,
       text: message,
@@ -34,7 +39,7 @@ export async function POST(req: Request) {
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Message:</strong></p>
-        <p>${message}</p>
+        <p>${message.replace(/</g, "&lt;")}</p>
       `,
     });
 

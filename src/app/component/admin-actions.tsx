@@ -2,6 +2,10 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
+import { supabase } from "@/lib/supabaseclient";
+
+const { data: { session } } = await supabase.auth.getSession();
+const accessToken = session?.access_token;
 
 // --------- Toggle Delivery Button ----------
 export function ToggleDeliveryButton({orderId, currentStatus, onStatusChange,}: {orderId: string;currentStatus: string; onStatusChange: () => void;}) {
@@ -22,7 +26,8 @@ export function ToggleDeliveryButton({orderId, currentStatus, onStatusChange,}: 
       setLoading(true);
       const res = await fetch("/api/update-delivery", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" ,
+        "Authorization": `Bearer ${accessToken}`},
         body: JSON.stringify({ orderId, status: nextStatus }),
       });
       const data = await res.json();
@@ -111,7 +116,8 @@ export function NotifyCustomerButton({order,}: {order: {id: string; email: strin
       setLoading(true);
       const res = await fetch("/api/notify-customer", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" ,
+        "Authorization": `Bearer ${accessToken}`},
         body: JSON.stringify({
           email: order.email,
           name: order.name,
@@ -170,6 +176,8 @@ export function RefundOrderButton({
 
       const res = await fetch(`/api/refund-order?id=${orderId}`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" ,
+        "Authorization": `Bearer ${accessToken}`},
       });
 
       const data = await res.json();

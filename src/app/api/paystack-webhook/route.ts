@@ -5,6 +5,7 @@ import nodemailer from "nodemailer";
 
 
 export async function POST(req: Request) {
+  
   try {
     const body = await req.text();
     console.log("Webhook hit! Raw body:", body);
@@ -94,23 +95,28 @@ export async function POST(req: Request) {
       // 4️⃣ Send confirmation email
       try {
         const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-
-        const items = orderItems ?? []; // default to empty array
+        host: "smtppro.zoho.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USER2, // e.g. support@ashirovinc.com
+          pass: process.env.EMAIL_PASS2, // Zoho App Password
+        },
+        tls: {
+          rejectUnauthorized: true
+        }
+      });
+        
+      const items = orderItems ?? []; // default to empty array
 
       await transporter.sendMail({
-        from: `"Ashirovinc" <${process.env.EMAIL_USER}>`,
+        from: `"AshirovInc Store" <${process.env.EMAIL_USER2}>`,
         to: orderRow.email,
-        subject: `Order Confirmation - #${orderId}`,
+        subject: `Order Confirmation - ${orderId}`,
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 8px;">
             <h2 style="color: #1E3A8A;">Hi ${orderRow.name},</h2>
-            <p>Thank you for shopping with <strong>Ashirovinc</strong>! Your order <strong>#${orderId}</strong> has been confirmed successfully.</p>
+            <p>Thank you for shopping with <strong>Ashirovinc</strong>! Your order <strong>${orderId}</strong> has been confirmed successfully.</p>
             
             <h3 style="color:#1E3A8A; border-bottom:1px solid #ddd; padding-bottom:4px;">Order Details</h3>
     <table style="width:100%; border-collapse:collapse;">
@@ -168,28 +174,32 @@ export async function POST(req: Request) {
       });
  
       
-try {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
+    try {
+        const transporter = nodemailer.createTransport({
+        host: "smtppro.zoho.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USER2, // e.g. support@ashirovinc.com
+          pass: process.env.EMAIL_PASS2, // Zoho App Password
+        },
+        tls: {
+          rejectUnauthorized: true
+        }
+      });
   const items = orderItems ?? []; // default to empty array
 
   
 
-  // ✅ Owner email (send after customer)
+  // Owner email (send after customer)
   await transporter.sendMail({
-    from: `"Ashirovinc Store" <${process.env.EMAIL_USER}>`,
-    to: "ashirovinc@gmail.com", // owner
-    subject: `New Order Received - #${orderId}`,
+    from: `"AshirovInc Store" <${process.env.EMAIL_USER2}>`,
+    to: "support@ashirovinc.com", // owner
+    subject: `New Order Received - ${orderId}`,
     html: `
       <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 8px;">
         <h2 style="color: #1E3A8A;">New Order Received!</h2>
-        <p>Order <strong>#${orderId}</strong> has been paid successfully.</p>
+        <p>Order <strong>${orderId}</strong> has been paid successfully.</p>
         <h3 style="color: #1E3A8A;">Customer Details</h3>
         <p>
           <strong>Name:</strong> ${orderRow.name}<br/>

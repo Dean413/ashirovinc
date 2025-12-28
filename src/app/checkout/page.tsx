@@ -67,7 +67,7 @@ export default function CheckoutPage() {
       currency: "NGN",
       firstname: details.name,
       phone: details.phone,
-      metadata: {order_id: orderId,},   // ✅ Paystack will send this back in the webhook,
+      metadata: {order_id: orderId,},   
       callback: function (response: any) {
         setLoading(true);
         toast.success("Payment successful. Reference: " + response.reference);

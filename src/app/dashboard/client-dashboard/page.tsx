@@ -117,77 +117,73 @@ export default function ClientDashboard() {
         <ul className="mt-8 space-y-6">
           {orders.map((order) => (
             <li
-              key={order.id}
-              className="p-6 border rounded-2xl shadow-sm bg-white hover:shadow-md transition"
-            >
-              {/* Order Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-semibold text-lg text-gray-800">
-                    Order #{order.id}
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    Ordered on{" "}
-                    <span className="font-medium">
-                      {new Date(order.created_at).toLocaleDateString()}{" "}
-                      {new Date(order.created_at).toLocaleTimeString()}
-                    </span>
-                  </p>
-                </div>
+  key={order.id}
+  className={`p-6 border rounded-2xl shadow-sm bg-white hover:shadow-md transition 
+    ${order.delivery_status === "delivered" || order.status === "refunded" ? "opacity-70 blur-[0.5px]" : ""}`}
+>
+  {/* Order Header */}
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <p className="font-semibold text-lg text-gray-800">Order #{order.id}</p>
+      <p className="text-gray-600 text-sm">
+        Ordered on{" "}
+        <span className="font-medium">
+          {new Date(order.created_at).toLocaleDateString()}{" "}
+          {new Date(order.created_at).toLocaleTimeString()}
+        </span>
+      </p>
+    </div>
 
-                <div className="mt-3 sm:mt-0 flex space-x-3">
-                  <span className="px-3 py-1 text-sm rounded-full bg-green-100 text-green-700 font-medium">
-                    {order.status}
-                  </span>
-                  <span className="px-3 py-1 text-sm rounded-full ">
-                   {order.delivery_status === "pending" ? (
-                    <p className="bg-blue-100 text-blue-700 font-medium">Pending delivery</p>
-                   ): (
-                    <p className="bg-green-100 text-green-700 font-medium">Delivered</p>
-                   )}
-                  </span>
-                </div>
-              </div>
+    <div className="mt-3 sm:mt-0 flex space-x-3">
+      <span className="px-3 py-1 text-sm rounded-full bg-green-100 text-green-700 font-medium">
+        {order.status}
+      </span>
+      <span className="px-3 py-1 text-sm rounded-full">
+        {order.status === "refunded" ? (
+          <p className="bg-gray-100 text-gray-700 font-medium">Refunded</p>
+        ) : order.delivery_status === "pending" ? (
+          <p className="bg-blue-100 text-blue-700 font-medium">Pending delivery</p>
+        ) : (
+          <p className="bg-green-100 text-green-700 font-medium">Delivered</p>
+        )}
+      </span>
+    </div>
+  </div>
 
-              {/* Order Total */}
-              <div className="mt-4">
-                <p className="text-black-700">
-                  <span className="font-bold">💰 Total:</span> ₦{order.total_amount.toLocaleString()}
-                </p>
-              </div>
+  {/* Order Total */}
+  <div className="mt-4">
+    <p className="text-black-700">
+      <span className="font-bold">💰 Total:</span> ₦{order.total_amount.toLocaleString()}
+    </p>
+  </div>
 
-              {/* Order Items */}
-              <ul className="mt-6 divide-y divide-gray-100">
-                {order.items?.map((item) => (
-                  <li
-                    key={item.id}
-                    className={`flex items-center space-x-4 py-4 ${
-                      order.delivery_status === "delivered"
-                        ? "opacity-70 blur-[0.5px]"
-                        : ""
-                    }`}
-                  >
-                    <div className="w-16 h-16 relative flex-shrink-0 rounded-lg overflow-hidden border">
-                      <Image
-                        src={item.product_image || "/placeholder.png"}
-                        alt={item.product_name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+  {/* Order Items */}
+  <ul className="mt-6 divide-y divide-gray-100">
+    {order.items?.map((item) => (
+      <li
+        key={item.id}
+        className="flex items-center space-x-4 py-4"
+      >
+        <div className="w-16 h-16 relative flex-shrink-0 rounded-lg overflow-hidden border">
+          <Image
+            src={item.product_image || "/placeholder.png"}
+            alt={item.product_name}
+            fill
+            className="object-cover"
+          />
+        </div>
 
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-800">
-                        {item.product_name}
-                      </p>
-                      <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                    </div>
+        <div className="flex-1">
+          <p className="font-medium text-gray-800">{item.product_name}</p>
+          <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+        </div>
 
-                    <p className="font-semibold text-gray-700">₦{item.price.toLocaleString()}</p>
-                  </li>
-                ))}
-              </ul>
-            </li>
+        <p className="font-semibold text-gray-700">₦{item.price.toLocaleString()}</p>
+      </li>
+    ))}
+  </ul>
+</li>
+
           ))}
         </ul>
       )}
