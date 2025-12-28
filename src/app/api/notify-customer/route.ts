@@ -2,25 +2,45 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 
+
+
 export async function POST(req: Request) {
+  
   try {
+   const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+
+    if (error || user?.user_metadata?.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { email, name, orderId, deliveryMethod, address } = await req.json();
 
     const { data: orderItems, error: fetchItemsError } = await supabaseAdmin
-        .from("order_items") // assuming you have an order_items table
-        .select("product_id, price, product_name, quantity, product_image")
-        .eq("order_id", orderId);
+    .from("order_items") // assuming you have an order_items table
+    .select("product_id, price, product_name, quantity, product_image")
+    .eq("order_id", orderId);
         
 
-         const items = orderItems ?? [];
+    const items = orderItems ?? [];
 
-     const transporter = nodemailer.createTransport({
-              service: "gmail",
-              auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-              },
-            });
+    const transporter = nodemailer.createTransport({
+      host: "smtppro.zoho.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER, // e.g. hello@ashirovinc.com
+        pass: process.env.EMAIL_PASS, // Zoho App Password
+        },
+        tls: {
+          rejectUnauthorized: true
+        }
+      });
+
 
     await transporter.sendMail({
       from: `"Ashirovinc" <${process.env.EMAIL_USER}>`,
