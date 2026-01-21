@@ -32,6 +32,7 @@ interface Product {
   storage?: string;
   display?: string;
   slug: string;
+  authenticity?: string
   stock: number;
   category: string;
   condition: string;
@@ -111,15 +112,17 @@ useEffect(() => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
               {/*intro*/}
-        <section className="py-16 px-6 text-center bg-gradient-to-r from-blue-50 to-blue-100">
+        <section className="py-16 px-6 text-center bg-gradient-to-r from-blue-50 to-blue-100 mt-8">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4">
             Welcome to Ashirovinc
           </h1>
           <p className="max-w-2xl mx-auto text-gray-600 text-lg">
-            Ashirovinc is an e-commerce platform that allows users to browse
+            An e-commerce platform that allows users to browse
             and purchase affordable, high-quality laptops and computers in Nigeria.
-            Users can sign in with Google to manage accounts and orders securely.
+            You can sign in with Google to manage accounts and orders securely.
+            
           </p>
+          <p className="font-bold uppercase">We offer free delivery within Abuja</p>
         </section>
      
       <section className="px-6 py-8">
@@ -196,15 +199,15 @@ useEffect(() => {
 
         {filteredProducts.length === 0 ? (<p className="text-center text-gray-500">No products found.</p>) : 
           (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-[100%] mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 max-w-[100%] mx-auto">
             {filteredProducts.map((product) => {
               const currentIndex = currentImages[product.id] || 0;
               const currentQuantity = cartItems.find((item) => item.id === product.id)?.quantity ?? 0;
 
               return (
-                <div key={product.id} className=" w-full bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col">
+                <div key={product.id} className=" w-44 md:w-full bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col">
                   {/* Product Image & Link */}
-                  <div className="w-full relative h-54 md:h-72 lg:h-96 cursor-pointer" onClick={() => setNavigating(true)}>
+                  <div className="w-full relative h-44 md:h-72 lg:h-96 cursor-pointer" onClick={() => setNavigating(true)}>
                     <Link href={`/products/${product.slug}`}>
                       {product.image_url?.length ? 
                         (
@@ -218,7 +221,7 @@ useEffect(() => {
                         ) 
                         : 
                         (
-                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">No Image</div>
+                          <div className="w-44 md:w-full h-full bg-gray-200 flex items-center justify-center">No Image</div>
                         )
                       }
                     </Link>
@@ -226,12 +229,13 @@ useEffect(() => {
 
                   {/* Product Info */}
                   <div className="p-4 flex flex-col flex-1">
-                    <Link href={`/products/brand/${encodeURIComponent(product.brand)}` } className="text-gray-500">{product.brand}</Link>
+                    <Link href={`/products/brand/${encodeURIComponent(product.brand)}` } className="text-gray-500 text-xs">{product.brand}</Link>
                     <Link href={`/products/${product.slug}`} onClick={() => setNavigating(true)}>
                      
-                      <h3 className="text-sm font-semibold text-gray-800 mt-1">{product.name}</h3>
-                       <h3 className="text-gray-500 mt-1">{product.condition}</h3>
-                      <p className="text-blue-600 font-bold mt-2">₦{product.price?.toLocaleString()}</p>
+                      <h3 className="text-sm font-semibold text-gray-800 mt-1 leading-tight">{product.name}</h3>
+                       <h3 className="text-sm font-semibold text-gray-800 mt-1">{product.authenticity}</h3>
+                       <h2 className="text-gray-500 mt-1 text-xs">{product.condition}</h2>
+                      <p className="text-blue-600 font-medium mt-2">₦{product.price?.toLocaleString()}</p>
 
                       {/* Stock Status */}
                       <div className="mt-1">
@@ -255,7 +259,7 @@ useEffect(() => {
 
                       {/* Product Specs */}
                      
-                     <div className="flex mt-3 text-gray-600 text-xs overflow-x-auto w-full whitespace-nowrap">
+                     <div className="flex mt-3 text-gray-600 text-xs overflow-x-auto no-scrollbar w-full whitespace-nowrap">
                       {product.processor && (
                         <div className="flex flex-col items-center gap-1 shrink-0 min-w-[80px]">
                           <FaMicrochip className="text-xl" />

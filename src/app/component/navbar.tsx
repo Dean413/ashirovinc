@@ -7,8 +7,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaFacebook, FaTwitter, FaInstagram, FaWhatsapp, FaUser, FaUserCheck, FaTiktok } from "react-icons/fa";
 import SearchBar from "./search-bar";
-import { useCart } from "@/context/cartcontext";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useCart } from "@/context/cartcontext";;
 import { useRouter, usePathname } from "next/navigation";
 import {Typewriter} from "react-simple-typewriter"
 import { supabase } from "@/lib/supabaseclient";
@@ -33,7 +32,47 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
+  const [showNavbar, setShowNavbar] = useState(true);
+  const lastScrollY = useRef(0);
+
   const isDashboard = pathname?.startsWith("/dashboard/client-dashboard");
+
+  useEffect(() => {
+  if (open) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
+
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, [open]);
+
+
+  useEffect(() => {
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY < 10) {
+      // Always show at top
+      setShowNavbar(true);
+    } else if (currentScrollY > lastScrollY.current) {
+      // Scrolling down → hide
+      setShowNavbar(false);
+    } else {
+      // Scrolling up → show
+      setShowNavbar(true);
+    }
+
+    lastScrollY.current = currentScrollY;
+  };
+
+  window.addEventListener("scroll", handleScroll, { passive: true });
+
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
 
   // ✅ Detect click outside
   useEffect(() => {
@@ -76,7 +115,7 @@ export default function Navbar() {
   return (
     <>
       {/* Top Header */}
-      <header className="bg-blue-950 text-white py-2 px-4 sticky top-0 z-50">
+      <header className={`bg-blue-950 text-white py-2 px-4 sticky top-0 z-50 ${open ? "hidden" : "block"}`}>
         <div className="relative max-w-7xl mx-auto flex items-center justify-end gap-4 text-xs md:text-sm">
           <span className="absolute left-[30%] md:left-1/2 transform -translate-x-1/2 font-semibold">
          <Typewriter
@@ -107,9 +146,13 @@ export default function Navbar() {
           </div>
         </div>
       </header>
+         
 
       {/* Main Navbar */}
-      <nav className="bg-white shadow-md px-6 flex items-center justify-between sticky top-7 z-50">
+      <motion.nav initial={{ y: 0 }}
+  animate={{ y: showNavbar ? 0 : "-100%" }}
+  transition={{ duration: 0.25, ease: "easeInOut" }}
+  className="bg-white shadow-md px-6 fixed left-0 right-0 top-7 z-40">
         <div className="container mx-auto flex items-center justify-between">
           {/* Mobile Menu Button */}
           { <button onClick={() => setOpen(!open)} className="md:hidden p-2 rounded hover:bg-gray-100 focus:outline-none">{open ? <X size={28} /> : <Menu size={28} />}</button> }
@@ -199,7 +242,7 @@ export default function Navbar() {
             <div className="hidden md:flex">
               <SearchBar />
             </div>
-            {/* <SearchBar /> */}
+            
             </>
           )} 
 
@@ -216,6 +259,13 @@ export default function Navbar() {
           )}
         </div>
 
+        {open && (
+  <div
+    className="fixed inset-0 bg-black/50 z-40"
+    onClick={() => setOpen(false)}
+  />
+)}
+
         {/* Mobile Sidebar */}
         <AnimatePresence>
           {open && (
@@ -225,14 +275,16 @@ export default function Navbar() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-100%", opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed top-0 left-0 h-full w-72 bg-blue-900 p-6 text-white z-50 shadow-lg flex flex-col space-y-6"
+              className="fixed top-0 left-0 h-full w-80 bg-white p-6 z-50 text-blue-900  shadow-lg flex flex-col space-y-6"
             >
-              { <button onClick={() => setOpen(false)} className="self-end text-white focus:outline-none">
+              { <button onClick={() => setOpen(false)} className="self-end text-blue-900 focus:outline-none">
                 <X size={28} />
               </button>}
 
              
-               <SearchBar />
+               <div className="mb">
+                <SearchBar />
+                </div>
               
 
               {<ul className="space-y-4 text-lg font-medium">
@@ -273,10 +325,19 @@ export default function Navbar() {
                      <li>
                       <Link href="/book-repair" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Book a Repair</Link>
                     </li>
-                    <div className="rounded-full bg-white text-blue-900 p-2 w-[80%] mx-auto text-center font-bold">
+                    <div className="rounded-full bg-blue-900 text-white p-2 w-[80%] mx-auto text-center font-bold">
                       <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
                         {user ? "Account" : "Sign In"}
                       </Link>
+
+                      
+                    </div>
+                    <div className="flex items-center gap-3 fixed bottom-5">
+                      <a href="https://www.facebook.com/share/17XYXACYee/" target="_blank" className="hover:text-blue-400"><FaFacebook /></a>          
+                      <a href="https://www.tiktok.com/@ashirov_inc_" target="_blank"  className="hover:text-black"><FaTiktok /></a>
+                      <a href="https://x.com/ASHirov_inc_?t=zgCQtUsVgTbFi-FcQZ99AA&s=09" target="_blank" className="hover:text-blue-600"><FaTwitter /></a>          
+                      <a href="https://www.instagram.com/ashirov_inc_?igsh=MTUxN2lzcmp3a2hu" target="_blank" className="hover:text-red-500"><FaInstagram /></a>         
+                      <a href="https://wa.me/2348156959605?text=Hello%2C%20I%20saw%20your%20website%20and%20wanted%20to%20chat!" target="_blank" className="hover:text-green-500"><FaWhatsapp /></a>                   
                     </div>
                   </>
                 )}
@@ -284,7 +345,8 @@ export default function Navbar() {
             </motion.div>
           )}
         </AnimatePresence>
-      </nav>
+      </motion.nav>
+      
     </>
   );
 }
