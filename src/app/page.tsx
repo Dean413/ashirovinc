@@ -85,7 +85,7 @@ useEffect(() => {
       const { data, error } = await supabase
         .from("products")
         .select('*')
-        .order("created_at", { ascending: false }).neq("type", "SRCAP");
+        .order("created_at", { ascending: false }).neq("type", "SCRAP");
 
       if (data && !error) setProducts(data as Product[]);
       setLoading(false);
@@ -233,7 +233,7 @@ useEffect(() => {
                     <Link href={`/products/${product.slug}`} onClick={() => setNavigating(true)}>
                      
                       <h3 className="text-sm font-semibold text-gray-800 mt-1 leading-tight">{product.name}</h3>
-                       <h3 className="text-sm font-semibold text-gray-800 mt-1">{product.authenticity}</h3>
+                       <h3 className="font-semibold text-gray-500 mt-1 text-xs">{`${product.authenticity ? ` (${product.authenticity})` : ""}`}</h3>
                        <h2 className="text-gray-500 mt-1 text-xs">{product.condition}</h2>
                       <p className="text-blue-600 font-medium mt-2">₦{product.price?.toLocaleString()}</p>
 
@@ -339,11 +339,11 @@ useEffect(() => {
                   
                    
 
-                    // ✅ Show toast
+                   
                     toast.success(`${product.name} added to cart!`);
                   }}
                   disabled={ currentQuantity >= product.stock}
-                  className={`mt-4 px-4 py-2 rounded-lg transition w-full ${
+                  className={`mt-4 px-4 py-2 rounded-lg transition w-full bottom-24 ${
                       currentQuantity >= product.stock
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-blue-600 text-white hover:bg-blue-700"

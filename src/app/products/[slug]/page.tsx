@@ -32,6 +32,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const sliderRef = useRef<Slider | null>(null);
   const [open, setOpen] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0);
+    const [expandedProducts, setExpandedProducts] = useState<Record<number, boolean>>({});
 
   
   useEffect(() => {
@@ -120,35 +121,15 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                         height={70}
                         className="object-cover w-full h-16"
                       />
+                      
                     </div>
                   ))}
+                  
                 </div>
               </>
+              
             )}
-          </div>
-
-          {/* Product Details */}
-          <div className="flex flex-col justify-between">
-            <div>
-              <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{product.name}</h1>
-              <p className="mb-4 text-gray-600">
-                Brand:{" "}
-                <Link
-                  href={`/products/brand/${encodeURIComponent(product.brand)}`}
-                  className="text-blue-600 font-medium hover:underline"
-                >
-                  {product.brand}
-                </Link>
-              </p>
-
-              <ul className="list-disc pl-6 space-y-1 text-gray-700 text-base md:text-lg">
-                {product.description.map((spec, i) => (
-                  <li key={i}>{spec}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="mt-8">
+             <div className="mt-8">
               <p className="text-3xl font-bold text-blue-700 mb-4">
                 ₦{product.price.toLocaleString()}
               </p>
@@ -175,6 +156,56 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 {isOutOfStock ? "Out of Stock" : "Add to Cart"}
               </button>
             </div>
+          </div>
+
+          {/* Product Details */}
+          <div className="flex flex-col justify-between">
+            <div>
+              <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{product.name}</h1>
+              <p className="mb-4 text-gray-600">
+                Brand:{" "}
+                <Link
+                  href={`/products/brand/${encodeURIComponent(product.brand)}`}
+                  className="text-blue-600 font-medium hover:underline"
+                >
+                  {product.brand}
+                </Link>
+              </p>
+
+              <ul className="list-disc pl-6 space-y-1 text-gray-700 text-base md:text-lg">
+                {/* {product.description.map((spec, i) => (
+                  <li key={i}>{spec}</li>
+                ))} */}
+
+                {product.description?.length ? (
+                    <div className="mt-3 text-sm text-gray-700">
+                      {expandedProducts[product.id] ? (
+                        <ul className="list-disc pl-4 space-y-1">
+                          {product.description.map((line, i) => (
+                            <li key={i}>{line}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>
+                          {product.description.join(" ").slice(0, 2000)}...
+                        </p>
+                      )}
+                      {product.description.join(" ").length > 100 && (
+                        <button
+                          onClick={() =>
+                            setExpandedProducts((prev) => ({ ...prev, [product.id]: !prev[product.id] }))
+                          }
+                          className="text-blue-600 ml-2 underline text-sm"
+                        >
+                          {expandedProducts[product.id] ? "Read less" : "Read more"}
+                        </button>
+                      )}
+                    </div>
+                  ) : null}
+              </ul>
+            </div>
+
+           
           </div>
         </div>
       </div>
