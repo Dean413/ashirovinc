@@ -47,7 +47,7 @@ useEffect(() => {
 
 
   return (
-    <div className="relative w-64 hidden md:flex">
+    <div className="relative w-full md:w-64 flex">
       {/* Search box */}
       <div className="flex items-center border border-blue-300 rounded-lg px-2 py-1 bg-white">
         {focused && (

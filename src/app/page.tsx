@@ -196,7 +196,7 @@ useEffect(() => {
 
         {filteredProducts.length === 0 ? (<p className="text-center text-gray-500">No products found.</p>) : 
           (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8 max-w-[95%] mx-auto">
             {filteredProducts.map((product) => {
               const currentIndex = currentImages[product.id] || 0;
               const currentQuantity = cartItems.find((item) => item.id === product.id)?.quantity ?? 0;

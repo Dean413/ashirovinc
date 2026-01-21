@@ -196,7 +196,10 @@ export default function Navbar() {
               : 
               <FaUser size={24} className="text-blue-900 mr-2" />}
             </Link>
-            <SearchBar />
+            <div className="hidden md:flex">
+              <SearchBar />
+            </div>
+            {/* <SearchBar /> */}
             </>
           )} 
 
@@ -228,9 +231,9 @@ export default function Navbar() {
                 <X size={28} />
               </button>}
 
-              <div className="flex items-center rounded-lg mb-6">
-                <SearchBar />
-              </div>
+             
+               <SearchBar />
+              
 
               {<ul className="space-y-4 text-lg font-medium">
                 {isDashboard && user ? (
@@ -243,6 +246,7 @@ export default function Navbar() {
                     </li>
                     <li>
                       <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition"> Shop</Link>
+                     
                     </li>
                     <li>
                       <button onClick={signOut} className="rounded-full bg-white text-red-400 p-2 w-[80%] mx-auto text-center transition">Sign Out</button>
@@ -254,8 +258,9 @@ export default function Navbar() {
                 
                 (
                   <>
+                  
                     <li>
-                      <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Home</Link>
+                      <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition"> Home</Link>
                     </li>
                   
                     <li>
@@ -263,6 +268,7 @@ export default function Navbar() {
                     </li>
                     <li>
                       <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Contact</Link>
+                       
                     </li>
                      <li>
                       <Link href="/book-repair" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Book a Repair</Link>
