@@ -121,10 +121,10 @@ useEffect(() => {
             Users can sign in with Google to manage accounts and orders securely.
           </p>
         </section>
-      {/* <Carousel /> */}
+     
       <section className="px-6 py-8">
   <div className="flex flex-col items-center gap-6">
-    {/* All button */}
+   
     <button
       className={`px-4 py-2 rounded-lg font-medium transition ${
         (!selectedBrand && !selectedCategory) || (selectedBrand === "All" && selectedCategory === "All")
@@ -196,15 +196,15 @@ useEffect(() => {
 
         {filteredProducts.length === 0 ? (<p className="text-center text-gray-500">No products found.</p>) : 
           (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8 max-w-[95%] mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-[100%] mx-auto">
             {filteredProducts.map((product) => {
               const currentIndex = currentImages[product.id] || 0;
               const currentQuantity = cartItems.find((item) => item.id === product.id)?.quantity ?? 0;
 
               return (
-                <div key={product.id} className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col">
+                <div key={product.id} className=" w-full bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col">
                   {/* Product Image & Link */}
-                  <div className="w-full relative h-64 md:h-72 lg:h-96 cursor-pointer" onClick={() => setNavigating(true)}>
+                  <div className="w-full relative h-54 md:h-72 lg:h-96 cursor-pointer" onClick={() => setNavigating(true)}>
                     <Link href={`/products/${product.slug}`}>
                       {product.image_url?.length ? 
                         (
@@ -229,7 +229,7 @@ useEffect(() => {
                     <Link href={`/products/brand/${encodeURIComponent(product.brand)}` } className="text-gray-500">{product.brand}</Link>
                     <Link href={`/products/${product.slug}`} onClick={() => setNavigating(true)}>
                      
-                      <h3 className="text-lg font-semibold text-gray-800 mt-1">{product.name}</h3>
+                      <h3 className="text-sm font-semibold text-gray-800 mt-1">{product.name}</h3>
                        <h3 className="text-gray-500 mt-1">{product.condition}</h3>
                       <p className="text-blue-600 font-bold mt-2">₦{product.price?.toLocaleString()}</p>
 
@@ -254,42 +254,49 @@ useEffect(() => {
                       </div>
 
                       {/* Product Specs */}
-                      <div className="flex flex-wrap gap-6 mt-3 text-gray-600 text-sm">
-                        {product.processor && (
-                          <div className="flex flex-col items-center gap-1">
-                            <FaMicrochip className="text-xl" />
-                            <span className="text-black font-semibold">{product.processor}</span>
-                            <span className="text-xs text-gray-500">Processor</span>
-                          </div>
-                        )}
+                     
+                     <div className="flex mt-3 text-gray-600 text-xs overflow-x-auto w-full whitespace-nowrap">
+                      {product.processor && (
+                        <div className="flex flex-col items-center gap-1 shrink-0 min-w-[80px]">
+                          <FaMicrochip className="text-xl" />
+                          <span className="text-black font-semibold text-xs whitespace-nowrap">
+                            {product.processor.toLowerCase()}
+                          </span>
+                          <span className="text-xs text-gray-500">Processor</span>
+                        </div>
+                      )}
 
-                        {product.storage && (
-                          <div className="flex flex-col items-center gap-1">
-                            <FaHdd className="text-xl" />
-                            <span className="text-black font-semibold">{product.storage}</span>
-                            <span className="text-xs text-gray-500">Storage</span>
-                          </div>
-                        )}
+                      {product.storage && (
+                        <div className="flex flex-col items-center gap-1 shrink-0 min-w-[80px]">
+                          <FaHdd className="text-xl" />
+                          <span className="text-black font-semibold whitespace-nowrap">
+                            {product.storage}
+                          </span>
+                          <span className="text-xs text-gray-500">Storage</span>
+                        </div>
+                      )}
 
-                        {product.ram && (
-                          <div className="flex flex-col items-center gap-1">
-                            <FaMemory className="text-xl" />
-                            <span className="text-black font-semibold">{product.ram}</span>
-                            <span className="text-xs text-gray-500">RAM</span>
-                          </div>
-                        )}
+                      {product.ram && (
+                        <div className="flex flex-col items-center gap-1 shrink-0 min-w-[80px]">
+                          <FaMemory className="text-xl" />
+                          <span className="text-black font-semibold whitespace-nowrap">
+                            {product.ram}
+                          </span>
+                          <span className="text-xs text-gray-500">RAM</span>
+                        </div>
+                      )}
 
-                        {product.display && (
-                          <div className="flex flex-col items-center gap-1">
-                            <FaDesktop className="text-xl" />
-                            <span className="text-black font-semibold">{product.display}</span>
-                            <span className="text-xs text-gray-500">Display</span>
-                          </div>
-                        )}
-                        
-                        
-                        
-                      </div>
+                      {product.display && (
+                        <div className="flex flex-col items-center gap-1 shrink-0 min-w-[80px]">
+                          <FaDesktop className="text-xl" />
+                          <span className="text-black font-semibold whitespace-nowrap">
+                            {product.display}
+                          </span>
+                          <span className="text-xs text-gray-500">Display</span>
+                        </div>
+                      )}
+                    </div>
+
                     </Link>
 
                     {/* Add to Cart Button */}
@@ -300,7 +307,7 @@ useEffect(() => {
 
                     if (!user) {
                       toast.info("Please sign in to add items to your cart.");
-                      router.push("/sign-in"); // or /auth/signin
+                      router.push("/sign-in"); 
                       return;
                     }
 
