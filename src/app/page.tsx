@@ -110,7 +110,18 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Carousel />
+              {/*intro*/}
+        <section className="py-16 px-6 text-center bg-gradient-to-r from-blue-50 to-blue-100">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4">
+            Welcome to Ashirovinc
+          </h1>
+          <p className="max-w-2xl mx-auto text-gray-600 text-lg">
+            Ashirovinc is an e-commerce platform that allows users to browse
+            and purchase affordable, high-quality laptops and computers in Nigeria.
+            Users can sign in with Google to manage accounts and orders securely.
+          </p>
+        </section>
+      {/* <Carousel /> */}
       <section className="px-6 py-8">
   <div className="flex flex-col items-center gap-6">
     {/* All button */}
@@ -131,7 +142,7 @@ useEffect(() => {
     {/* Dropdowns */}
     <div className="flex flex-col md:flex-row gap-6 w-full justify-center items-center">
       
-
+      
       {/* Category Dropdown */}
       <div className="flex flex-col items-center">
         <label className="font-semibold mb-2" htmlFor="category-select">
@@ -176,16 +187,7 @@ useEffect(() => {
 </section>
 
 
-        {/*intro*/}
-        <section className="py-16 px-6 text-center bg-gradient-to-r from-blue-50 to-blue-100">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4">
-            Welcome to Ashirovinc
-          </h1>
-          <p className="max-w-2xl mx-auto text-gray-600 text-lg">
-            Your one-stop shop for affordable, high-quality used laptops and computers
-            in Nigeria. Browse our carefully curated selection and find your next device today.
-          </p>
-        </section>
+
 
 
       {/* Featured Products */}

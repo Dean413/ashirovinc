@@ -222,13 +222,13 @@ export default function AdminOrders() {
                     <DeleteOrderButton orderId={order.id} onDelete={fetchOrders} />
                   )}
 
-{order.status === "paid" && (
-  <RefundOrderButton orderId={order.id} onRefund={fetchOrders} />
-)}
+                    {order.status === "paid" && (
+                      <RefundOrderButton orderId={order.id} onRefund={fetchOrders} />
+                    )}
 
-{order.status === "refunded" && (
-  <span className="text-red-600 font-semibold">Refunded</span>
-)}
+                    {order.status === "refunded" && (
+                      <span className="text-red-600 font-semibold">Refunded</span>
+                    )}
                 </td>
               </tr>
             ))}

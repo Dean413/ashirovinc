@@ -6,6 +6,18 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url);
     const orderId = searchParams.get("id");
 
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+
+    if (error || user?.user_metadata?.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     if (!orderId) {
       return NextResponse.json({ error: "Order ID required" }, { status: 400 });
     }

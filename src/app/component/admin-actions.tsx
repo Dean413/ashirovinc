@@ -75,6 +75,8 @@ export function DeleteOrderButton({orderId, onDelete,}: {orderId: string; onDele
       setLoading(true);
       const res = await fetch(`/api/delete-order?id=${orderId}`, {
         method: "DELETE",
+        headers: { "Content-Type": "application/json" ,
+        "Authorization": `Bearer ${accessToken}`},
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete order");

@@ -79,17 +79,24 @@ export default function Navbar() {
       <header className="bg-blue-950 text-white py-2 px-4 sticky top-0 z-50">
         <div className="relative max-w-7xl mx-auto flex items-center justify-end gap-4 text-xs md:text-sm">
           <span className="absolute left-[30%] md:left-1/2 transform -translate-x-1/2 font-semibold">
-          <Typewriter
-            words=
-            {
-              ['Welcome to Ashirov Inc',
-                'Affordable Quality Laptops in Nigeria',
-                'Your Trusted Source for UK-Used Computers',
-                'Get the Best Deals on Reliable Tech',
-                'Shop Smart, Work Faster with Ashirov Inc'
-              ]
-            } loop={false} cursor cursorStyle="|" typeSpeed={50} deleteSpeed={50} delaySpeed={2000}
-          />
+         <Typewriter
+          words={[
+            'Welcome to Ashirov Inc',
+            'Affordable Quality Laptops in Nigeria',
+            'Your Trusted Source for UK-Used Computers',
+            'Get the Best Deals on Reliable Tech',
+            'Shop Smart, Work Faster with Ashirov Inc',
+          ]}
+          loop={false}
+          cursor
+          cursorStyle="|"
+          typeSpeed={50}
+          deleteSpeed={50}
+          delaySpeed={2000}
+        />
+
+       
+
           </span>
           <div className="flex items-center gap-3">
             <a href="https://www.facebook.com/share/17XYXACYee/" target="_blank" className="hover:text-blue-400"><FaFacebook /></a>          
