@@ -42,7 +42,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-6 py-12 mt-25">
       {/* Header */}
       <h1 className="text-4xl font-extrabold mb-4 text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
         Contact Us

@@ -33,8 +33,8 @@ export async function POST(req: Request) {
     const orderItems = cartItems.map((item: any) => ({
       order_id: order.id,
       product_id: item.id,
-      product_name: item.name,        // ✅ add product name
-      product_image: item.image,      // ✅ add product image
+      product_name: item.name,        
+      product_image: item.image,      
       quantity: item.quantity,
       price: item.price,
       ram: item.ram,

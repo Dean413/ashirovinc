@@ -7,7 +7,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [open, setOpen] = useState(true);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 mt-25">
       {/* Sidebar */}
       <aside className={`bg-white shadow-md ${open ? "w-40" : "w-20"} transition-all`}>
         <div className="p-4 font-bold text-xl">Admin</div>

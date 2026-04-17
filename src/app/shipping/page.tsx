@@ -4,7 +4,7 @@ import { Truck, Clock, DollarSign, MapPin, Eye } from "lucide-react";
 
 export default function Shipping() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12 bg-gray-50">
+    <div className="max-w-5xl mx-auto px-6 py-12 bg-gray-50 mt-25">
       <h1 className="text-4xl font-extrabold text-center mb-10 text-gray-800 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text">
         🚚 Shipping Information
       </h1>

@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function About() {
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12 bg-gray-50">
+    <div className="max-w-6xl mx-auto px-6 py-12 bg-gray-50 mt-25">
       {/* Title */}
       <h1 className="text-4xl font-extrabold text-center mb-12 text-gray-800 bg-gradient-to-r from-blue-600 to-indigo-600  bg-clip-text">
         💻 About Ashirovinc

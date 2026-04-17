@@ -57,7 +57,7 @@ export default function CartPage() {
         const { data: serials, error } = await supabase.from("product_units").select("*").eq("product_id", item.id).eq("status", "available")
         if (error) throw error;
         if (!serials || serials.length < item.quantity) {
-          toast.error(`Not enough serials for ${item.name}. Only ${serials?.length ?? 0} available.`);
+          toast.error(`Not enough stocks for ${item.name}. Only ${serials?.length ?? 0} available.`);
           setLoading(false);
           return;
         }
@@ -102,7 +102,7 @@ export default function CartPage() {
   if (loading) return <FullPageLoader />;
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="max-w-4xl mx-auto p-4 mt-25">
       <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
 
       {cartItems.length === 0 ? 

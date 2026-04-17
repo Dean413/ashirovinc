@@ -44,7 +44,7 @@ export default function FAQ() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-4xl font-extrabold text-center mb-10 bg-gradient-to-r from-blue-500 to-indigo-600 text-transparent bg-clip-text">
+      <h1 className="text-4xl font-extrabold text-center mb-10 bg-gradient-to-r from-blue-500 to-indigo-600 text-transparent bg-clip-text mt-25">
         Frequently Asked Questions
       </h1>
 

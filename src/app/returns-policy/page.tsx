@@ -3,7 +3,7 @@ import React from "react";
 
 export default function ReturnPolicy() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12 bg-gray-50">
+    <div className="max-w-5xl mx-auto px-6 py-12 bg-gray-50 mt-25">
       <h1 className="text-4xl font-bold text-center mb-10 text-gray-800">
         🛒 Return & Refund Policy
       </h1>

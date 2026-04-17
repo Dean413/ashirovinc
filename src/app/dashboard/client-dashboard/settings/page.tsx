@@ -112,7 +112,7 @@ const updateEmail = async () => {
 
   if (loading) return <FullPageLoader text="loading" />
   return (
-    <div className="max-w-md mx-auto p-6 space-y-8">
+    <div className="max-w-md mx-auto p-6 space-y-8 mt-25">
       <h1 className="text-2xl font-bold mb-4">Account Settings</h1>
 
       {message && <p className="text-green-600">{message}</p>}

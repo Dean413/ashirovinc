@@ -36,7 +36,7 @@ export default function SuccessPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className="max-w-3xl mx-auto p-6 mt-15">
       <div className="bg-white shadow rounded-lg p-6 text-center">
         <h1 className="text-3xl font-bold text-green-600 mb-4">🎉 Payment Successful!</h1>
         <p className="text-gray-600 mb-6">Thank you <span className="font-semibold">{order.details.name}</span> for your order.</p>

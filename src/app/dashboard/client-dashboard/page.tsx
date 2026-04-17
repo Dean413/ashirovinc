@@ -46,7 +46,7 @@ export default function ClientDashboard() {
 
       setUser(user);
 
-      // 1️⃣ Get orders
+      // Get orders
       const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
         .select("*")
@@ -64,7 +64,7 @@ export default function ClientDashboard() {
         return;
       }
 
-      // 2️⃣ Get order items
+      //Get order items
       const orderIds = ordersData.map((o) => o.id);
       const { data: itemsData, error: itemsError } = await supabase
         .from("order_items")
@@ -77,14 +77,14 @@ export default function ClientDashboard() {
         return;
       }
 
-      // 3️⃣ Attach items
+      //Attach items
       const ordersWithItems = ordersData.map((order) => ({
         ...order,
         items: itemsData?.filter((item) => item.order_id === order.id) || [],
       }));
 
       setOrders(ordersWithItems as Order[]);
-      setLoading(false); // ✅ stop loader
+      setLoading(false);
     };
 
     getUserAndOrders();
@@ -94,7 +94,7 @@ export default function ClientDashboard() {
   if (loading) return <FullPageLoader text="Loading dashboard" />;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto mt-25">
       <h1 className="text-3xl font-bold text-gray-800">My Orders</h1>
 
       {user && (

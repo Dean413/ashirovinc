@@ -125,7 +125,7 @@ export default function SalesAnalyticsPage() {
   if (loading) return <p>Loading analytics...</p>;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 ">
       <h1 className="text-2xl font-bold">Sales Analytics</h1>
 
       {/* Filter Selection */}

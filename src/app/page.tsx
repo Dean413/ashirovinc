@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaMicrochip, FaMemory, FaHdd, FaDesktop, FaExclamationTriangle } from "react-icons/fa";
-import { ToastContainer, toast } from "react-toastify";   // ✅ NEW
-import 'react-toastify/dist/ReactToastify.css'; 
+import { ToastContainer, toast } from "react-toastify";  
+// import 'react-toastify/dist/ReactToastify.css'; 
 import Carousel from "./component/carousel";
 import FullPageLoader from "./component/page-reloader";
 import { supabase } from "@/lib/supabaseclient";
@@ -108,11 +108,20 @@ useEffect(() => {
     return brandMatch && categoryMatch;
   });
 
+  const cleanProductName = (name:any) => {
+    return name
+      ?.replace(/UK-USED|NIGERIAN-USED|BRAND-NEW/gi, "")
+      .replace(/\s+-\s+$/, "")
+      .trim();
+  };
+
+
+
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
               {/*intro*/}
-        <section className="py-16 px-6 text-center bg-gradient-to-r from-blue-50 to-blue-100 mt-8">
+        <section className="py-16 px-6 text-center bg-gradient-to-r from-blue-50 to-blue-100 mt-15">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4">
             Welcome to Ashirovinc
           </h1>
@@ -232,7 +241,7 @@ useEffect(() => {
                     <Link href={`/products/brand/${encodeURIComponent(product.brand)}` } className="text-gray-500 text-xs">{product.brand}</Link>
                     <Link href={`/products/${product.slug}`} onClick={() => setNavigating(true)}>
                      
-                      <h3 className="text-sm font-semibold text-gray-800 mt-1 leading-tight">{product.name}</h3>
+                      <h3 className="text-sm font-semibold text-gray-800 mt-1 leading-tight">{cleanProductName(product.name)}</h3>
                        <h3 className="font-semibold text-gray-500 mt-1 text-xs">{`${product.authenticity ? ` (${product.authenticity})` : ""}`}</h3>
                        <h2 className="text-gray-500 mt-1 text-xs">{product.condition}</h2>
                       <p className="text-blue-600 font-medium mt-2">₦{product.price?.toLocaleString()}</p>
