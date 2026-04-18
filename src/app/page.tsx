@@ -51,9 +51,22 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [navigating, setNavigating] = useState(false);
   const [user, setUser] = useState<User | null>(null)
-
+  const [allowed, setAllowed] = useState(false);
   const router = useRouter();
+  const sitePassword = "ashirov_inc";
 
+
+  useEffect(() => {
+    const enteredPassword = prompt("Enter password");
+
+    if (enteredPassword === sitePassword) {
+      setAllowed(true);
+    } else {
+      alert("Access denied");
+    }
+  }, []);
+
+ 
 
 // Get user on mount
 useEffect(() => {
@@ -95,8 +108,7 @@ useEffect(() => {
 
   
 
-  if (loading || navigating) return <FullPageLoader text="loading..." />;
-
+  
   // Get unique brands and categories
   const brands = Array.from(new Set(products.map((p) => p.brand)));
   const categories = Array.from(new Set(products.map((p) => p.category)));
@@ -115,8 +127,9 @@ useEffect(() => {
       .trim();
   };
 
-
-
+  
+   if (!allowed) return null;
+   if (loading || navigating) return <FullPageLoader text="loading..." />;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

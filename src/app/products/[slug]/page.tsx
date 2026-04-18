@@ -3,8 +3,8 @@
 import { use, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+// import "slick-carousel/slick/slick.css";
+// import "slick-carousel/slick/slick-theme.css";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseclient";
 import { useCart } from "@/context/cartcontext";
@@ -82,7 +82,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen py-10 px-4">
+    <div className="bg-gray-50 min-h-screen mt-28 py-10 px-4">
       <div className="mx-auto max-w-6xl bg-white shadow-xl rounded-2xl p-6 md:p-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Image Gallery */}
@@ -99,7 +99,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                         className="object-cover bg-gray-100"
                         onClick={() => {setOpen(true); setCurrentIndex(idx)}}
                       />
-                    </div>
+                    </div> 
                   ))}
                 </Slider>
                  <Lightbox
