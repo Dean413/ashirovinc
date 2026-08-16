@@ -112,8 +112,8 @@ export default function AdminOrders() {
 
 
   const sortedOrders = [...filteredOrders].sort(
-  (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-);
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 
   // Pagination calculation
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
@@ -159,7 +159,7 @@ export default function AdminOrders() {
             type="text"
             className="border px-2 py-1 rounded"
             value={searchTerm}
-            onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}}
+            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
             placeholder="e.g. ORD123, REF456"
           />
         </div>
@@ -178,8 +178,8 @@ export default function AdminOrders() {
               {/* <th className="border px-2 py-1">Email</th>  */}
               <th className="border px-2 py-1">Total</th>
               <th className="border px-2 py-1">Status</th>
-              
-           
+
+
               <th className="border px-2 py-1">Reference</th>
               <th className="border px-2 py-1">Date</th>
               <th className="border px-2 py-1">Actions</th>
@@ -192,22 +192,22 @@ export default function AdminOrders() {
                 <td className="border px-2 py-1">{order.name}</td>
                 <td className="border px-2 py-1">{order.phone}</td>
                 <td className="border px-2 py-1">{order.address}</td>
-                 <td className="border px-2 py-1">{order.delivery_method}</td>
-                 <td className="border px-2 py-1">
+                <td className="border px-2 py-1">{order.delivery_method}</td>
+                <td className="border px-2 py-1">
                   <span
-                    className={`px-2 py-1 rounded text-white ${ order.delivery_status === "pending" ? "bg-yellow-500" : order.delivery_status === "delivered"  ? "bg-green-600" : "bg-gray-400"}`}>
+                    className={`px-2 py-1 rounded text-white ${order.delivery_status === "pending" ? "bg-yellow-500" : order.delivery_status === "delivered" ? "bg-green-600" : "bg-gray-400"}`}>
                     {order.delivery_status}
                   </span>
                 </td>
                 {/* <td className="border px-2 py-1">{order.email}</td> */}
                 <td className="border px-2 py-1">₦{order.total_amount?.toLocaleString() || 0}</td>
                 <td className="border px-2 py-1">
-                  <span className={`px-2 py-1 rounded text-white ${ order.status === "pending" ? "bg-yellow-500" : order.status === "completed" ? "bg-green-600" : "bg-gray-400"  }`}>
+                  <span className={`px-2 py-1 rounded text-white ${order.status === "pending" ? "bg-yellow-500" : order.status === "completed" ? "bg-green-600" : "bg-gray-400"}`}>
                     {order.status}
                   </span>
                 </td>
-               
-                
+
+
                 <td className="border px-2 py-1">{order.reference}</td>
                 <td className="border px-2 py-1">{new Date(order.created_at).toLocaleString()}</td>
                 <td className="border px-2 py-1 flex gap-2">
@@ -215,20 +215,20 @@ export default function AdminOrders() {
                     onClick={() => { setExpandedOrder(expandedOrder === order.id ? null : order.id); window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth", }) }}>
                     {expandedOrder === order.id ? "Hide Items" : "View Items"}
                   </button>
-                  <ToggleDeliveryButton orderId={order.id} currentStatus={order.delivery_status} onStatusChange={fetchOrders}/>
+                  <ToggleDeliveryButton orderId={order.id} currentStatus={order.delivery_status} onStatusChange={fetchOrders} />
                   <NotifyCustomerButton order={order} />
-                
-                 {order.status === "pending" && (
+
+                  {order.status === "pending" && (
                     <DeleteOrderButton orderId={order.id} onDelete={fetchOrders} />
                   )}
 
-                    {order.status === "paid" && (
-                      <RefundOrderButton orderId={order.id} onRefund={fetchOrders} />
-                    )}
+                  {order.status === "paid" && (
+                    <RefundOrderButton orderId={order.id} onRefund={fetchOrders} />
+                  )}
 
-                    {order.status === "refunded" && (
-                      <span className="text-red-600 font-semibold">Refunded</span>
-                    )}
+                  {order.status === "refunded" && (
+                    <span className="text-red-600 font-semibold">Refunded</span>
+                  )}
                 </td>
               </tr>
             ))}
@@ -250,7 +250,7 @@ export default function AdminOrders() {
             expandedOrder === order.id && (
               <div key={order.id + "-items"} className="mt-2 mb-4 border rounded bg-gray-50 p-4">
                 <h3 className="font-semibold mb-2">Order Items</h3>
-                {order.items?.length ? 
+                {order.items?.length ?
                   (
                     <table className="w-full border-collapse border border-gray-300">
                       <thead>
@@ -273,11 +273,11 @@ export default function AdminOrders() {
                         ))}
                       </tbody>
                     </table>
-                  ) 
-                  : 
+                  )
+                  :
                   (
                     <p>No items found for this order.</p>
-                   )
+                  )
                 }
               </div>
             )

@@ -23,7 +23,7 @@
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.542.0",
     "luxon": "^3.7.2",
-    "next": "^16.0.8",
+    "next": "^16.2.12",
     "nigeria-states": "^0.0.1",
     "nodemailer": "^7.0.6",
     "react": "^19.2.1",
@@ -41,7 +41,8 @@
     "sweetalert2": "^11.23.0",
     "tailwind-merge": "^3.3.1",
     "world-countries": "^5.1.0",
-    "yet-another-react-lightbox": "^3.25.0"
+    "yet-another-react-lightbox": "^3.25.0",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

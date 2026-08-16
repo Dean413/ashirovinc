@@ -5,27 +5,31 @@ import { useCart } from "@/context/cartcontext";
 import Image from "next/image";
 import Script from "next/script";
 import countries from "world-countries"
-import {getAllStates} from "nigeria-states"
+import { getAllStates } from "nigeria-states"
 import { useRouter } from "next/navigation";
 import FullPageLoader from "../component/page-reloader";
 import { toast } from "react-toastify";
 import { supabase } from "@/lib/supabaseclient";
+import { useAuth } from "../authprovider";
 
 
 export default function CheckoutPage() {
   const router = useRouter()
+  const { user } = useAuth();
   const [isPaying, setIsPaying] = useState(false);
   const { cartItems, getTotalItems, clearCart } = useCart();
-  const totalPrice = cartItems.reduce( (sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const nigeriaStates = getAllStates()
   const [loading, setLoading] = useState(false)
   const sortedCountries = countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
-  const [details, setDetails] = useState({name: "", email: "", phone: "", address: "", delivery: "", country: "", state: ""});
+  const [details, setDetails] = useState({ name: "", email: "", phone: "", address: "", delivery: "", country: "", state: "" });
   const [paystackLoaded, setPaystackLoaded] = useState(false);
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {setDetails({ ...details, [e.target.name]: e.target.value });};
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => { setDetails({ ...details, [e.target.name]: e.target.value }); };
 
   const createPendingOrder = async () => {
-    const { data: { user }, } = await supabase.auth.getUser();
+    // const { data: { user }, } = await supabase.auth.getUser();
+    // const serialAssignments = JSON.parse(localStorage.getItem("serial_reservations") || "{}");
+
     const serialAssignments = JSON.parse(localStorage.getItem("serial_reservations") || "{}");
     const res = await fetch("/api/create-order", {
       method: "POST",
@@ -41,9 +45,9 @@ export default function CheckoutPage() {
       }),
     });
 
-    const { orderId } = await res.json(); 
-      return orderId;
-    };
+    const { orderId } = await res.json();
+    return orderId;
+  };
 
   const handlePaystackPayment = async () => {
     if (!details.email || !details.name || !details.phone || !details.address || !details.delivery) {
@@ -58,16 +62,16 @@ export default function CheckoutPage() {
     setIsPaying(true)
 
     const orderId = await createPendingOrder(); // get the DB id first
-    
+
     const handler = (window as any).PaystackPop.setup({
       key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
-        
+
       email: details.email,
       amount: totalPrice * 100, // Paystack expects kobo
       currency: "NGN",
       firstname: details.name,
       phone: details.phone,
-      metadata: {order_id: orderId,},   // ✅ Paystack will send this back in the webhook,
+      metadata: { order_id: orderId, },   // ✅ Paystack will send this back in the webhook,
       callback: function (response: any) {
         setLoading(true);
         toast.success("Payment successful. Reference: " + response.reference);
@@ -80,9 +84,9 @@ export default function CheckoutPage() {
             reference: response.reference,
           };
           localStorage.setItem("lastOrder", JSON.stringify(orderData));
-          const { data: { user }, } = await supabase.auth.getUser();
+          // const { data: { user }, } = await supabase.auth.getUser();
           await fetch("/api/update-order", {
-            
+
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -125,10 +129,10 @@ export default function CheckoutPage() {
             )}
             <div className="flex-1">
               {item.brand && (<p className="text-gray-500 text-sm">{item.brand}</p>)}
-                <p className="font-bold">{item.name}</p>
-                <p>₦{item.price.toLocaleString()}</p>
-                <p>Qty: {item.quantity}</p>
-                <p>Total: ₦{(item.price * item.quantity).toLocaleString()}</p>
+              <p className="font-bold">{item.name}</p>
+              <p>₦{item.price.toLocaleString()}</p>
+              <p>Qty: {item.quantity}</p>
+              <p>Total: ₦{(item.price * item.quantity).toLocaleString()}</p>
             </div>
           </div>
         ))}
@@ -195,7 +199,7 @@ export default function CheckoutPage() {
               ))}
             </select>
           </div>
-            
+
           <div>
             <label className="block text-sm font-medium mb-1">Phone</label>
             <input
@@ -275,13 +279,13 @@ export default function CheckoutPage() {
             <Image src="/visa-logo.jpg" alt="Visa" width={30} height={30} />
           </div>
           <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
-            <Image src="/master-card-logo.jpg" alt="Mastercard" width={30} height={30} />            
+            <Image src="/master-card-logo.jpg" alt="Mastercard" width={30} height={30} />
           </div>
           <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
-            <Image src="/mtn-logo.jpg" alt="MTN" width={30} height={30} />            
+            <Image src="/mtn-logo.jpg" alt="MTN" width={30} height={30} />
           </div>
           <div className="border rounded-md px-3 py-2 flex items-center gap-2 shadow-sm">
-            <Image src="/airtel-logo.jpg" alt="Airtel Tigo" width={30} height={30} />              
+            <Image src="/airtel-logo.jpg" alt="Airtel Tigo" width={30} height={30} />
           </div>
           {/* + More */}
           <div className="text-sm text-gray-400">+3 more</div>
@@ -297,16 +301,16 @@ export default function CheckoutPage() {
           SubTotal ({getTotalItems()} items): ₦{totalPrice.toLocaleString()}
         </p>
         <button onClick={handlePaystackPayment} disabled={!paystackLoaded || isPaying}
-          className={`bg-blue-600 text-white px-6 py-3 rounded transition ${!paystackLoaded || isPaying ? "opacity-60 cursor-not-allowed"  : "hover:bg-blue-700"}`}>
+          className={`bg-blue-600 text-white px-6 py-3 rounded transition ${!paystackLoaded || isPaying ? "opacity-60 cursor-not-allowed" : "hover:bg-blue-700"}`}>
           {isPaying ? "Processing…" : "Pay Now"}
         </button>
       </div>
       {/* Paystack Script */}
-        <Script
+      <Script
         src="https://js.paystack.co/v1/inline.js"
         strategy="afterInteractive"
         onLoad={() => setPaystackLoaded(true)}
-      /> 
+      />
     </div>
   );
 }

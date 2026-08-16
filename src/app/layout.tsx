@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     title: "AshirowInc – Affordable Used Laptops & Computers",
     description:
       "Get premium UK-used laptops and computers with warranty and fast nationwide delivery.",
-      siteName: "AshirovInc",
+    siteName: "AshirovInc",
     images: [
       {
         url: "https://ashirovinc.com/og-image.jpg",
@@ -56,16 +56,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ClientProviders>
           {children}
           <ToastContainer
-        position="top-center"
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss={false}
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+            position="top-center"
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            pauseOnFocusLoss={false}
+            draggable
+            pauseOnHover
+            theme="light"
+          />
 
         </ClientProviders>
       </body>

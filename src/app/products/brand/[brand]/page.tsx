@@ -82,8 +82,7 @@ export default function BrandPage({ params }: { params: Promise<{ brand: string 
             return (
               <div
                 key={product.id}
-                className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col"
-              >
+                className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition flex flex-col">
                 {/* Product Image */}
                 <div className="relative w-full h-64 md:h-72 lg:h-80">
                   <Link href={`/products/${product.slug}`}>
@@ -92,7 +91,7 @@ export default function BrandPage({ params }: { params: Promise<{ brand: string 
                         src={product.image_url[currentIndex]}
                         alt={product.name}
                         fill
-                        style={{ objectFit: "cover" }}
+                        style={{ objectFit: "contain" }}
                         className="w-full h-full"
                       />
                     ) : (
@@ -170,9 +169,8 @@ export default function BrandPage({ params }: { params: Promise<{ brand: string 
                       });
                     }}
                     disabled={isOutOfStock}
-                    className={`mt-4 px-4 py-2 rounded-lg text-white transition w-full ${
-                      isOutOfStock ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-                    }`}
+                    className={`mt-4 px-4 py-2 rounded-lg text-white transition w-full ${isOutOfStock ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                      }`}
                   >
                     {isOutOfStock ? "Out of Stock" : "Add to Cart"}
                   </button>

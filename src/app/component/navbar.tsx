@@ -9,7 +9,7 @@ import { FaFacebook, FaTwitter, FaInstagram, FaWhatsapp, FaUser, FaUserCheck, Fa
 import SearchBar from "./search-bar";
 import { useCart } from "@/context/cartcontext";;
 import { useRouter, usePathname } from "next/navigation";
-import {Typewriter} from "react-simple-typewriter"
+import { Typewriter } from "react-simple-typewriter"
 import { supabase } from "@/lib/supabaseclient";
 
 const getInitials = (user: any) => {
@@ -38,40 +38,40 @@ export default function Navbar() {
   const isDashboard = pathname?.startsWith("/dashboard/client-dashboard");
 
   useEffect(() => {
-  if (open) {
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "";
-  }
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
 
-  return () => {
-    document.body.style.overflow = "";
-  };
-}, [open]);
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
 
   useEffect(() => {
-  const handleScroll = () => {
-    const currentScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
 
-    if (currentScrollY < 10) {
-      // Always show at top
-      setShowNavbar(true);
-    } else if (currentScrollY > lastScrollY.current) {
-      // Scrolling down → hide
-      setShowNavbar(false);
-    } else {
-      // Scrolling up → show
-      setShowNavbar(true);
-    }
+      if (currentScrollY < 10) {
+        // Always show at top
+        setShowNavbar(true);
+      } else if (currentScrollY > lastScrollY.current) {
+        // Scrolling down → hide
+        setShowNavbar(false);
+      } else {
+        // Scrolling up → show
+        setShowNavbar(true);
+      }
 
-    lastScrollY.current = currentScrollY;
-  };
+      lastScrollY.current = currentScrollY;
+    };
 
-  window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
 
   // ✅ Detect click outside
@@ -118,44 +118,44 @@ export default function Navbar() {
       <header className={`bg-blue-950 text-white py-2 px-4 sticky top-0 z-50 ${open ? "hidden" : "block"}`}>
         <div className="relative max-w-7xl mx-auto flex items-center justify-end gap-4 text-xs md:text-sm">
           <span className="absolute left-[30%] md:left-1/2 transform -translate-x-1/2 font-semibold">
-         <Typewriter
-          words={[
-            'Welcome to Ashirov Inc',
-            'Affordable Quality Laptops in Nigeria',
-            'Your Trusted Source for UK-Used Computers',
-            'Get the Best Deals on Reliable Tech',
-            'Shop Smart, Work Faster with Ashirov Inc',
-          ]}
-          loop={false}
-          cursor
-          cursorStyle="|"
-          typeSpeed={50}
-          deleteSpeed={50}
-          delaySpeed={2000}
-        />
+            <Typewriter
+              words={[
+                'Welcome to Ashirov Inc',
+                'Affordable Quality Laptops in Nigeria',
+                'Your Trusted Source for UK-Used Computers',
+                'Get the Best Deals on Reliable Tech',
+                'Shop Smart, Work Faster with Ashirov Inc',
+              ]}
+              loop={false}
+              cursor
+              cursorStyle="|"
+              typeSpeed={50}
+              deleteSpeed={50}
+              delaySpeed={2000}
+            />
 
-       
+
 
           </span>
           <div className="flex items-center gap-3">
-            <a href="https://www.facebook.com/share/17XYXACYee/" target="_blank" className="hover:text-blue-400"><FaFacebook /></a>          
-            <a href="https://www.tiktok.com/@ashirov_inc_" target="_blank"  className="hover:text-black"><FaTiktok /></a>
-            <a href="https://x.com/ASHirov_inc_?t=zgCQtUsVgTbFi-FcQZ99AA&s=09" target="_blank" className="hover:text-blue-600"><FaTwitter /></a>          
-            <a href="https://www.instagram.com/ashirov_inc_?igsh=MTUxN2lzcmp3a2hu" target="_blank" className="hover:text-red-500"><FaInstagram /></a>         
-            <a href="https://wa.me/2348156959605?text=Hello%2C%20I%20saw%20your%20website%20and%20wanted%20to%20chat!" target="_blank" className="hover:text-green-500"><FaWhatsapp /></a>                   
+            <a href="https://www.facebook.com/share/17XYXACYee/" target="_blank" className="hover:text-blue-400"><FaFacebook /></a>
+            <a href="https://www.tiktok.com/@ashirov_inc_" target="_blank" className="hover:text-black"><FaTiktok /></a>
+            <a href="https://x.com/ASHirov_inc_?t=zgCQtUsVgTbFi-FcQZ99AA&s=09" target="_blank" className="hover:text-blue-600"><FaTwitter /></a>
+            <a href="https://www.instagram.com/ashirov_inc_?igsh=MTUxN2lzcmp3a2hu" target="_blank" className="hover:text-red-500"><FaInstagram /></a>
+            <a href="https://wa.me/2348156959605?text=Hello%2C%20I%20saw%20your%20website%20and%20wanted%20to%20chat!" target="_blank" className="hover:text-green-500"><FaWhatsapp /></a>
           </div>
         </div>
       </header>
-         
+
 
       {/* Main Navbar */}
       <motion.nav initial={{ y: 0 }}
-  animate={{ y: showNavbar ? 0 : "-100%" }}
-  transition={{ duration: 0.25, ease: "easeInOut" }}
-  className="bg-white shadow-md px-6 fixed left-0 right-0 top-7 z-40">
+        animate={{ y: showNavbar ? 0 : "-100%" }}
+        transition={{ duration: 0.25, ease: "easeInOut" }}
+        className="bg-white shadow-md px-6 fixed left-0 right-0 top-7 z-40">
         <div className="container mx-auto flex items-center justify-between">
           {/* Mobile Menu Button */}
-          { <button onClick={() => setOpen(!open)} className="md:hidden p-2 rounded hover:bg-gray-100 focus:outline-none">{open ? <X size={28} /> : <Menu size={28} />}</button> }
+          {<button onClick={() => setOpen(!open)} className="md:hidden p-2 rounded hover:bg-gray-100 focus:outline-none">{open ? <X size={28} /> : <Menu size={28} />}</button>}
 
           {/* Logo */}
           <Link href="/" className="flex flex-1 justify-center md:justify-start">
@@ -185,66 +185,66 @@ export default function Navbar() {
 
               <li>
                 <Link href="/dashboard/client-dashboard/settings">
-                  {getAvatarOrInitials(user) ? 
-                  (
-                    <Image
-                      src={getAvatarOrInitials(user)}
-                      alt="Profile picture"
-                      width={40}
-                      height={40}
-                      className="w-10 h-10 rounded-full object-cover shadow-md"
-                    />
-                  ) 
-                  
-                  : 
-                  
-                  (
-                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold cursor-pointer shadow-md">
-                      {getInitials(user)}
-                    </div>
-                  )}
+                  {getAvatarOrInitials(user) ?
+                    (
+                      <Image
+                        src={getAvatarOrInitials(user)}
+                        alt="Profile picture"
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 rounded-full object-cover shadow-md"
+                      />
+                    )
+
+                    :
+
+                    (
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold cursor-pointer shadow-md">
+                        {getInitials(user)}
+                      </div>
+                    )}
                 </Link>
               </li>
             </ul>
-          ) 
-          
-          : 
-          
-          (
-            <ul className="hidden md:flex items-center space-x-6 text-gray-700 font-medium absolute left-1/2 transform -translate-x-1/2">
-              <li>
-                <Link href="/" className="hover:text-blue-700 transition">Home</Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-blue-700 transition">About</Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-blue-700 transition">Contact</Link>
-              </li>
-              <li>
-                <Link href="/book-repair" className="hover:text-blue-700 transition">Book a Repair</Link>
-              </li>
-              <li>
-                <Link href="/reviews" className="hover:text-blue-700 transition"></Link>
-              </li> 
-            </ul>
-          )}
+          )
+
+            :
+
+            (
+              <ul className="hidden md:flex items-center space-x-6 text-gray-700 font-medium absolute left-1/2 transform -translate-x-1/2">
+                <li>
+                  <Link href="/" className="hover:text-blue-700 transition">Home</Link>
+                </li>
+                <li>
+                  <Link href="/about" className="hover:text-blue-700 transition">About</Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="hover:text-blue-700 transition">Contact</Link>
+                </li>
+                <li>
+                  <Link href="/book-repair" className="hover:text-blue-700 transition">Book a Repair</Link>
+                </li>
+                <li>
+                  <Link href="/reviews" className="hover:text-blue-700 transition"></Link>
+                </li>
+              </ul>
+            )}
 
           {/* User icon for non-dashboard */}
-           {!isDashboard && (
+          {!isDashboard && (
             <>
-            <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"} className="hidden md:flex items-center space-x-4 ml-4">
-              {user ? 
-              <FaUserCheck size={24} className="text-blue-900 mr-2" /> 
-              : 
-              <FaUser size={24} className="text-blue-900 mr-2" />}
-            </Link>
-            <div className="hidden md:flex">
-              <SearchBar />
-            </div>
-            
+              <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"} className="hidden md:flex items-center space-x-4 ml-4">
+                {user ?
+                  <FaUserCheck size={24} className="text-blue-900 mr-2" />
+                  :
+                  <FaUser size={24} className="text-blue-900 mr-2" />}
+              </Link>
+              <div className="hidden md:flex">
+                <SearchBar />
+              </div>
+
             </>
-          )} 
+          )}
 
           {/* Cart Icon */}
           {!isDashboard && (
@@ -260,11 +260,11 @@ export default function Navbar() {
         </div>
 
         {open && (
-  <div
-    className="fixed inset-0 bg-black/50 z-40"
-    onClick={() => setOpen(false)}
-  />
-)}
+          <div
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setOpen(false)}
+          />
+        )}
 
         {/* Mobile Sidebar */}
         <AnimatePresence>
@@ -277,15 +277,15 @@ export default function Navbar() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="fixed top-0 left-0 h-full w-80 bg-white p-6 z-50 text-blue-900  shadow-lg flex flex-col space-y-6"
             >
-              { <button onClick={() => setOpen(false)} className="self-end text-blue-900 focus:outline-none">
+              {<button onClick={() => setOpen(false)} className="self-end text-blue-900 focus:outline-none">
                 <X size={28} />
               </button>}
 
-             
-               <div className="mb">
+
+              <div className="mb">
                 <SearchBar />
-                </div>
-              
+              </div>
+
 
               {<ul className="space-y-4 text-lg font-medium">
                 {isDashboard && user ? (
@@ -298,55 +298,55 @@ export default function Navbar() {
                     </li>
                     <li>
                       <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition"> Shop</Link>
-                     
+
                     </li>
                     <li>
                       <button onClick={signOut} className="rounded-full bg-white text-red-400 p-2 w-[80%] mx-auto text-center transition">Sign Out</button>
                     </li>
                   </>
-                ) 
-                
-                : 
-                
-                (
-                  <>
-                  
-                    <li>
-                      <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition"> Home</Link>
-                    </li>
-                  
-                    <li>
-                      <Link href="/about" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">About</Link>
-                    </li>
-                    <li>
-                      <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Contact</Link>
-                       
-                    </li>
-                     <li>
-                      <Link href="/book-repair" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Book a Repair</Link>
-                    </li>
-                    <div className="rounded-full bg-blue-900 text-white p-2 w-[80%] mx-auto text-center font-bold">
-                      <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
-                        {user ? "Account" : "Sign In"}
-                      </Link>
+                )
 
-                      
-                    </div>
-                    <div className="flex items-center gap-3 fixed bottom-5">
-                      <a href="https://www.facebook.com/share/17XYXACYee/" target="_blank" className="hover:text-blue-400"><FaFacebook /></a>          
-                      <a href="https://www.tiktok.com/@ashirov_inc_" target="_blank"  className="hover:text-black"><FaTiktok /></a>
-                      <a href="https://x.com/ASHirov_inc_?t=zgCQtUsVgTbFi-FcQZ99AA&s=09" target="_blank" className="hover:text-blue-600"><FaTwitter /></a>          
-                      <a href="https://www.instagram.com/ashirov_inc_?igsh=MTUxN2lzcmp3a2hu" target="_blank" className="hover:text-red-500"><FaInstagram /></a>         
-                      <a href="https://wa.me/2348156959605?text=Hello%2C%20I%20saw%20your%20website%20and%20wanted%20to%20chat!" target="_blank" className="hover:text-green-500"><FaWhatsapp /></a>                   
-                    </div>
-                  </>
-                )}
+                  :
+
+                  (
+                    <>
+
+                      <li>
+                        <Link href="/" onClick={() => setOpen(false)} className="hover:text-gray-300 transition"> Home</Link>
+                      </li>
+
+                      <li>
+                        <Link href="/about" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">About</Link>
+                      </li>
+                      <li>
+                        <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Contact</Link>
+
+                      </li>
+                      <li>
+                        <Link href="/book-repair" onClick={() => setOpen(false)} className="hover:text-gray-300 transition">Book a Repair</Link>
+                      </li>
+                      <div className="rounded-full bg-blue-900 text-white p-2 w-[80%] mx-auto text-center font-bold">
+                        <Link href={user ? "/dashboard/client-dashboard" : "/sign-in"}>
+                          {user ? "Account" : "Sign In"}
+                        </Link>
+
+
+                      </div>
+                      <div className="flex items-center gap-3 fixed bottom-5">
+                        <a href="https://www.facebook.com/share/17XYXACYee/" target="_blank" className="hover:text-blue-400"><FaFacebook /></a>
+                        <a href="https://www.tiktok.com/@ashirov_inc_" target="_blank" className="hover:text-black"><FaTiktok /></a>
+                        <a href="https://x.com/ASHirov_inc_?t=zgCQtUsVgTbFi-FcQZ99AA&s=09" target="_blank" className="hover:text-blue-600"><FaTwitter /></a>
+                        <a href="https://www.instagram.com/ashirov_inc_?igsh=MTUxN2lzcmp3a2hu" target="_blank" className="hover:text-red-500"><FaInstagram /></a>
+                        <a href="https://wa.me/2348156959605?text=Hello%2C%20I%20saw%20your%20website%20and%20wanted%20to%20chat!" target="_blank" className="hover:text-green-500"><FaWhatsapp /></a>
+                      </div>
+                    </>
+                  )}
               </ul>}
             </motion.div>
           )}
         </AnimatePresence>
       </motion.nav>
-      
+
     </>
   );
 }

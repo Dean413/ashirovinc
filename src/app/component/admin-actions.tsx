@@ -2,13 +2,18 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
-import { supabase } from "@/lib/supabaseclient";
+// import { supabase } from "@/lib/supabaseclient";
+import { useAuthStore } from "../authStore/authStore";
 
-const { data: { session } } = await supabase.auth.getSession();
-const accessToken = session?.access_token;
+// const { data: { session } } = await supabase.auth.getSession();
+// const accessToken = session?.access_token;
+
+function getAccessToken() {
+  return useAuthStore.getState().getAccessToken();
+}
 
 // --------- Toggle Delivery Button ----------
-export function ToggleDeliveryButton({orderId, currentStatus, onStatusChange,}: {orderId: string;currentStatus: string; onStatusChange: () => void;}) {
+export function ToggleDeliveryButton({ orderId, currentStatus, onStatusChange, }: { orderId: string; currentStatus: string; onStatusChange: () => void; }) {
   const [loading, setLoading] = useState(false);
   const handleClick = async () => {
     const nextStatus = currentStatus === "pending" ? "delivered" : "pending";
@@ -26,8 +31,10 @@ export function ToggleDeliveryButton({orderId, currentStatus, onStatusChange,}: 
       setLoading(true);
       const res = await fetch("/api/update-delivery", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" ,
-        "Authorization": `Bearer ${accessToken}`},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${getAccessToken()}`
+        },
         body: JSON.stringify({ orderId, status: nextStatus }),
       });
       const data = await res.json();
@@ -50,14 +57,14 @@ export function ToggleDeliveryButton({orderId, currentStatus, onStatusChange,}: 
       {loading
         ? "Updating..."
         : currentStatus === "pending"
-        ? "Mark Delivered"
-        : "Mark Pending"}
+          ? "Mark Delivered"
+          : "Mark Pending"}
     </button>
   );
 }
 
 // --------- Delete Order Button ----------
-export function DeleteOrderButton({orderId, onDelete,}: {orderId: string; onDelete: () => void;}) {
+export function DeleteOrderButton({ orderId, onDelete, }: { orderId: string; onDelete: () => void; }) {
   const [loading, setLoading] = useState(false);
   const handleClick = async () => {
     const result = await Swal.fire({
@@ -75,8 +82,11 @@ export function DeleteOrderButton({orderId, onDelete,}: {orderId: string; onDele
       setLoading(true);
       const res = await fetch(`/api/delete-order?id=${orderId}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" ,
-        "Authorization": `Bearer ${accessToken}`},
+        headers: {
+          "Content-Type": "application/json",
+          // "Authorization": `Bearer ${accessToken}`},
+          "Authorization": `Bearer ${getAccessToken()}`
+        },
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete order");
@@ -100,7 +110,7 @@ export function DeleteOrderButton({orderId, onDelete,}: {orderId: string; onDele
   );
 }
 
-export function NotifyCustomerButton({order,}: {order: {id: string; email: string; name: string; delivery_method: string; address: string;};}) {
+export function NotifyCustomerButton({ order, }: { order: { id: string; email: string; name: string; delivery_method: string; address: string; }; }) {
   const [loading, setLoading] = useState(false);
   const handleClick = async () => {
     const result = await Swal.fire({
@@ -118,8 +128,10 @@ export function NotifyCustomerButton({order,}: {order: {id: string; email: strin
       setLoading(true);
       const res = await fetch("/api/notify-customer", {
         method: "POST",
-        headers: { "Content-Type": "application/json" ,
-        "Authorization": `Bearer ${accessToken}`},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${getAccessToken()}`
+        },
         body: JSON.stringify({
           email: order.email,
           name: order.name,
@@ -178,8 +190,10 @@ export function RefundOrderButton({
 
       const res = await fetch(`/api/refund-order?id=${orderId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" ,
-        "Authorization": `Bearer ${accessToken}`},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${getAccessToken()}`
+        },
       });
 
       const data = await res.json();
@@ -198,7 +212,7 @@ export function RefundOrderButton({
     <button
       onClick={handleClick}
       disabled={loading}
-     className="px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 flex items-center gap-2 disabled:opacity-50">
+      className="px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 flex items-center gap-2 disabled:opacity-50">
       {loading && <Spinner />}
       {loading ? "Processing..." : "Refund Order"}
     </button>
